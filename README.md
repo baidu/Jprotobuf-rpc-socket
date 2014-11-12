@@ -7,7 +7,7 @@ Protobuf RPC是一种基于TCP协议的二进制RPC通信协议。它以Protobuf
 [https://github.com/jhunters/jprotobuf](https://github.com/jhunters/jprotobuf "https://github.com/jhunters/jprotobuf")
 
 ## 协议规范 ##
-[https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83 "协议规范")
+[https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83 "协议规范")
 
 
 ## 使用示例 ##
@@ -18,7 +18,7 @@ Protobuf RPC是一种基于TCP协议的二进制RPC通信协议。它以Protobuf
 Jprotobuf-rpc-socket基于JProtobuf基础上开发，可帮助大家开发中省去编写Google Protobuf的IDL描述文件的过程。
 
 ##### 客户端开发 #####
-1. EchoService功用实现
+1.EchoService功用实现
 
 EchoService 提供一个echo方法 ，参数对象EchoInfo只有一个message属性。
 下面是EchoInfo对象定义
@@ -45,7 +45,7 @@ message InterClassName {
 
 
 ```
-2. 定义EchoService接口
+2.定义EchoService接口
 ```java
 public interface EchoService {
 
@@ -67,7 +67,7 @@ RPC的方法必须要指定@ProtobufRPC注解. serviceName与methodName要与服
 这里未指定methodName，则使用方法的名称 "echo"
 
 
-3. 创建RPC Client进行访问
+3.创建RPC Client进行访问
 ```java
 RpcClient rpcClient = new RpcClient();
 // 创建EchoService代理
@@ -81,7 +81,7 @@ EchoInfo response = echoService.echo(request);
 ```
 
 ##### 服务端开发 #####
-1. 开发服务实现类
+1.开发服务实现类
 ```java
 public class EchoServiceImpl {
 
@@ -96,7 +96,7 @@ public class EchoServiceImpl {
 ```
 服务发布的RPC方法必须用@ProtobufPRCService注解进行标识
 
-2. 发布RPC服务
+2.发布RPC服务
 ```java
 	RpcServer rpcServer = new RpcServer();
 	
