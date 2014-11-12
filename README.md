@@ -19,6 +19,7 @@ Jprotobuf-rpc-socket基于JProtobuf基础上开发，可帮助大家开发中省
 
 ##### 客户端开发 #####
 1. EchoService功用实现
+
 EchoService 提供一个echo方法 ，参数对象EchoInfo只有一个message属性。
 下面是EchoInfo对象定义
 ```java
