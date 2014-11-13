@@ -7,49 +7,54 @@
  */
 package com.baidu.jprotobuf.pbrpc.server;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
-import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+import com.google.protobuf.GeneratedMessage;
 
 /**
- * RPC handler for Jprotobuf annotation.
+ * RPC handler for Google protoc generated java code.
  *
  * @author xiemalin
- * @since 1.0
+ * @since 1.2
  */
-public class AnnotationRpcHandler extends AbstractRpcHandler {
+public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
+    
+    private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
-    private Codec inputCodec;
-    private Codec outputCodec;
+    private Method parseFromMethod;
     
     /**
      * @param method
      * @param service
+     * @param protobufPRCService
      */
-    public AnnotationRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    public MessageGeneratedRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
         super(method, service, protobufPRCService);
-        if (getInputClass() != null) {
-            inputCodec = ProtobufProxy.create(getInputClass());
-        }
-        if (getOutputClass() != null) {
-            outputCodec = ProtobufProxy.create(getOutputClass());
-        }
         
+        if (getInputClass() != null) {
+            if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
+                try {
+                    parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        }
     }
 
     /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(byte[])
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc.server.RpcData)
      */
     public RpcData doHandle(RpcData data) throws Exception {
+        
         Object input = null;
         Object[] param;
         Object ret;
-        if (data.getData() != null && inputCodec != null) {
-            input = inputCodec.decode(data.getData());
+        if (data.getData() != null && parseFromMethod != null) {
+            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));;
             param = new Object[] {input};
         } else {
             param = new Object[0];
@@ -68,16 +73,12 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
             return retData;
         }
         
-        if (outputCodec != null) {
-            byte[] response = outputCodec.encode(ret);
+        if (ret != null && ret instanceof GeneratedMessage) {
+            byte[] response = ((GeneratedMessage) input).toByteArray();
             retData.setData(response);
         }
         
         return retData;
     }
-
-
-    
-    
 
 }

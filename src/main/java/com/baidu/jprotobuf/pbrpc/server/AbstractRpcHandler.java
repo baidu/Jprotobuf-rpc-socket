@@ -9,8 +9,10 @@ package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
 
+import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
+import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -31,6 +33,7 @@ public abstract class AbstractRpcHandler implements RpcHandler {
     private Class outputClass;
     private Object service;
 
+    private ServerAttachmentHandler attachmentHandler;
     /**
      * get the method
      * 
@@ -79,6 +82,17 @@ public abstract class AbstractRpcHandler implements RpcHandler {
         if (!ReflectionUtils.isVoid(returnType)) {
             outputClass = returnType;
         }
+        
+        // process attachment handler
+        Class<? extends ServerAttachmentHandler> attachmentHandlerClass = protobufPRCService.attachmentHandler();
+        if (attachmentHandlerClass != DummyServerAttachmentHandler.class) {
+            try {
+                attachmentHandler = attachmentHandlerClass.newInstance();
+            } catch (Exception e) {
+                throw new IllegalAccessError("Can not initialize 'logIDGenerator' of class '"
+                        + attachmentHandlerClass.getName() + "'");
+            }
+        }
     }
 
     /**
@@ -124,6 +138,14 @@ public abstract class AbstractRpcHandler implements RpcHandler {
      */
     protected String getMethodName() {
         return methodName;
+    }
+
+    /**
+     * get the attachmentHandler
+     * @return the attachmentHandler
+     */
+    public ServerAttachmentHandler getAttachmentHandler() {
+        return attachmentHandler;
     }
 
 }

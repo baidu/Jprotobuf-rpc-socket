@@ -97,18 +97,20 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                                     + "] method name [" + methodName + "]");
                 }
                 
+                RpcMethodInfo methodInfo;
                 if (!RpcMethodInfo.isMessageType(method)) {
                     // using POJO
-                    PojoRpcMethodInfo methodInfo = new PojoRpcMethodInfo(method, protobufPRC);
-                    methodInfo.setOnceTalkTimeout(protobufPRC.onceTalkTimeout());
-                    methodInfo.setServiceName(serviceName);
-                    methodInfo.setMethodName(methodName);
-                    
-                    cachedRpcMethods.put(methodSignature, methodInfo);
+                    methodInfo = new PojoRpcMethodInfo(method, protobufPRC);
                     
                 } else {
-                    // TODO support google protobuf GeneratedMessage
+                    // support google protobuf GeneratedMessage
+                    methodInfo = new GeneratedMessageRpcMethodInfo(method, protobufPRC);
                 }
+                methodInfo.setOnceTalkTimeout(protobufPRC.onceTalkTimeout());
+                methodInfo.setServiceName(serviceName);
+                methodInfo.setMethodName(methodName);
+                
+                cachedRpcMethods.put(methodSignature, methodInfo);
                 
             }
         }
