@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.BaseTest;
-import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;

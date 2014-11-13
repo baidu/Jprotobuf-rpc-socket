@@ -11,9 +11,7 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
-import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 
 /**
  * RPC handler for Jprotobuf annotation.

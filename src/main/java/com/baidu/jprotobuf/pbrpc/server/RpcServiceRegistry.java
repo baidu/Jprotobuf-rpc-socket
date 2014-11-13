@@ -66,17 +66,16 @@ public class RpcServiceRegistry {
     
     private void doRegiterService(Method method, Object service, ProtobufPRCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
+        AbstractRpcHandler rpcHandler;
         if (!messageType) {
-            AnnotationRpcHandler rpcHandler = new AnnotationRpcHandler(method, service, protobufPRCService);
-            
-            if (StringUtils.isEmpty(rpcHandler.getServiceName())) {
-                throw new IllegalArgumentException(" serviceName from 'serviceExporter' is empty.");
-            }
-            
-            serviceMap.put(getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName()), rpcHandler);
+            rpcHandler = new AnnotationRpcHandler(method, service, protobufPRCService);
         } else {
-            // TODO
+            rpcHandler = new MessageGeneratedRpcHandler(method, service, protobufPRCService);
         }
+        if (StringUtils.isEmpty(rpcHandler.getServiceName())) {
+            throw new IllegalArgumentException(" serviceName from 'serviceExporter' is empty.");
+        }
+        serviceMap.put(getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName()), rpcHandler);
     }
     
     private String getMethodSignature(String serviceName, String method) {

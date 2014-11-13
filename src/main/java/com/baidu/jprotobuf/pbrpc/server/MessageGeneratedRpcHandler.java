@@ -74,7 +74,7 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
         }
         
         if (ret != null && ret instanceof GeneratedMessage) {
-            byte[] response = ((GeneratedMessage) input).toByteArray();
+            byte[] response = ((GeneratedMessage) ret).toByteArray();
             retData.setData(response);
         }
         
