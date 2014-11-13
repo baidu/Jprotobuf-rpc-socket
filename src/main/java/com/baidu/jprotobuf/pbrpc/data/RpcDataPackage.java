@@ -9,6 +9,11 @@ package com.baidu.jprotobuf.pbrpc.data;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
+import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 
 /**
  * 
@@ -329,6 +334,37 @@ public class RpcDataPackage implements Readable, Writerable {
             bais.read(attachment, 0, attachmentSize);
         }
         
+    }
+    
+    public static RpcDataPackage buildRpcDataPackage(RpcMethodInfo methodInfo, Object[] args) throws IOException {
+        RpcDataPackage dataPacage = new RpcDataPackage();
+        dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
+        dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethod().getName());
+        // set data
+        if (args.length == 1) {
+            byte[] data = methodInfo.inputEncode(args[0]);
+            if (data != null) {
+                dataPacage.data(data);
+            }
+        }
+        
+        // set logid
+        LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
+        if (logIDGenerator != null) {
+            long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
+            dataPacage.logId(logId);
+        }
+        
+        // set attachment
+        ClientAttachmentHandler attachmentHandler = methodInfo.getClientAttachmentHandler();
+        if (attachmentHandler != null) {
+            byte[] attachment = attachmentHandler.handleRequest(methodInfo.getServiceName(), 
+                    methodInfo.getMethod().getName(), args);
+            if (attachment != null) {
+                dataPacage.attachment(attachment);
+            }
+        }
+        return dataPacage;
     }
     
 }

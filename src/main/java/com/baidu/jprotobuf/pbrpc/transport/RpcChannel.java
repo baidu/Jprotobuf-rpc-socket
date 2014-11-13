@@ -51,9 +51,6 @@ public class RpcChannel {
 
         long callMethodStart = System.currentTimeMillis();
 
-        // set correlationId
-        rpcDataPackage.getRpcMeta().setCorrelationId(rpcClient.getNextCorrelationId());
-
         // register timer
         Timeout timeout = rpcClient.getTimer().newTimeout(
                 new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient), onceTalkTimeout,

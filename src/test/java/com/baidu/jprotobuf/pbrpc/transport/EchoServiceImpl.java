@@ -10,7 +10,8 @@ package com.baidu.jprotobuf.pbrpc.transport;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 
 /**
- *
+ * Echo service 
+ * 
  * @author xiemalin
  * @since 1.0
  */
@@ -20,8 +21,13 @@ public class EchoServiceImpl {
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage());
-        
+
         return ret;
     }
-    
+
+    @ProtobufPRCService(serviceName = "echoService", methodName = "echoWithAttachement", 
+            attachmentHandler = EchoServerAttachmentHandler.class)
+    public EchoInfo dealWithAttachement(EchoInfo info) {
+        return doEcho(info);
+    }
 }

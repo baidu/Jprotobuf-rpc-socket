@@ -7,6 +7,8 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
+import com.baidu.jprotobuf.pbrpc.server.RpcData;
+
 /**
  * RPC handle for each request and response
  * 
@@ -20,6 +22,6 @@ public interface RpcHandler {
      * @param data
      * @exception Exception in case of any exception in handle
      */
-    byte[] doHandle(byte[] data) throws Exception;
+    RpcData doHandle(RpcData data) throws Exception;
 
 }

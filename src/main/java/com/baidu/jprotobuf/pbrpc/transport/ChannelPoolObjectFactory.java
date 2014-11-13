@@ -47,7 +47,7 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
         // Wait until the connection is made successfully.
         future.awaitUninterruptibly();
         if (!future.isSuccess()) {
-            LOGGER.log(Level.SEVERE, "failed to get result from stp", connection.getFuture().getCause());
+            LOGGER.log(Level.SEVERE, "failed to get result from stp", future.getCause());
         } else {
             connection.setIsConnected(true);
         }

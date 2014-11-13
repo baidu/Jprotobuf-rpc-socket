@@ -11,14 +11,12 @@ import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 
 /**
- * Base test case.
+ * Base performace test case.
  *
  * @author xiemalin
  * @since 1.0
  */
-public abstract class BasePerformaceTest {
-    protected static final String HOST = System.getProperty("host", "127.0.0.1");
-    protected static final int PORT = Integer.parseInt(System.getProperty("port", "1031"));
+public abstract class BasePerformaceTest extends BaseTest {
     
     String formatString = "|%20s|%20s|%22s|%20s|%20s|";
     

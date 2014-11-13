@@ -11,7 +11,9 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 
 /**
  * RPC handler for Jprotobuf annotation.
@@ -23,7 +25,7 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
 
     private Codec inputCodec;
     private Codec outputCodec;
-    
+    private ServerAttachmentHandler attachmentHandler;
     /**
      * @param method
      * @param service
@@ -37,30 +39,52 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
             outputCodec = ProtobufProxy.create(getOutputClass());
         }
         
+        // process attachment handler
+        Class<? extends ServerAttachmentHandler> attachmentHandlerClass = protobufPRCService.attachmentHandler();
+        if (attachmentHandlerClass != DummyServerAttachmentHandler.class) {
+            try {
+                attachmentHandler = attachmentHandlerClass.newInstance();
+            } catch (Exception e) {
+                throw new IllegalAccessError("Can not initialize 'logIDGenerator' of class '"
+                        + attachmentHandlerClass.getName() + "'");
+            }
+        }
+        
     }
 
     /* (non-Javadoc)
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(byte[])
      */
-    public byte[] doHandle(byte[] data) throws Exception {
+    public RpcData doHandle(RpcData data) throws Exception {
         Object input = null;
+        Object[] param;
         Object ret;
-        if (data != null && inputCodec != null) {
-            input = inputCodec.decode(data);
-            ret = getMethod().invoke(getService(), new Object[] {input});
+        if (data.getData() != null && inputCodec != null) {
+            input = inputCodec.decode(data.getData());
+            param = new Object[] {input};
         } else {
-            ret = getMethod().invoke(getService(), new Object[0]);
+            param = new Object[0];
         }
         
+        RpcData retData = new RpcData();
+        // process attachment
+        if (attachmentHandler != null) {
+            byte[] responseAttachment = attachmentHandler.handleAttachement(data.getAttachment(), getServiceName(), getMethodName(), param);
+            retData.setAttachment(responseAttachment);
+        }
+        
+        ret = getMethod().invoke(getService(), param);
+        
         if (ret == null) {
-            return null;
+            return retData;
         }
         
         if (outputCodec != null) {
-            return outputCodec.encode(ret);
+            byte[] response = outputCodec.encode(ret);
+            retData.setData(response);
         }
         
-        return null;
+        return retData;
     }
 
 

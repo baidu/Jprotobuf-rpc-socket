@@ -7,6 +7,8 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -20,10 +22,58 @@ import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
  * @see EchoService
  * 
  */
-public class EchoServiceTest {
+public class EchoServiceTest extends BaseEchoServiceTest {
     
-    static final String HOST = System.getProperty("host", "127.0.0.1");
-    static final int PORT = Integer.parseInt(System.getProperty("port", "1031"));
+    /**
+     * test client auto recover connection from server.
+     */
+    @Test
+    public void testAutoRecoverConnection() {
+
+        EchoInfo echoInfo = getEchoInfo();
+        
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+        
+        EchoInfo response = echoService.echo(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+        
+        // here stop server
+        stopServer();
+        
+        try {
+            echoService.echo(echoInfo);
+            Assert.fail("should be connect server failed.");
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
+        
+        startServer();
+        
+        response = echoService.echo(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+    }
+
+    /**
+     * @return
+     */
+    private EchoInfo getEchoInfo() {
+        String message = "xiemalin";
+        // test success
+        EchoInfo echoInfo = new EchoInfo();
+        echoInfo.setMessage(message);
+        return echoInfo;
+    }
+    
+    @Test
+    public void testAttachment() {
+        EchoInfo echoInfo = getEchoInfo();
+        
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+        
+        EchoInfo response = echoService.echoWithAttachement(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+    }
+    
 
     /**
      * 

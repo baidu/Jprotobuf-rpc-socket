@@ -7,16 +7,13 @@
  */
 package com.baidu.jprotobuf.pbrpc.client;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
-import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
-import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
@@ -159,7 +156,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
         
         BlockingRpcCallback callback = new BlockingRpcCallback();
-        RpcDataPackage rpcDataPackage = buildRpcDataPackage(rpcMethodInfo, args);
+        RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
+        // set correlationId
+        rpcDataPackage.getRpcMeta().setCorrelationId(rpcClient.getNextCorrelationId());
         rpcChannel.doTransport(rpcDataPackage, callback, onceTalkTimeout);
         
         if (!callback.isDone()) {
@@ -203,35 +202,5 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         return rpcMethodInfo.outputDecode(data);
     }
     
-    protected RpcDataPackage buildRpcDataPackage(RpcMethodInfo methodInfo, Object[] args) throws IOException {
-        RpcDataPackage dataPacage = new RpcDataPackage();
-        dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
-        dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethod().getName());
-        // set data
-        if (args.length == 1) {
-            byte[] data = methodInfo.inputEncode(args[0]);
-            if (data != null) {
-                dataPacage.data(data);
-            }
-        }
-        
-        // set logid
-        LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
-        if (logIDGenerator != null) {
-            long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
-            dataPacage.logId(logId);
-        }
-        
-        // set attachment
-        ClientAttachmentHandler attachmentHandler = methodInfo.getClientAttachmentHandler();
-        if (attachmentHandler != null) {
-            byte[] attachment = attachmentHandler.handleRequest(methodInfo.getServiceName(), 
-                    methodInfo.getMethod().getName(), args);
-            if (attachment != null) {
-                dataPacage.attachment(attachment);
-            }
-        }
-        return dataPacage;
-    }
 
 }

@@ -14,6 +14,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
+import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 
 /**
@@ -64,8 +65,17 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
         } else {
             
             byte[] data = dataPackage.getData();
-            byte[] result = handler.doHandle(data);
-            dataPackage.data(result);
+            RpcData request = new RpcData();
+            request.setData(data);
+            request.setAttachment(dataPackage.getAttachment());
+            if (dataPackage.getRpcMeta() != null) {
+                request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
+            }
+            
+            RpcData response = handler.doHandle(request);
+            dataPackage.data(response.getData());
+            dataPackage.attachment(response.getAttachment());
+            dataPackage.authenticationData(response.getAuthenticationData());
             
             dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
             dataPackage.errorText(null);

@@ -28,11 +28,11 @@ public class IDLServiceRpcHandler implements RpcHandler {
     }
 
     /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(byte[])
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc.server.RpcData)
      */
-    public byte[] doHandle(byte[] data) {
-        
+    public RpcData doHandle(RpcData data) throws Exception {
         return null;
     }
+
 
 }

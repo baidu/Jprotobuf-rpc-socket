@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Test;
 
@@ -34,6 +36,8 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     
     RpcDataPackage in;
     RpcDataPackage out;
+    
+    int totalRequestSize = 10000;
     
     Runnable runnable = new Runnable() {
         
@@ -105,7 +109,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
      */
     private void oneThreadExecute(String requestString, String responseString) {
         setUp(1, requestString, responseString);
-        int totalRequestSize = 100000;
+        
         
         long time = System.currentTimeMillis();
         for (int i = 0; i < totalRequestSize; i++) {
@@ -118,7 +122,6 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     
     @Test
     public void performanceTwoTreadsTest() throws Exception {
-        int totalRequestSize = 100000;
         int thread = 2;
         long timetook = multiExecute(totalRequestSize, thread, "world", "hello world");
         
@@ -127,7 +130,6 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     
     @Test
     public void performanceFourTreadsTest() throws Exception {
-        int totalRequestSize = 100000;
         int thread = 4;
         long timetook = multiExecute(totalRequestSize, thread, "world", "hello world");
         
@@ -136,7 +138,6 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     
     @Test
     public void performance20TreadsTest() throws Exception {
-        int totalRequestSize = 100000;
         int thread = 20;
         long timetook = multiExecute(totalRequestSize, thread, "world", "hello world");
         
@@ -153,7 +154,6 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
             responseString += "hello world";
         }
         
-        int totalRequestSize = 100000;
         int thread = 20;
         long timetook = multiExecute(totalRequestSize, thread, requestString, responseString);
         
@@ -171,12 +171,45 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
             responseString += "hello world";
         }
         
-        int totalRequestSize = 100000;
         int thread = 40;
         long timetook = multiExecute(totalRequestSize, thread, requestString, responseString);
         
         printResult(in, out, totalRequestSize, timetook, thread);
         
+    }
+    
+    @Test
+    public void multiExecuteValidTest() throws Exception {
+        
+        setUp(100, "hello", "world");
+        ExecutorService pool = Executors.newFixedThreadPool(100);
+        
+        List<Future<?>> futures = new ArrayList<Future<?>>(10000);
+        for (int i = 0; i < 10000; i++) {
+            final EchoInfo echoInfo = new EchoInfo();
+            echoInfo.setMessage(i+"");
+            final int order = i;
+            Runnable runnable = new Runnable() {
+                
+                public void run() {
+                    try {
+                        
+                        EchoInfo echo = echoService.echo(echoInfo);
+                        Assert.assertEquals("hello:" + order, echo.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
+            };
+            Future<?> submit = pool.submit(runnable);
+            futures.add(submit);
+        }
+        for (Future<?> future : futures) {
+            future.get();
+        }
+        
+        pool.shutdown();
     }
 
     /**

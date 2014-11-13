@@ -48,6 +48,6 @@ public @interface ProtobufPRCService {
      * attachment handler
      * @return class instance of DummyAttachmentHandler
      */
-    Class<? extends AttachmentHandler> attachmentHandler() default DummyAttachmentHandler.class;
+    Class<? extends ServerAttachmentHandler> attachmentHandler() default DummyServerAttachmentHandler.class;
 
 }
