@@ -5,9 +5,10 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
-import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
+
+import org.junit.Assert;
 
 /**
  * Echo test {@link ClientAttachmentHandler}
@@ -34,7 +35,7 @@ public class EchoClientAttachmentHandler implements ClientAttachmentHandler {
      */
     public void handleResponse(byte[] response, String serviceName, String methodName, Object... params) {
         if ("echoWithAttachement".equals(methodName)) {
-            System.out.println("recieve attachement:" + new String(response));
+            Assert.assertEquals(EchoServerAttachmentHandler.class.getName(), new String(response));
         }
 
     }

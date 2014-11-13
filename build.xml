@@ -6,10 +6,13 @@
 	<property name="ant.home" value="${env.ANT_HOME}" />
 
 	<property name="src.dir" value="src/main/java" />
+	<property name="src-test.dir" value="src/test/java" />
 	<property name="classes.dir" value="build" />
+	<property name="classes-test.dir" value="build-test" />
 	<property name="lib.dir" value="lib" />
 
-	<property name="jar.file" value="jprotobuf-rpc-socket-1.1.jar" />
+	<property name="jar.file" value="jprotobuf-rpc-socket-1.2.jar" />
+	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.2.jar" />
 
 	<property name="encoding" value="UTF-8" />
 
@@ -37,15 +40,33 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	<target name="compile-test" depends="init">
+		<mkdir dir="${classes-test.dir}" />
+		<javac destdir="${classes-test.dir}" deprecation="true" encoding="${encoding}" debug="on" debuglevel="lines,vars,source" fork="yes" includeantruntime="false" memoryMaximumSize="1000M">
+			<src path="${src-test.dir}" />
+			<classpath refid="project.classpath" />
+			<classpath path="${classes.dir}"></classpath>
+		</javac>
 
-	<target name="jar" depends="compile">
+		<copy todir="${classes-test.dir}">
+			<fileset dir="${classes-test.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile, compile-test">
 		<jar  jarfile="output/${jar.file}" basedir="${classes.dir}">
+		</jar>
+		<jar  jarfile="output/${test-jar.file}" basedir="${classes-test.dir}">
 		</jar>
 	</target>
 
 	<target name="clean">
 		<echo message="Delete classes: ${classes.dir}" />
-		<delete dir="${build.src.dir}" />
+		<delete dir="${classes.dir}" />
+		<delete dir="${classes-test.dir}" />
 	</target>
 
 </project>

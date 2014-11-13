@@ -5,12 +5,15 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
 import org.junit.After;
 import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
+import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 
 /**
  * Base test class for echo RPC server and client

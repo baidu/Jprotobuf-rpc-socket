@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
 import java.util.Arrays;
 
@@ -13,6 +13,10 @@ import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
+import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
+import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 
 /**
  * Test class for RpcServer

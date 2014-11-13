@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
 /**
  *

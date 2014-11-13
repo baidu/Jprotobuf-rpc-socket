@@ -1,0 +1,11 @@
+package pkg;  
+
+option java_package = "com.baidu.jprotobuf.pbrpc.proto";
+
+//这里声明输出的java的类名  
+option java_outer_classname = "EchoInfoClass";  
+
+message EchoInfo {  
+  required string message = 1;
+} 
+

@@ -5,13 +5,11 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
-
-import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 
 /**
  * 
@@ -73,50 +71,5 @@ public class EchoServiceTest extends BaseEchoServiceTest {
         EchoInfo response = echoService.echoWithAttachement(echoInfo);
         Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
     }
-    
 
-    /**
-     * 
-     */
-    @Test
-    public void testEchoServiceClient() {
-        
-        
-        RpcServer rpcServer = new RpcServer();
-        
-        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
-        rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(PORT);
-        
-        
-        RpcClientOptions options = new RpcClientOptions();
-        options.setMaxWait(1);
-        RpcClient rpcClient = new RpcClient(options);
-        
-        
-        ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
-        pbrpcProxy.setPort(PORT);
-        EchoService echoService = pbrpcProxy.proxy();
-        
-        try {
-            long time = System.currentTimeMillis();
-            for (int i = 0; i < 1000; i++) {
-                EchoInfo echo = echoService.echo(new EchoInfo("hello"));
-                System.out.println("time took:" + (System.currentTimeMillis() - time));
-                time = System.currentTimeMillis();
-                echo = echoService.echo(new EchoInfo("hello"));
-            }
-            System.out.println("time took:" + (System.currentTimeMillis() - time));
-/*            rpcServer.shutdown();
-            
-            rpcServer = new RpcServer();
-            rpcServer.registerService(echoServiceImpl);
-            rpcServer.start(PORT);
-            echo = echoService.echo(new EchoInfo("hello"));*/
-            
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-    }
 }

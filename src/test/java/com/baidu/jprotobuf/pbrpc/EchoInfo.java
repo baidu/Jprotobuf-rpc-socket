@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
@@ -20,7 +20,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class EchoInfo {
     
     @Protobuf
-    public String message;
+    private String message;
     
     /**
      * 

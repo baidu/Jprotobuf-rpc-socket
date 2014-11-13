@@ -5,9 +5,10 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.jprotobuf.pbrpc.transport;
+package com.baidu.jprotobuf.pbrpc;
 
-import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+
+import org.junit.Assert;
 
 /**
  * Echo test {@link ServerAttachmentHandler}
@@ -25,7 +26,7 @@ public class EchoServerAttachmentHandler implements ServerAttachmentHandler {
      * [], java.lang.String, java.lang.String, java.lang.Object[])
      */
     public byte[] handleAttachement(byte[] response, String serviceName, String methodName, Object... params) {
-        System.out.println("recieve attachment from client attachment contnet is '" + new String(response) + "'");
+        Assert.assertEquals(EchoClientAttachmentHandler.class.getName(), new String(response));
         return EchoServerAttachmentHandler.class.getName().getBytes();
     }
 
