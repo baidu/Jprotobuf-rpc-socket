@@ -18,7 +18,7 @@ public class ProtocolConstant {
     /**
      * default magic code
      */
-    public static final String MAGIC_CODE = "HULU";
+    public static final String MAGIC_CODE = "PRPC";
     
     
 }

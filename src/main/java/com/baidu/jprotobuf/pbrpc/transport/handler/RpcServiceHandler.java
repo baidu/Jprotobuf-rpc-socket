@@ -65,38 +65,44 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
         }
         RpcDataPackage dataPackage = (RpcDataPackage) e.getMessage();
 
-        RpcMeta rpcMeta = dataPackage.getRpcMeta();
-        String serviceName = rpcMeta.getRequest().getSerivceName();
-        String methodName = rpcMeta.getRequest().getMethodName();
+        try {
+            RpcMeta rpcMeta = dataPackage.getRpcMeta();
+            String serviceName = rpcMeta.getRequest().getSerivceName();
+            String methodName = rpcMeta.getRequest().getMethodName();
 
-        RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
-        if (handler == null) {
-            dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
-            dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
-        } else {
+            RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
+            if (handler == null) {
+                dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
+                dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
+            } else {
 
-            byte[] data = dataPackage.getData();
-            RpcData request = new RpcData();
-            request.setData(data);
-            request.setAttachment(dataPackage.getAttachment());
-            if (dataPackage.getRpcMeta() != null) {
-                request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
+                byte[] data = dataPackage.getData();
+                RpcData request = new RpcData();
+                request.setData(data);
+                request.setAttachment(dataPackage.getAttachment());
+                if (dataPackage.getRpcMeta() != null) {
+                    request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
+                }
+
+                RpcData response = handler.doHandle(request);
+                dataPackage.data(response.getData());
+                dataPackage.attachment(response.getAttachment());
+                dataPackage.authenticationData(response.getAuthenticationData());
+
+                dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
+                dataPackage.errorText(null);
             }
 
-            RpcData response = handler.doHandle(request);
-            dataPackage.data(response.getData());
-            dataPackage.attachment(response.getAttachment());
-            dataPackage.authenticationData(response.getAuthenticationData());
-
-            dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
-            dataPackage.errorText(null);
+            // We do not need to write a ChannelBuffer here.
+            // We know the encoder inserted at TelnetPipelineFactory will do the
+            // conversion.
+            e.getChannel().write(dataPackage);
+        } catch (Exception t) {
+            ErrorDataException exception = new ErrorDataException();
+            exception.setErrorCode(ErrorCodes.ST_ERROR);
+            exception.setRpcDataPackage(dataPackage);
+            throw exception;
         }
-
-        // We do not need to write a ChannelBuffer here.
-        // We know the encoder inserted at TelnetPipelineFactory will do the
-        // conversion.
-        e.getChannel().write(dataPackage);
-
     }
 
     /*
