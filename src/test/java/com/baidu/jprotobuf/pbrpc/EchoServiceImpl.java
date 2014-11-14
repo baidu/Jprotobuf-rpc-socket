@@ -30,4 +30,10 @@ public class EchoServiceImpl {
     public EchoInfo dealWithAttachement(EchoInfo info) {
         return doEcho(info);
     }
+    
+    @ProtobufPRCService(serviceName = "echoService", methodName = "echoGzip", 
+            attachmentHandler = EchoServerAttachmentHandler.class)
+    public EchoInfo dealWithGzipEnable(EchoInfo info) {
+        return doEcho(info);
+    }
 }

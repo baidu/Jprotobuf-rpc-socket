@@ -1,22 +1,20 @@
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.DefaultExceptionEvent;
-import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.handler.timeout.IdleState;
 import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
 import org.jboss.netty.handler.timeout.IdleStateEvent;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class RpcServerChannelIdleHandler extends IdleStateAwareChannelHandler {
 
     private static Logger LOG = Logger.getLogger(RpcServerChannelIdleHandler.class.getName());
-
+    
     public RpcServerChannelIdleHandler() {
     }
 
@@ -42,17 +40,4 @@ public class RpcServerChannelIdleHandler extends IdleStateAwareChannelHandler {
         super.channelIdle(ctx, e);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.netty.channel.SimpleChannelHandler#exceptionCaught(org.jboss
-     * .netty.channel.ChannelHandlerContext,
-     * org.jboss.netty.channel.ExceptionEvent)
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        LOG.log(Level.SEVERE, e.getChannel().toString(), e.getCause());
-        super.exceptionCaught(ctx, e);
-    }
 }

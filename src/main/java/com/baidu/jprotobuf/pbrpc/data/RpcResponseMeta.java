@@ -61,6 +61,9 @@ public class RpcResponseMeta implements Readable, Writerable {
      * @return the errorCode
      */
     public Integer getErrorCode() {
+        if (errorCode == null) {
+            errorCode = 0;
+        }
         return errorCode;
     }
 

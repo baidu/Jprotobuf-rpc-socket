@@ -21,14 +21,19 @@ public class ErrorCodes {
     public static final int ST_SUCCESS = 0;
     
     /**
-     * 
+     * 未知异常
      */
     public static final int ST_ERROR = 1;
     
     /**
-     * 
+     * 方法未找到异常
      */
     public static final int ST_SERVICE_NOTFOUND = 2;
+    
+    /**
+     * 压缩与解压异常
+     */
+    public static final int ST_ERROR_COMPRESS = 3;
     
     /**
      * 

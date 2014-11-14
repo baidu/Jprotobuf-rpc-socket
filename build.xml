@@ -11,8 +11,8 @@
 	<property name="classes-test.dir" value="build-test" />
 	<property name="lib.dir" value="lib" />
 
-	<property name="jar.file" value="jprotobuf-rpc-socket-1.3.jar" />
-	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.3.jar" />
+	<property name="jar.file" value="jprotobuf-rpc-socket-1.4.jar" />
+	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.4.jar" />
 
 	<property name="encoding" value="UTF-8" />
 

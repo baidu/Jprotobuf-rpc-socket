@@ -11,8 +11,10 @@ import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
+import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageCompressHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageDecoder;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageEncoder;
+import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageUnCompressHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServiceHandler;
 
@@ -28,6 +30,9 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
      * 
      */
     private static final String DECODER = "decoder";
+    
+    private static final String UNCOMPRESS = "uncompress";
+    private static final String COMPRESS = "compress";
 
     private static final String RPC_SERVER_HANDLER = "rpc_handler";
 
@@ -43,6 +48,7 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
 
     private static final String SERVER_DATA_PACK = "server_data_pack";
 
+
     private final com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions rpcServerOptions;
 
     public RpcServerPipelineFactory(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions) {
@@ -54,19 +60,28 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
         LOG.log(Level.FINE, "begin process RPC server handler");
         ChannelPipeline channelPipe = pipeline();
 
-        // receive byte array to encode to RpcDataPackage
-        channelPipe.addLast(DECODER, new RpcDataPackageDecoder());
-        // to process RPC service handler of request object RpcDataPackage and
-        // return new RpcDataPackage
-        channelPipe.addLast(RPC_SERVER_HANDLER, new RpcServiceHandler(this.rpcServiceRegistry));
-        // encode RpcDataPackage to byte array
-        channelPipe.addLast(SERVER_DATA_PACK, new RpcDataPackageEncoder());
-
+        // receive request data
         channelPipe.addLast(
                 RPC_CHANNEL_STATE_AWARE_HANDLER,
                 new IdleStateHandler(this.idleTimer, this.rpcServerOptions.getKeepAliveTime(), this.rpcServerOptions
                         .getKeepAliveTime(), 0));
         channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
+        
+        
+        // receive byte array to encode to RpcDataPackage
+        channelPipe.addLast(DECODER, new RpcDataPackageDecoder());
+        // do uncompress handle
+        channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
+        // to process RPC service handler of request object RpcDataPackage and
+        // return new RpcDataPackage
+        channelPipe.addLast(RPC_SERVER_HANDLER, new RpcServiceHandler(this.rpcServiceRegistry));
+        
+        // response back
+        // check if need to compress for data and attachment
+        channelPipe.addFirst(COMPRESS, new RpcDataPackageCompressHandler());
+        // encode RpcDataPackage to byte array
+        channelPipe.addFirst(SERVER_DATA_PACK, new RpcDataPackageEncoder());
+
         return channelPipe;
     }
 

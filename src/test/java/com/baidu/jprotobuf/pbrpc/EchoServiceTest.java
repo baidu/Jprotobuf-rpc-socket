@@ -71,5 +71,15 @@ public class EchoServiceTest extends BaseEchoServiceTest {
         EchoInfo response = echoService.echoWithAttachement(echoInfo);
         Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
     }
+    
+    @Test
+    public void testGzip() {
+        EchoInfo echoInfo = getEchoInfo();
+        
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+        
+        EchoInfo response = echoService.echoGzip(echoInfo);
+        Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
+    }
 
 }

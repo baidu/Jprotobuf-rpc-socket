@@ -182,7 +182,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             Integer errorCode = response.getErrorCode();
             if (!ErrorCodes.isSuccess(errorCode)) {
                 String error = message.getRpcMeta().getResponse().getErrorText();
-                throw new Throwable("A error occurred:" + error);
+                throw new Throwable("A error occurred: errorCode=" + errorCode + " errorMessage:" + error);
             }
         }
         

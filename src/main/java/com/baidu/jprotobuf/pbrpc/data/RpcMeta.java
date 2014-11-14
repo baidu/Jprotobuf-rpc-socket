@@ -116,6 +116,9 @@ public class RpcMeta implements Readable, Writerable {
      * @return the compressType
      */
     public Integer getCompressType() {
+        if (compressType == null) {
+            compressType = 0;
+        }
         return compressType;
     }
 
@@ -132,6 +135,9 @@ public class RpcMeta implements Readable, Writerable {
      * @return the correlationId
      */
     public Long getCorrelationId() {
+        if (correlationId == null) {
+            correlationId = 0L;
+        }
         return correlationId;
     }
 

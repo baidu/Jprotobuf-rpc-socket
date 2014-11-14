@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
@@ -48,6 +49,7 @@ public class RpcServerTest {
         dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
         dataPacage.serviceName("sn").methodName("method").data(new byte[] {1, 2, 4, 8});
         dataPacage.logId(1L).correlationId(2L);
+        dataPacage.compressType(RpcMeta.COMPRESS_NO);
         
         RpcChannel rpcChannel = new RpcChannel(rpcClient, HOST, PORT);
         

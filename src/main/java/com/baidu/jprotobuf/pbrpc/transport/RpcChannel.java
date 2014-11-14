@@ -58,13 +58,11 @@ public class RpcChannel {
 
         RpcClientCallState state = new RpcClientCallState(callback, rpcDataPackage, timeout);
 
-        Long correlationId = state.getDataPackage().getRpcMeta().getCorrelationId();
-
-        rpcClient.registerPendingRequest(correlationId, state);
-
         Connection channel = channelPool.getChannel();
-
         try {
+            Long correlationId = state.getDataPackage().getRpcMeta().getCorrelationId();
+            rpcClient.registerPendingRequest(correlationId, state);
+
             if (!channel.getFuture().isSuccess()) {
                 try {
                     channel.produceRequest(state);

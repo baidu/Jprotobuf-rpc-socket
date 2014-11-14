@@ -340,6 +340,7 @@ public class RpcDataPackage implements Readable, Writerable {
         RpcDataPackage dataPacage = new RpcDataPackage();
         dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
         dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethod().getName());
+        dataPacage.compressType(methodInfo.getProtobufPRC().compressType().value());
         // set data
         if (args.length == 1) {
             byte[] data = methodInfo.inputEncode(args[0]);

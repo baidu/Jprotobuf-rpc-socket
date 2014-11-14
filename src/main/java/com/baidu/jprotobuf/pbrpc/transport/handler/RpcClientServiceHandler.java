@@ -7,7 +7,11 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 
@@ -23,6 +27,11 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientCallState;
  */
 public class RpcClientServiceHandler extends SimpleChannelUpstreamHandler {
 
+    /**
+     * log this class
+     */
+    private static final Logger LOG = Logger.getLogger(RpcClientServiceHandler.class.getName());
+    
     /**
      * RPC client
      */
@@ -54,19 +63,39 @@ public class RpcClientServiceHandler extends SimpleChannelUpstreamHandler {
         Long correlationId = dataPackage.getRpcMeta().getCorrelationId();
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         
-        if (state != null) {
-            
-            Integer errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
-            if (! ErrorCodes.isSuccess(errorCode)) {
-                state.getDataPackage().errorCode(errorCode).errorText(
-                        dataPackage.getRpcMeta().getResponse().getErrorText());
+        Integer errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
+        if (! ErrorCodes.isSuccess(errorCode)) {
+            if (state != null) {
+                state.handleFailure(errorCode, dataPackage.getRpcMeta().getResponse().getErrorText());
+            } else {
+                ctx.sendUpstream(e);
+                throw new Exception(dataPackage.getRpcMeta().getResponse().getErrorText());
             }
-            state.setDataPackage(dataPackage);
-            state.handleResponse(state.getDataPackage());
+        } else {
+            if (state != null) {
+                state.setDataPackage(dataPackage);
+                state.handleResponse(state.getDataPackage());
+            } 
         }
-        
 
         ctx.sendUpstream(e);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.netty.channel.SimpleChannelHandler#exceptionCaught(org.jboss
+     * .netty.channel.ChannelHandlerContext,
+     * org.jboss.netty.channel.ExceptionEvent)
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        LOG.log(Level.SEVERE, e.getCause().getMessage(), e.getCause());
+        
+        if (e.getChannel().isOpen()) {
+            e.getChannel().close();
+        }
     }
 
 }

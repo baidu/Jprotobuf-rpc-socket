@@ -129,12 +129,16 @@ public class RpcClientCallState {
             callback.run(message);
         }
     }
-
-    public void handleFailure(String message) {
-        dataPackage.errorCode(ErrorCodes.ST_ERROR);
+    
+    public void handleFailure(int erroCode, String message) {
+        dataPackage.errorCode(erroCode);
         dataPackage.errorText(message);
         this.timeout.cancel();
         callback(dataPackage);
+    }
+
+    public void handleFailure(String message) {
+        handleFailure(ErrorCodes.ST_ERROR, message);
     }
 
     public void handleResponse(RpcDataPackage response) {

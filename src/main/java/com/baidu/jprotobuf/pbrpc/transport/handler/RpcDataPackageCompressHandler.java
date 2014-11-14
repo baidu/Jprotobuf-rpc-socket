@@ -7,28 +7,23 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
+import com.baidu.jprotobuf.pbrpc.compress.Compress;
+import com.baidu.jprotobuf.pbrpc.compress.GZipCompress;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 
 /**
- * Pack client data of byte array type.
+ * Do data compress handler
  * 
  * @author xiemalin
- * @since 1.0
+ * @since 1.4
  */
-public class RpcDataPackageEncoder extends OneToOneEncoder {
-    
-    /**
-     * log this class
-     */
-    private static final Logger LOG = Logger.getLogger(RpcDataPackageEncoder.class.getName());
+public class RpcDataPackageCompressHandler extends OneToOneEncoder {
+
     /*
      * (non-Javadoc)
      * 
@@ -43,15 +38,27 @@ public class RpcDataPackageEncoder extends OneToOneEncoder {
             return msg;
         }
         
+        // if select compress type should do compress here
         RpcDataPackage dataPackage = (RpcDataPackage) msg;
         
-        byte[] encodeBytes = dataPackage.write();
-        if (encodeBytes !=  null) {
-            LOG.log(Level.FINE, "Client send content byte size:" + encodeBytes.length);
+        // check if do compress
+        Integer compressType = dataPackage.getRpcMeta().getCompressType();
+        Compress compress = null;
+        if (compressType == RpcMeta.COMPERESS_GZIP) {
+            compress = new GZipCompress();
         }
-           
-        return ChannelBuffers.copiedBuffer(
-                ctx.getChannel().getConfig().getBufferFactory().getDefaultOrder(), encodeBytes);
+        
+        if (compress != null) {
+            byte[] data = dataPackage.getData();
+            data = compress.compress(data);
+            dataPackage.data(data);
+            
+            byte[] attachment = dataPackage.getAttachment();
+            attachment = compress.compress(attachment);
+            dataPackage.attachment(attachment);
+        }
+        
+        return dataPackage;
     }
 
 }

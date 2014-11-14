@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * PbRPC definition annotation.
  * 
  * @author xiemalin
- * @since 1.0.0
+ * @since 1.0
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -60,4 +60,9 @@ public @interface ProtobufPRC {
      */
     Class<? extends ClientAttachmentHandler> attachmentHandler() default DummyClientAttachmentHandler.class;
 
+    /**
+     * Compress type. 
+     * @see CompressType
+     */
+    CompressType compressType() default CompressType.NO;
 }
