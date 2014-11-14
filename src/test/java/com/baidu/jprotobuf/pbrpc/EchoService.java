@@ -26,10 +26,10 @@ public interface EchoService {
      * @param info
      * @return
      */
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 1500)
+    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 150)
     EchoInfo echo(EchoInfo info);
     
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 1500, 
+    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 150, 
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoWithAttachement(EchoInfo info);
     

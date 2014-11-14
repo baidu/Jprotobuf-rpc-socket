@@ -7,6 +7,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,8 +98,14 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
             // We know the encoder inserted at TelnetPipelineFactory will do the
             // conversion.
             e.getChannel().write(dataPackage);
+        } catch (InvocationTargetException t) {
+            Throwable error = t.getTargetException();
+            ErrorDataException exception = new ErrorDataException(error.getMessage(), error);
+            exception.setErrorCode(ErrorCodes.ST_ERROR);
+            exception.setRpcDataPackage(dataPackage);
+            throw exception;
         } catch (Exception t) {
-            ErrorDataException exception = new ErrorDataException();
+            ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
             exception.setErrorCode(ErrorCodes.ST_ERROR);
             exception.setRpcDataPackage(dataPackage);
             throw exception;

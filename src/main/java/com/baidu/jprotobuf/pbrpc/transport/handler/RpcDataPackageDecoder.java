@@ -17,6 +17,7 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
 
+import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcHeadMeta;
 
@@ -83,6 +84,12 @@ public class RpcDataPackageDecoder extends FrameDecoder {
             buf.resetReaderIndex();
 
             return null;
+        }
+        
+        //check magic code
+        String magicCode = headMeta.getMagicCodeAsString();
+        if (!ProtocolConstant.MAGIC_CODE.equals(magicCode)) {
+            throw new Exception("Error magic code:" + magicCode);
         }
 
         // There's enough bytes in the buffer. Read it.

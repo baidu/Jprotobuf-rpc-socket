@@ -54,10 +54,6 @@ public class RpcDataPackageUnCompressHandler extends OneToOneDecoder {
                 byte[] data = dataPackage.getData();
                 data = compress.unCompress(data);
                 dataPackage.data(data);
-
-                byte[] attachment = dataPackage.getAttachment();
-                attachment = compress.unCompress(attachment);
-                dataPackage.attachment(attachment);
             }
 
             return dataPackage;

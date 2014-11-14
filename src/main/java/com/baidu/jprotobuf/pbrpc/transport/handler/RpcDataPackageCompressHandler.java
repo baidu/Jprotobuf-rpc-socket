@@ -52,10 +52,6 @@ public class RpcDataPackageCompressHandler extends OneToOneEncoder {
             byte[] data = dataPackage.getData();
             data = compress.compress(data);
             dataPackage.data(data);
-            
-            byte[] attachment = dataPackage.getAttachment();
-            attachment = compress.compress(attachment);
-            dataPackage.attachment(attachment);
         }
         
         return dataPackage;
