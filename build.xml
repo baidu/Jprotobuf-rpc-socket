@@ -10,9 +10,13 @@
 	<property name="classes.dir" value="build" />
 	<property name="classes-test.dir" value="build-test" />
 	<property name="lib.dir" value="lib" />
-
-	<property name="jar.file" value="jprotobuf-rpc-socket-1.6.jar" />
-	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.6.jar" />
+	
+	<property name="target.unit-test.dir" value="output/unit-test" />
+	<property name="target.unit-test-report.dir" value="output/unit-report" />
+	
+	
+	<property name="jar.file" value="jprotobuf-rpc-socket-1.2.jar" />
+	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.2.jar" />
 
 	<property name="encoding" value="UTF-8" />
 
@@ -67,6 +71,36 @@
 		<echo message="Delete classes: ${classes.dir}" />
 		<delete dir="${classes.dir}" />
 		<delete dir="${classes-test.dir}" />
+		<delete dir="${target.unit-test.dir}" />
+		<delete dir="${target.unit-test-report.dir}" />
 	</target>
+	
+    <target name="unit-test" depends="compile, compile-test">
+        <mkdir dir="${target.unit-test.dir}" />
+    	<mkdir dir="${target.unit-test-report.dir}" />
+        <junit printsummary="on" haltonerror="off" 
+            haltonfailure="off" fork="on">
+            <formatter type="plain" usefile="off"/>
+            <formatter type="xml" usefile="on" />
+            <batchtest todir="${target.unit-test-report.dir}">
+                <fileset dir="${classes-test.dir}">
+                    <include name="**/*Test.class"/>
+                </fileset>
+            </batchtest>
+            <classpath path="${classes.dir}"></classpath>
+            <classpath path="${classes-test.dir}"></classpath>
+        	<classpath refid="project.classpath"></classpath>
+        </junit>
+    </target>
+
+    <target name="unit-test-report" depends="unit-test">
+        <mkdir dir="${target.unit-test-report.dir}/html" />
+        <junitreport todir="${target.unit-test-report.dir}">
+            <fileset dir="${target.unit-test-report.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${target.unit-test-report.dir}/html" />
+        </junitreport>
+    </target>
 
 </project>
