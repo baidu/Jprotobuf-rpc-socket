@@ -25,7 +25,7 @@ public class RpcHeadMeta implements Writerable, Readable {
     public static final int SIZE = 12;
 
     /**
-     * 协议标识 "HULU"
+     * 协议标识 
      */
     private byte[] magicCode;
     
@@ -54,7 +54,7 @@ public class RpcHeadMeta implements Writerable, Readable {
         if (magicCode == null) {
             return null;
         }
-        return new String(magicCode);
+        return new String(magicCode, ProtocolConstant.CHARSET);
     }
     
     /**
@@ -65,7 +65,7 @@ public class RpcHeadMeta implements Writerable, Readable {
         if (magicCode == null) {
             throw new IllegalArgumentException("invalid magic code. size must be 4.");
         }
-        setMagicCode(magicCode.getBytes());
+        setMagicCode(magicCode.getBytes(ProtocolConstant.CHARSET));
     }
 
     /**
