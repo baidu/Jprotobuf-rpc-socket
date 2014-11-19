@@ -15,8 +15,8 @@
 	<property name="target.unit-test-report.dir" value="output/unit-report" />
 	
 	
-	<property name="jar.file" value="jprotobuf-rpc-socket-1.2.jar" />
-	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.2.jar" />
+	<property name="jar.file" value="jprotobuf-rpc-socket-1.7.jar" />
+	<property name="test-jar.file" value="jprotobuf-rpc-socket-test-1.7.jar" />
 
 	<property name="encoding" value="UTF-8" />
 
