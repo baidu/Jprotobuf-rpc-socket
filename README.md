@@ -78,6 +78,7 @@ EchoService echoService = pbrpcProxy.proxy();
 EchoInfo request = new EchoInfo();
 request.message = "hello";
 EchoInfo response = echoService.echo(request);
+rpcClient.stop();
 ```
 
 ##### 服务端开发 #####

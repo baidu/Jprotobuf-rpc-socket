@@ -65,6 +65,7 @@ public class ChannelPool {
     public void stop() {
         try {
             if (pool != null) {
+                pool.clear();
                 pool.close();
             }
         } catch (Exception e) {
