@@ -9,7 +9,6 @@ package com.baidu.jprotobuf.pbrpc.transport;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -37,11 +36,11 @@ public class RpcClient extends ClientBootstrap {
     private ChannelPool channelPool;
 
     public RpcClient() {
-        this(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+        this(new NioClientSocketChannelFactory());
     }
     
     public RpcClient(RpcClientOptions rpcClientOptions) {
-        this(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()), rpcClientOptions);
+        this(new NioClientSocketChannelFactory(), rpcClientOptions);
     }
 
     public RpcClient(ChannelFactory channelFactory) {
@@ -133,6 +132,10 @@ public class RpcClient extends ClientBootstrap {
         if (channelPool != null) {
             channelPool.stop();
         }
+        if (timer != null) {
+            timer.stop();
+        }
+        shutdown();
     }
 
 }
