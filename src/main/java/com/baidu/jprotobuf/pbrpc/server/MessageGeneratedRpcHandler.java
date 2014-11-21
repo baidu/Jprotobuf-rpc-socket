@@ -16,16 +16,16 @@ import com.google.protobuf.GeneratedMessage;
 
 /**
  * RPC handler for Google protoc generated java code.
- *
+ * 
  * @author xiemalin
  * @since 1.2
  */
 public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
-    
+
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
     private Method parseFromMethod;
-    
+
     /**
      * @param method
      * @param service
@@ -33,7 +33,7 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
      */
     public MessageGeneratedRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
         super(method, service, protobufPRCService);
-        
+
         if (getInputClass() != null) {
             if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
                 try {
@@ -45,39 +45,45 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
         }
     }
 
-    /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc.server.RpcData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc
+     * .server.RpcData)
      */
     public RpcData doHandle(RpcData data) throws Exception {
-        
+
         Object input = null;
         Object[] param;
         Object ret;
         if (data.getData() != null && parseFromMethod != null) {
-            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));;
-            param = new Object[] {input};
+            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
+            ;
+            param = new Object[] { input };
         } else {
             param = new Object[0];
         }
-        
+
         RpcData retData = new RpcData();
         // process attachment
         if (getAttachmentHandler() != null) {
-            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(), getMethodName(), param);
+            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(),
+                    getServiceName(), getMethodName(), param);
             retData.setAttachment(responseAttachment);
         }
-        
+
         ret = getMethod().invoke(getService(), param);
-        
+
         if (ret == null) {
             return retData;
         }
-        
+
         if (ret != null && ret instanceof GeneratedMessage) {
             byte[] response = ((GeneratedMessage) ret).toByteArray();
             retData.setData(response);
         }
-        
+
         return retData;
     }
 

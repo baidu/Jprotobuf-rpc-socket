@@ -19,8 +19,9 @@ import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 
 /**
- * @file RpcClient.java
- * @brief 应用层
+ * RPC client handler class.
+ * 
+ * @author xiemalin
  * @author songhuiqing
  * @date 2013/03/07 10:30:20
  * @version 1.0.0
@@ -128,13 +129,24 @@ public class RpcClient extends ClientBootstrap {
         this.channelPool = channelPool;
     }
     
-    public void stop() {
+    /* (non-Javadoc)
+     * @see org.jboss.netty.bootstrap.Bootstrap#shutdown()
+     */
+    @Override
+    public void shutdown() {
         if (channelPool != null) {
             channelPool.stop();
         }
         if (timer != null) {
             timer.stop();
         }
+        super.shutdown();
+    }
+    
+    /**
+     * do shutdown action
+     */
+    public void stop() {
         shutdown();
     }
 

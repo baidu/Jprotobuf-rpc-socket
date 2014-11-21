@@ -12,7 +12,10 @@ import org.jboss.netty.channel.ChannelFutureListener;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
 /**
+ * A {@link ChannelFutureListener} implementation of RPC operation complete call back
  * 
  * @author xiemalin
  * @since 1.0

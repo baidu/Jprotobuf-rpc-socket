@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServiceHandler;
 public class RpcServerPipelineFactory implements ChannelPipelineFactory {
 
     /**
-     * 
+     * decode handler
      */
     private static final String DECODER = "decoder";
     
@@ -49,7 +49,7 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
     private static final String SERVER_DATA_PACK = "server_data_pack";
 
 
-    private final com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions rpcServerOptions;
+    private final RpcServerOptions rpcServerOptions;
 
     public RpcServerPipelineFactory(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions) {
         this.rpcServiceRegistry = rpcServiceRegistry;

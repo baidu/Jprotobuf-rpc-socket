@@ -7,6 +7,9 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -22,6 +25,8 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @since 1.0
  */
 public abstract class BaseEchoServiceTest extends BaseTest {
+    
+    private static final Logger LOG = Logger.getLogger(BaseEchoServiceTest.class.getName());
 
     protected RpcServer rpcServer;
     protected EchoService echoService;
@@ -58,6 +63,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         try {
             rpcServer.shutdown();
         } catch (Exception e) {
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
     }
     
@@ -70,6 +76,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         try {
             rpcClient.stop();
         } catch (Exception e) {
+            LOG.log(Level.SEVERE, e.getMessage(), e);
         }
         stopServer();
     }

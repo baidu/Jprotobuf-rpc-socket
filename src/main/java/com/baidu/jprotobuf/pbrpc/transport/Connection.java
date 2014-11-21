@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jboss.netty.channel.ChannelFuture;
 
 /**
- * RPC client connection
+ * RPC client connection 
  * 
  * @author xiemalin
  * @since 1.0
  */
 public class Connection {
     /**
-     * 
+     * max request default count
      */
     private static final int MAX_REQUEST_SIZE = 102400;
     private ChannelFuture future;

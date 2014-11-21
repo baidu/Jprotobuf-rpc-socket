@@ -34,6 +34,14 @@ public class RpcChannel {
     private ChannelPool channelPool;
 
     /**
+     * try to do connect
+     */
+    public void testChannlConnect() {
+        Connection channel = channelPool.getChannel();
+        channelPool.returnChannel(channel);
+    }
+
+    /**
      * @param rpcClient
      * @param host
      * @param port

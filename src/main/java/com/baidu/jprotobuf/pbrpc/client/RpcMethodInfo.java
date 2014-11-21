@@ -45,9 +45,9 @@ public abstract class RpcMethodInfo {
     public abstract Object outputDecode(byte[] output) throws IOException;
 
     public static boolean isMessageType(Method method) {
-        
+
         boolean paramMessagetType = false;
-        
+
         Class<?>[] types = method.getParameterTypes();
         if (types.length == 1) {
             if (GeneratedMessage.class.isAssignableFrom(types[0])) {
@@ -61,8 +61,8 @@ public abstract class RpcMethodInfo {
                 if (paramMessagetType) {
                     return true;
                 } else {
-                    throw new IllegalArgumentException("Invalid RPC method. parameter type and return " +
-                    		"type should define in same way.");
+                    throw new IllegalArgumentException("Invalid RPC method. parameter type and return "
+                            + "type should define in same way.");
                 }
             }
         }
@@ -101,7 +101,7 @@ public abstract class RpcMethodInfo {
                         + logIDGeneratorClass.getName() + "'");
             }
         }
-        
+
         Class<? extends ClientAttachmentHandler> attachmentHandlerClass = protobufPRC.attachmentHandler();
         if (attachmentHandlerClass != DummyClientAttachmentHandler.class) {
             try {
@@ -111,13 +111,12 @@ public abstract class RpcMethodInfo {
                         + attachmentHandlerClass.getName() + "'");
             }
         }
-        
+
     }
-    
-    
 
     /**
      * get the logIDGenerator
+     * 
      * @return the logIDGenerator
      */
     public LogIDGenerator getLogIDGenerator() {
@@ -126,6 +125,7 @@ public abstract class RpcMethodInfo {
 
     /**
      * get the clientAttachmentHandler
+     * 
      * @return the clientAttachmentHandler
      */
     public ClientAttachmentHandler getClientAttachmentHandler() {

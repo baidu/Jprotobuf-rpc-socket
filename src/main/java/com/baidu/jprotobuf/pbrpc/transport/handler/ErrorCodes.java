@@ -36,7 +36,7 @@ public class ErrorCodes {
     public static final int ST_ERROR_COMPRESS = 3;
     
     /**
-     * 
+     * service not found 
      */
     public static final String MSG_SERVICE_NOTFOUND = "service not found";
     
@@ -46,8 +46,10 @@ public class ErrorCodes {
     public static final int ST_READ_TIMEOUT = 100;
     
     
-    
-    public static final String MSG_READ_TIMEOUT = "read time out";
+    /**
+     * onceTalkTimeout timeout message
+     */
+    public static final String MSG_READ_TIMEOUT = "method request time out, please check 'onceTalkTimeout' property.";
     
     
     /**

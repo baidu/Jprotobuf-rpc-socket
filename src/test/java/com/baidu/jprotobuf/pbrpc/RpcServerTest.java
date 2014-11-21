@@ -17,6 +17,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 
 /**
@@ -39,23 +40,26 @@ public class RpcServerTest {
     public void testServerStart() throws InterruptedException {
         RpcServer rpcServer = new RpcServer();
         rpcServer.start(PORT);
-        
-        
-        RpcClient rpcClient = new RpcClient();
-        
-        //build package
-        
+
+        RpcClientOptions options = new RpcClientOptions();
+        options.setMinIdleSize(1);
+        options.setThreadPoolSize(1);
+        options.setMaxIdleSize(1);
+
+        RpcClient rpcClient = new RpcClient(options);
+
+        // build package
         RpcDataPackage dataPacage = new RpcDataPackage();
         dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
-        dataPacage.serviceName("sn").methodName("method").data(new byte[] {1, 2, 4, 8});
+        dataPacage.serviceName("sn").methodName("method").data(new byte[] { 1, 2, 4, 8 });
         dataPacage.logId(1L).correlationId(2L);
         dataPacage.compressType(RpcMeta.COMPRESS_NO);
-        
+
         RpcChannel rpcChannel = new RpcChannel(rpcClient, HOST, PORT);
-        
+
         BlockingRpcCallback callback = new BlockingRpcCallback();
         rpcChannel.doTransport(dataPacage, callback, 100000);
-        
+
         if (!callback.isDone()) {
             synchronized (callback) {
                 while (!callback.isDone()) {
@@ -70,6 +74,6 @@ public class RpcServerTest {
         if (callback.getMessage() != null) {
             System.out.println(Arrays.toString(callback.getMessage().getData()));
         }
-        
+
     }
 }
