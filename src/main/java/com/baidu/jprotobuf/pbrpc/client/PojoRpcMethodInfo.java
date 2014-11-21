@@ -38,7 +38,7 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
             inputCodec = ProtobufProxy.create(inputClass);
         }
         Class<? extends Object> outputClass = getOutputClass();
-        if (inputClass != null) {
+        if (outputClass != null) {
             outputCodec = ProtobufProxy.create(outputClass);
         }
     }
