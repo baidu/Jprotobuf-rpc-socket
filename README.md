@@ -13,6 +13,13 @@ Protobuf RPC是一种基于TCP协议的二进制RPC通信协议。它以Protobuf
 ## 使用示例 ##
 
 环境要求：JDK 6+
+```xml
+<dependency>
+  <groupId>com.baidu</groupId>
+  <artifactId>jprotobuf-rpc-socket</artifactId>
+  <version>1.8</version>
+</dependency>
+```
 
 #### Qucik Start ####
 Jprotobuf-rpc-socket基于JProtobuf基础上开发，可帮助大家开发中省去编写Google Protobuf的IDL描述文件的过程。

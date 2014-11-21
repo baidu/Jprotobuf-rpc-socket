@@ -15,7 +15,7 @@ import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 
 /**
  * RPC handler for Jprotobuf annotation.
- *
+ * 
  * @author xiemalin
  * @since 1.0
  */
@@ -23,7 +23,7 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
 
     private Codec inputCodec;
     private Codec outputCodec;
-    
+
     /**
      * @param method
      * @param service
@@ -36,10 +36,12 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
         if (getOutputClass() != null) {
             outputCodec = ProtobufProxy.create(getOutputClass());
         }
-        
+
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(byte[])
      */
     public RpcData doHandle(RpcData data) throws Exception {
@@ -48,34 +50,31 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
         Object ret;
         if (data.getData() != null && inputCodec != null) {
             input = inputCodec.decode(data.getData());
-            param = new Object[] {input};
+            param = new Object[] { input };
         } else {
             param = new Object[0];
         }
-        
+
         RpcData retData = new RpcData();
         // process attachment
         if (getAttachmentHandler() != null) {
-            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(), getMethodName(), param);
+            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(),
+                    getServiceName(), getMethodName(), param);
             retData.setAttachment(responseAttachment);
         }
-        
+
         ret = getMethod().invoke(getService(), param);
-        
+
         if (ret == null) {
             return retData;
         }
-        
+
         if (outputCodec != null) {
             byte[] response = outputCodec.encode(ret);
             retData.setData(response);
         }
-        
+
         return retData;
     }
-
-
-    
-    
 
 }

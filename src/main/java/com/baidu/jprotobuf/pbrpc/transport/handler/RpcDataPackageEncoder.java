@@ -29,6 +29,7 @@ public class RpcDataPackageEncoder extends OneToOneEncoder {
      * log this class
      */
     private static final Logger LOG = Logger.getLogger(RpcDataPackageEncoder.class.getName());
+    
     /*
      * (non-Javadoc)
      * 

@@ -15,9 +15,21 @@ package com.baidu.jprotobuf.pbrpc.server;
  */
 public class RpcData {
 
+    /**
+     * user data
+     */
     private byte[] data;
+    
+    /**
+     * user attachment data
+     */
     private byte[] attachment;
+    
+    /**
+     * user authentiction data
+     */
     private byte[] authenticationData;
+    
     /**
      * get the data
      * @return the data

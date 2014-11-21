@@ -26,7 +26,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 public class RpcServiceRegistry {
 
     /**
-     * 
+     * registered service map. the key if unique represent service name
      */
     private Map<String, RpcHandler> serviceMap = new HashMap<String, RpcHandler>();
     

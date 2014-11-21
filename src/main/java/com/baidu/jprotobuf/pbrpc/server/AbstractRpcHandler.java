@@ -34,6 +34,7 @@ public abstract class AbstractRpcHandler implements RpcHandler {
     private Object service;
 
     private ServerAttachmentHandler attachmentHandler;
+    
     /**
      * get the method
      * 

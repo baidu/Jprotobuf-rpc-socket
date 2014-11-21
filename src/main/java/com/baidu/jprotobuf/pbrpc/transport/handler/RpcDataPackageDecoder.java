@@ -85,8 +85,8 @@ public class RpcDataPackageDecoder extends FrameDecoder {
 
             return null;
         }
-        
-        //check magic code
+
+        // check magic code
         String magicCode = headMeta.getMagicCodeAsString();
         if (!ProtocolConstant.MAGIC_CODE.equals(magicCode)) {
             throw new Exception("Error magic code:" + magicCode);

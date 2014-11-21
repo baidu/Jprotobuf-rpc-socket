@@ -22,7 +22,7 @@ import java.util.zip.GZIPOutputStream;
 public class GZipCompress implements Compress {
 
     /**
-     * 
+     * default buffer size
      */
     private static final int BUFFER_SIZE = 256;
 

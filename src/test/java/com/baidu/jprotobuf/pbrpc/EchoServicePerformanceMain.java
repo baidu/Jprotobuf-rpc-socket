@@ -8,9 +8,11 @@
 package com.baidu.jprotobuf.pbrpc;
 
 /**
+ * 
+ * Performance test in main
  *
  * @author xiemalin
- *
+ * @since 1.1
  */
 public class EchoServicePerformanceMain {
 

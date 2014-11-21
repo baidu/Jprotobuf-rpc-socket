@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>1.8-SNAPSHOT</version>
+	<version>1.9</version>
 
 	<name>Jprotobuf-rpc-socket</name>
 	<description>A RPC implemention based on TCP protocol for Google protobuf</description>
@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf</artifactId>
-			<version>1.2.0</version>
+			<version>1.1.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

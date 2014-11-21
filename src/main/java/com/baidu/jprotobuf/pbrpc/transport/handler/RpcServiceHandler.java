@@ -38,7 +38,7 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
     private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
 
     /**
-     * 
+     * {@link RpcServiceRegistry}
      */
     private final RpcServiceRegistry rpcServiceRegistry;
 

@@ -42,6 +42,24 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private String host;
     private int port;
     
+    private boolean lookupStubOnStartup = true;
+    
+    /**
+     * get the lookupStubOnStartup
+     * @return the lookupStubOnStartup
+     */
+    public boolean isLookupStubOnStartup() {
+        return lookupStubOnStartup;
+    }
+
+    /**
+     * set lookupStubOnStartup value to lookupStubOnStartup
+     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     */
+    public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
+        this.lookupStubOnStartup = lookupStubOnStartup;
+    }
+
     /**
      * set host value to host
      * @param host the host to set
@@ -117,10 +135,14 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         
         // if not protobufRpc method defined throw exception
         if (cachedRpcMethods.isEmpty()) {
-            throw new IllegalArgumentException("This no protobufRpc method in interface class:" + interfaceClass.getName());
+            throw new IllegalArgumentException("This no protobufRpc method in interface class:"
+                    + interfaceClass.getName());
         }
         
         rpcChannel = new RpcChannel(rpcClient, host, port);
+        if (lookupStubOnStartup) {
+            rpcChannel.testChannlConnect();
+        }
         T proxy = ProxyFactory.createProxy(interfaceClass, this);
         return proxy;
     }
