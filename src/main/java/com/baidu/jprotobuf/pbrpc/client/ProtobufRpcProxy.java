@@ -7,6 +7,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.client;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -147,6 +148,11 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         return proxy;
     }
 
+    protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
+        RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
+        return rpcDataPackage;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -180,7 +186,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
         
         BlockingRpcCallback callback = new BlockingRpcCallback();
-        RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
+        RpcDataPackage rpcDataPackage = buildRequestDataPackage(rpcMethodInfo, args);
         // set correlationId
         rpcDataPackage.getRpcMeta().setCorrelationId(rpcClient.getNextCorrelationId());
         rpcChannel.doTransport(rpcDataPackage, callback, onceTalkTimeout);

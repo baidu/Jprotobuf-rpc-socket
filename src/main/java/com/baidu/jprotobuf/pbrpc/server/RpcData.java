@@ -31,6 +31,11 @@ public class RpcData {
     private byte[] authenticationData;
     
     /**
+     * extra params
+     */
+    private byte[] extraParams;
+    
+    /**
      * get the data
      * @return the data
      */
@@ -71,6 +76,20 @@ public class RpcData {
      */
     public void setAuthenticationData(byte[] authenticationData) {
         this.authenticationData = authenticationData;
+    }
+    /**
+     * get the extraParams
+     * @return the extraParams
+     */
+    public byte[] getExtraParams() {
+        return extraParams;
+    }
+    /**
+     * set extraParams value to extraParams
+     * @param extraParams the extraParams to set
+     */
+    public void setExtraParams(byte[] extraParams) {
+        this.extraParams = extraParams;
     }
     
     

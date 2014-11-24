@@ -34,5 +34,26 @@ public class IDLServiceRpcHandler implements RpcHandler {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getServiceName()
+     */
+    public String getServiceName() {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodName()
+     */
+    public String getMethodName() {
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getService()
+     */
+    public Object getService() {
+        return null;
+    }
+
 
 }

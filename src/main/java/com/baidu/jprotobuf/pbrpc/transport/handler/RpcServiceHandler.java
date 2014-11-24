@@ -84,6 +84,7 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
                 if (dataPackage.getRpcMeta() != null) {
                     request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
                 }
+                request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
 
                 RpcData response = handler.doHandle(request);
                 dataPackage.data(response.getData());

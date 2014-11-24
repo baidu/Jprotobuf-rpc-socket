@@ -100,6 +100,12 @@ public class RpcDataPackage implements Readable, Writerable {
         response.setErrorText(errorText);
         return this;
     }
+    
+    public RpcDataPackage extraParams(byte[] params) {
+        RpcRequestMeta request = initRequest();
+        request.setExtraParam(params);
+        return this;
+    }
 
     /**
      * 
@@ -342,7 +348,7 @@ public class RpcDataPackage implements Readable, Writerable {
         dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethod().getName());
         dataPacage.compressType(methodInfo.getProtobufPRC().compressType().value());
         // set data
-        if (args.length == 1) {
+        if (args != null && args.length == 1) {
             byte[] data = methodInfo.inputEncode(args[0]);
             if (data != null) {
                 dataPacage.data(data);

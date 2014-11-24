@@ -72,7 +72,7 @@ public class RpcServerTest {
             }
         }
         if (callback.getMessage() != null) {
-            System.out.println(Arrays.toString(callback.getMessage().getData()));
+            // System.out.println(Arrays.toString(callback.getMessage().getData()));
         }
 
     }

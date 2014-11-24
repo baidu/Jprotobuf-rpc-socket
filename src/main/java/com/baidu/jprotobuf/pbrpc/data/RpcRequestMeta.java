@@ -10,6 +10,7 @@ package com.baidu.jprotobuf.pbrpc.data;
 import java.io.IOException;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
@@ -39,6 +40,12 @@ public class RpcRequestMeta implements Readable, Writerable {
      */
     @Protobuf(required = true)
     private String methodName;
+    
+    /**
+     * 非PbRpc规范，用于传输额外的参数
+     */
+    @Protobuf(fieldType = FieldType.BYTES)
+    private byte[] extraParam;
     
     /**
      * 用于打印日志。可用于存放BFE_LOGID。该参数可选。
@@ -133,6 +140,22 @@ public class RpcRequestMeta implements Readable, Writerable {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * get the extraParam
+     * @return the extraParam
+     */
+    public byte[] getExtraParam() {
+        return extraParam;
+    }
+
+    /**
+     * set extraParam value to extraParam
+     * @param extraParam the extraParam to set
+     */
+    public void setExtraParam(byte[] extraParam) {
+        this.extraParam = extraParam;
     }
     
     
