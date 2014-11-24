@@ -24,4 +24,19 @@ public interface RpcHandler {
      */
     RpcData doHandle(RpcData data) throws Exception;
 
+    /**
+     * @return
+     */
+    String getServiceName();
+
+    /**
+     * @return
+     */
+    String getMethodName();
+
+    /**
+     * @return
+     */
+    Object getService();
+
 }

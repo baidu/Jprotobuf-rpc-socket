@@ -9,10 +9,12 @@ package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
 
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -23,7 +25,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 1.0
  * @see RpcServiceRegistry
  */
-public abstract class AbstractRpcHandler implements RpcHandler {
+public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
 
     private String serviceName;
     private String methodName;
@@ -34,13 +36,15 @@ public abstract class AbstractRpcHandler implements RpcHandler {
     private Object service;
 
     private ServerAttachmentHandler attachmentHandler;
+    private String inputIDl;
+    private String outputIDL;
     
     /**
      * get the method
      * 
      * @return the method
      */
-    protected Method getMethod() {
+    public Method getMethod() {
         return method;
     }
 
@@ -49,7 +53,7 @@ public abstract class AbstractRpcHandler implements RpcHandler {
      * 
      * @return the service
      */
-    protected Object getService() {
+    public Object getService() {
         return service;
     }
 
@@ -92,6 +96,22 @@ public abstract class AbstractRpcHandler implements RpcHandler {
             } catch (Exception e) {
                 throw new IllegalAccessError("Can not initialize 'logIDGenerator' of class '"
                         + attachmentHandlerClass.getName() + "'");
+            }
+        }
+        
+        if (inputClass != null) {
+            try {
+                inputIDl = ProtobufIDLGenerator.getIDL(inputClass);
+            } catch (Exception e) {
+                inputIDl = null;
+            }
+        }
+        
+        if (outputClass != null) {
+            try {
+                outputIDL = ProtobufIDLGenerator.getIDL(outputClass);
+            } catch (Exception e) {
+                outputIDL = null;
             }
         }
     }
@@ -137,7 +157,7 @@ public abstract class AbstractRpcHandler implements RpcHandler {
      * get the methodName
      * @return the methodName
      */
-    protected String getMethodName() {
+    public String getMethodName() {
         return methodName;
     }
 
@@ -149,4 +169,17 @@ public abstract class AbstractRpcHandler implements RpcHandler {
         return attachmentHandler;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getInputMetaProto()
+     */
+    public String getInputMetaProto() {
+        return inputIDl;
+    }
+    
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getOutputMetaProto()
+     */
+    public String getOutputMetaProto() {
+        return outputIDL;
+    }
 }

@@ -8,12 +8,14 @@
 package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
+import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -34,6 +36,15 @@ public class RpcServiceRegistry {
      * if override exist allowed. default is not allowed
      */
     private boolean dummyOverride = false;
+    
+    /**
+     * default constructor
+     */
+    public RpcServiceRegistry() {
+        RpcServiceMetaServiceProvider metaService = new RpcServiceMetaServiceProvider(this);
+        registerService(metaService);
+    }
+    
     
     /**
      * set dummyOverride value to dummyOverride
@@ -64,7 +75,7 @@ public class RpcServiceRegistry {
         
     }
     
-    private void doRegiterService(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
         AbstractRpcHandler rpcHandler;
         if (!messageType) {
@@ -75,6 +86,11 @@ public class RpcServiceRegistry {
         if (StringUtils.isEmpty(rpcHandler.getServiceName())) {
             throw new IllegalArgumentException(" serviceName from 'serviceExporter' is empty.");
         }
+        return rpcHandler;
+    }
+    
+    private void doRegiterService(Method method, Object service, ProtobufPRCService protobufPRCService) {
+        RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         serviceMap.put(getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName()), rpcHandler);
     }
     
@@ -85,6 +101,10 @@ public class RpcServiceRegistry {
     public RpcHandler lookupService(String serviceName, String methodName) {
         String methodSignature = getMethodSignature(serviceName, methodName);
         return serviceMap.get(methodSignature);
+    }
+    
+    public Collection<RpcHandler> getServices() {
+        return serviceMap.values();
     }
 
     /**

@@ -9,6 +9,7 @@ package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,6 +98,7 @@ public class RpcDataPackageDecoder extends FrameDecoder {
         buf.readBytes(totalBytes, 0, messageSize);
 
         RpcDataPackage rpcDataPackage = new RpcDataPackage();
+        
         rpcDataPackage.read(totalBytes);
 
         long rpcMessageDecoderEnd = System.nanoTime();

@@ -34,17 +34,20 @@ public class RpcServer extends ServerBootstrap {
     private AtomicBoolean stop = new AtomicBoolean(false);
 
     private RpcServerOptions rpcServerOptions;
+    
+    private RpcServerPipelineFactory rpcServerPipelineFactory;
 
     /**
      * rpcServiceRegistry
      */
-    private RpcServiceRegistry rpcServiceRegistry = new RpcServiceRegistry();
+    private RpcServiceRegistry rpcServiceRegistry;
 
-    public RpcServer(RpcServerOptions serverOptions) {
+    public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
         this(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+        this.rpcServiceRegistry = rpcServiceRegistry;
 
         rpcServerOptions = new RpcServerOptions();
-        RpcServerPipelineFactory rpcServerPipelineFactory = new RpcServerPipelineFactory(rpcServiceRegistry,
+        rpcServerPipelineFactory = new RpcServerPipelineFactory(rpcServiceRegistry,
                 rpcServerOptions);
         setPipelineFactory(rpcServerPipelineFactory);
 
@@ -61,6 +64,10 @@ public class RpcServer extends ServerBootstrap {
         this.setOption("backlog", serverOptions.getBacklog());
         this.setOption("child.receiveBufferSize", serverOptions.getReceiveBufferSize());
         this.setOption("child.sendBufferSize", serverOptions.getSendBufferSize());
+    }
+    
+    public RpcServer(RpcServerOptions serverOptions) {
+       this(serverOptions, new RpcServiceRegistry());
     }
 
     public RpcServer() {
@@ -126,5 +133,6 @@ public class RpcServer extends ServerBootstrap {
     public void setRpcServerOptions(RpcServerOptions rpcServerOptions) {
         this.rpcServerOptions = rpcServerOptions;
     }
+
 
 }
