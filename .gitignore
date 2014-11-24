@@ -109,3 +109,13 @@ crashlytics-build.properties
 hs_err_pid*
 
 
+
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+
