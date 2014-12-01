@@ -42,9 +42,9 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(byte[])
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(byte[])
      */
-    public RpcData doHandle(RpcData data) throws Exception {
+    protected RpcData doRealHandle(RpcData data) throws Exception {
         Object input = null;
         Object[] param;
         Object ret;

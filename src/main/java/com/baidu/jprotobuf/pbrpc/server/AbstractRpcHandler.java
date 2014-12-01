@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.LogIDHolder;
 import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
@@ -57,6 +58,20 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
         return service;
     }
 
+    
+    public RpcData doHandle(RpcData data) throws Exception {
+        Long logId = data.getLogId();
+        if (logId != null) {
+            LogIDHolder.setCurrentLogid(logId);
+        }
+        try {
+            return doRealHandle(data);
+        } finally {
+            LogIDHolder.clearLogId();
+        }
+    }
+    
+    protected abstract RpcData doRealHandle(RpcData data) throws Exception;
 
     /**
      * @param method
