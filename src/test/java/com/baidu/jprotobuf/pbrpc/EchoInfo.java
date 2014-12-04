@@ -19,7 +19,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class EchoInfo {
     
-    @Protobuf
+    @Protobuf(description = "Echo消息内容")
     private String message;
     
     /**

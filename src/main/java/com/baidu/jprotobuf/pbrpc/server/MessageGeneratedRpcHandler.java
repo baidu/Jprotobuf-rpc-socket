@@ -49,10 +49,10 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
      * (non-Javadoc)
      * 
      * @see
-     * com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc
+     * com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf.pbrpc
      * .server.RpcData)
      */
-    public RpcData doHandle(RpcData data) throws Exception {
+    protected RpcData doRealHandle(RpcData data) throws Exception {
 
         Object input = null;
         Object[] param;

@@ -79,6 +79,7 @@ public class RpcServiceHandler extends SimpleChannelUpstreamHandler {
 
                 byte[] data = dataPackage.getData();
                 RpcData request = new RpcData();
+                request.setLogId(dataPackage.getRpcMeta().getRequest().getLogId());
                 request.setData(data);
                 request.setAttachment(dataPackage.getAttachment());
                 if (dataPackage.getRpcMeta() != null) {
