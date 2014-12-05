@@ -9,7 +9,7 @@ package com.baidu.jprotobuf.pbrpc.proto;
 
 import com.baidu.jprotobuf.pbrpc.EchoClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.EchoLogIDGenerator;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
 
 /**
@@ -29,10 +29,10 @@ public interface EchoService {
      * @param info
      * @return
      */
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 1500)
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1500)
     EchoInfo echo(EchoInfo info);
     
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 1500, 
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1500, 
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoWithAttachement(EchoInfo info);
 }

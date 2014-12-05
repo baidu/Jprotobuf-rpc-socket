@@ -14,7 +14,7 @@ import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.DummyClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.DummyLogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.google.protobuf.GeneratedMessage;
 
@@ -24,12 +24,12 @@ import com.google.protobuf.GeneratedMessage;
  * @author xiemalin
  * @since 1.0
  * @see ProtobufRpcProxy
- * @see ProtobufPRC
+ * @see ProtobufRPC
  */
 public abstract class RpcMethodInfo {
 
     private Method method;
-    private ProtobufPRC protobufPRC;
+    private ProtobufRPC protobufPRC;
     private String serviceName;
     private String methodName;
     private long onceTalkTimeout;
@@ -74,7 +74,7 @@ public abstract class RpcMethodInfo {
      * @param method
      * @param protobufPRC
      */
-    public RpcMethodInfo(Method method, ProtobufPRC protobufPRC) {
+    public RpcMethodInfo(Method method, ProtobufRPC protobufPRC) {
         this.method = method;
         this.protobufPRC = protobufPRC;
 
@@ -221,7 +221,7 @@ public abstract class RpcMethodInfo {
      * 
      * @return the protobufPRC
      */
-    public ProtobufPRC getProtobufPRC() {
+    public ProtobufRPC getProtobufPRC() {
         return protobufPRC;
     }
 

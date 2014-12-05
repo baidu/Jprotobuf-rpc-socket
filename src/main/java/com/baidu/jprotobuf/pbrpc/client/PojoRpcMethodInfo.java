@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 
 /**
  * RPC method description info for JProtobuf annotation.
@@ -30,7 +30,7 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
      * @param method
      * @param protobufPRC
      */
-    public PojoRpcMethodInfo(Method method, ProtobufPRC protobufPRC) {
+    public PojoRpcMethodInfo(Method method, ProtobufRPC protobufPRC) {
         super(method, protobufPRC);
         
         Class<? extends Object> inputClass = getInputClass();
