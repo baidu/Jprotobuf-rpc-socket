@@ -7,7 +7,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.meta;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 
 /**
  * {@link RpcServiceMetaService}
@@ -17,6 +17,6 @@ import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
  */
 public interface RpcServiceMetaService {
 
-    @ProtobufPRC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
+    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
     RpcServiceMetaList getRpcServiceMetaInfo();
 }

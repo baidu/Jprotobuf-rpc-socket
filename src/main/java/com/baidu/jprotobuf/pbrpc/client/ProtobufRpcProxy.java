@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
@@ -101,7 +101,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         // to parse interface
         Method[] methods = interfaceClass.getMethods();
         for (Method method : methods) {
-            ProtobufPRC protobufPRC = method.getAnnotation(ProtobufPRC.class);
+            ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
             if (protobufPRC != null) {
                 String serviceName = protobufPRC.serviceName();
                 String methodName = protobufPRC.methodName();
@@ -161,7 +161,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        ProtobufPRC protobufPRC = method.getAnnotation(ProtobufPRC.class);
+        ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
         if (protobufPRC == null) {
             throw new IllegalAccessError("Target method is not marked annotation @ProtobufPRC. method name :"
                     + method.getDeclaringClass().getName() + "." + method.getName());

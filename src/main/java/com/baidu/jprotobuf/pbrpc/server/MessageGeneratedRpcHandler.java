@@ -59,7 +59,6 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
         Object ret;
         if (data.getData() != null && parseFromMethod != null) {
             input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
-            ;
             param = new Object[] { input };
         } else {
             param = new Object[0];

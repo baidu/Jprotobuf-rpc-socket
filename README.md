@@ -17,7 +17,7 @@ Protobuf RPC是一种基于TCP协议的二进制RPC通信协议。它以Protobuf
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-rpc-socket</artifactId>
-  <version>2.5</version>
+  <version>2.7</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-rpc-socket/)

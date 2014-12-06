@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.google.protobuf.GeneratedMessage;
 
 /**
@@ -31,7 +31,7 @@ public class GeneratedMessageRpcMethodInfo extends RpcMethodInfo {
      * @param method
      * @param protobufPRC
      */
-    public GeneratedMessageRpcMethodInfo(Method method, ProtobufPRC protobufPRC) {
+    public GeneratedMessageRpcMethodInfo(Method method, ProtobufRPC protobufPRC) {
         super(method, protobufPRC);
 
         Class<?> outputClass = getOutputClass();

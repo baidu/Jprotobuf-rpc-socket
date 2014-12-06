@@ -7,7 +7,7 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRC;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 
 /**
  * Simple echo service interface
@@ -26,15 +26,15 @@ public interface EchoService {
      * @param info
      * @return
      */
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 150)
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 150)
     EchoInfo echo(EchoInfo info);
     
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 150, 
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 150, 
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoWithAttachement(EchoInfo info);
     
     
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 1500000, compressType = CompressType.GZIP,
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1500000, compressType = CompressType.GZIP,
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoGzip(EchoInfo info);
 }
