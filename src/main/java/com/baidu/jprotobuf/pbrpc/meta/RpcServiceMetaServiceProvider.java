@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 
@@ -37,7 +37,7 @@ public class RpcServiceMetaServiceProvider {
         this.rpcServiceRegistry = rpcServiceRegistry;
     }
 
-    @ProtobufPRCService(serviceName = RPC_META_SERVICENAME)
+    @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
     public RpcServiceMetaList getRpcServiceMetaInfo() {
         
         Collection<RpcHandler> services = rpcServiceRegistry.getServices();

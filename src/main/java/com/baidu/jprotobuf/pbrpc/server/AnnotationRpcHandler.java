@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 
 /**
  * RPC handler for Jprotobuf annotation.
@@ -28,7 +28,7 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
      * @param method
      * @param service
      */
-    public AnnotationRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    public AnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super(method, service, protobufPRCService);
         if (getInputClass() != null) {
             inputCodec = ProtobufProxy.create(getInputClass());

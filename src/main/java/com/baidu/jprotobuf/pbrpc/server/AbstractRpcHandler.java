@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.LogIDHolder;
-import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
@@ -31,7 +31,7 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
     private String serviceName;
     private String methodName;
     private Method method;
-    private ProtobufPRCService protobufPRCService;
+    private ProtobufRPCService protobufPRCService;
     private Class inputClass;
     private Class outputClass;
     private Object service;
@@ -78,7 +78,7 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
      * @param service
      * @param protobufPRCService
      */
-    public AbstractRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    public AbstractRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super();
         this.method = method;
         this.service = service;

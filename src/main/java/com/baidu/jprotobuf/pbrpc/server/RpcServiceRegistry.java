@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
@@ -65,7 +65,7 @@ public class RpcServiceRegistry {
             
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
                 
-                ProtobufPRCService protobufPRCService = method.getAnnotation(ProtobufPRCService.class);
+                ProtobufRPCService protobufPRCService = method.getAnnotation(ProtobufRPCService.class);
                 if (protobufPRCService != null) {
                     doRegiterService(method, target, protobufPRCService);
                 }
@@ -75,7 +75,7 @@ public class RpcServiceRegistry {
         
     }
     
-    protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
         AbstractRpcHandler rpcHandler;
         if (!messageType) {
@@ -89,7 +89,7 @@ public class RpcServiceRegistry {
         return rpcHandler;
     }
     
-    private void doRegiterService(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    private void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         serviceMap.put(getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName()), rpcHandler);
     }

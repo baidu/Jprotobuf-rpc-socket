@@ -65,7 +65,7 @@ public interface EchoService {
      * @param info
      * @return
      */
-    @ProtobufPRC(serviceName = "echoService", onceTalkTimeout = 200)
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 200)
     EchoInfo echo(EchoInfo info);
 }
 
@@ -93,7 +93,7 @@ rpcClient.stop();
 ```java
 public class EchoServiceImpl {
 
-    @ProtobufPRCService(serviceName = "echoService", methodName = "echo")
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.message);

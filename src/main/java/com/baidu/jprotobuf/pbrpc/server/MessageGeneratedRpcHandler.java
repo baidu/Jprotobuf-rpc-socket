@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufPRCService;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.google.protobuf.GeneratedMessage;
 
 /**
@@ -31,7 +31,7 @@ public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
      * @param service
      * @param protobufPRCService
      */
-    public MessageGeneratedRpcHandler(Method method, Object service, ProtobufPRCService protobufPRCService) {
+    public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super(method, service, protobufPRCService);
 
         if (getInputClass() != null) {
