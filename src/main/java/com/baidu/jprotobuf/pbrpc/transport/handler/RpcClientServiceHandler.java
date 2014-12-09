@@ -16,6 +16,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientCallState;
 
@@ -63,17 +64,18 @@ public class RpcClientServiceHandler extends SimpleChannelUpstreamHandler {
         Long correlationId = dataPackage.getRpcMeta().getCorrelationId();
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         
-        Integer errorCode = 0;
-        if (dataPackage.getRpcMeta().getResponse() != null) {
-            errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
+        Integer errorCode = ErrorCodes.ST_SUCCESS;
+        RpcResponseMeta response = dataPackage.getRpcMeta().getResponse();
+        if (response != null) {
+            errorCode = response.getErrorCode();
         }
         
         if (! ErrorCodes.isSuccess(errorCode)) {
             if (state != null) {
-                state.handleFailure(errorCode, dataPackage.getRpcMeta().getResponse().getErrorText());
+                state.handleFailure(errorCode, response.getErrorText());
             } else {
                 ctx.sendUpstream(e);
-                throw new Exception(dataPackage.getRpcMeta().getResponse().getErrorText());
+                throw new Exception(response.getErrorText());
             }
         } else {
             if (state != null) {

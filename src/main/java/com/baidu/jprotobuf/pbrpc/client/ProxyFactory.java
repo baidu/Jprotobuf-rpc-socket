@@ -28,6 +28,6 @@ public class ProxyFactory {
      */
     public static <T> T createProxy(Class<T> type, InvocationHandler handler) {
         Class[] clazz = { type };
-        return (T) Proxy.newProxyInstance(ProxyFactory.class.getClassLoader(), clazz, handler);
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), clazz, handler);
     }
 }
