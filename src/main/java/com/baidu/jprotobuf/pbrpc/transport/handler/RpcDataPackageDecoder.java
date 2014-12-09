@@ -9,7 +9,6 @@ package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,7 +71,7 @@ public class RpcDataPackageDecoder extends FrameDecoder {
         headMeta.read(bytes);
 
         // get total message size
-        int messageSize = headMeta.getMessageSize();
+        int messageSize = headMeta.getMessageSize() + RpcHeadMeta.SIZE;
 
         // Make sure if there's enough bytes in the buffer.
         if (buf.readableBytes() < messageSize) {
@@ -92,7 +91,6 @@ public class RpcDataPackageDecoder extends FrameDecoder {
         if (!ProtocolConstant.MAGIC_CODE.equals(magicCode)) {
             throw new Exception("Error magic code:" + magicCode);
         }
-
         // There's enough bytes in the buffer. Read it.
         byte[] totalBytes = new byte[messageSize];
         buf.readBytes(totalBytes, 0, messageSize);

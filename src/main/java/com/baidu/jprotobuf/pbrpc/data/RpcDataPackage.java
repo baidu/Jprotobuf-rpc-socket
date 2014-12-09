@@ -246,7 +246,7 @@ public class RpcDataPackage implements Readable, Writerable {
             throw new RuntimeException("property 'rpcMeta' is null.");
         }
         
-        int totolSize = RpcHeadMeta.SIZE;
+        int totolSize = 0;
         
         // set dataSize
         int dataSize = 0;
@@ -327,7 +327,7 @@ public class RpcDataPackage implements Readable, Writerable {
         // read message data
         // message data size =  totalsize - metasize - headsize - attachmentSize
         int totalSize = head.getMessageSize();
-        int dataSize = totalSize - RpcHeadMeta.SIZE - metaSize - attachmentSize;
+        int dataSize = totalSize - metaSize - attachmentSize;
         
         if (dataSize > 0) {
             data = new byte[dataSize];
@@ -345,7 +345,7 @@ public class RpcDataPackage implements Readable, Writerable {
     public static RpcDataPackage buildRpcDataPackage(RpcMethodInfo methodInfo, Object[] args) throws IOException {
         RpcDataPackage dataPacage = new RpcDataPackage();
         dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
-        dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethod().getName());
+        dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethodName());
         dataPacage.compressType(methodInfo.getProtobufPRC().compressType().value());
         // set data
         if (args != null && args.length == 1) {

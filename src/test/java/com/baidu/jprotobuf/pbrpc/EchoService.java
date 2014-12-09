@@ -34,7 +34,7 @@ public interface EchoService {
     EchoInfo echoWithAttachement(EchoInfo info);
     
     
-    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1500000, compressType = CompressType.GZIP,
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1500, compressType = CompressType.GZIP,
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoGzip(EchoInfo info);
 }

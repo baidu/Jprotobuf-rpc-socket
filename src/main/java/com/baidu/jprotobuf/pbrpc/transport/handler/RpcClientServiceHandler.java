@@ -63,7 +63,11 @@ public class RpcClientServiceHandler extends SimpleChannelUpstreamHandler {
         Long correlationId = dataPackage.getRpcMeta().getCorrelationId();
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         
-        Integer errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
+        Integer errorCode = 0;
+        if (dataPackage.getRpcMeta().getResponse() != null) {
+            errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
+        }
+        
         if (! ErrorCodes.isSuccess(errorCode)) {
             if (state != null) {
                 state.handleFailure(errorCode, dataPackage.getRpcMeta().getResponse().getErrorText());

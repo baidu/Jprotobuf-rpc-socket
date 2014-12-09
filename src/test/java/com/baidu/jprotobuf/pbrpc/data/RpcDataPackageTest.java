@@ -47,7 +47,7 @@ public class RpcDataPackageTest {
         rpcDataPackage.setData(new byte[] {1, 2, 4, 8});
         
         byte[] bytes = rpcDataPackage.write();
-        Assert.assertEquals(bytes.length, rpcDataPackage.getHead().getMessageSize());
+        Assert.assertEquals(bytes.length, rpcDataPackage.getHead().getMessageSize() + RpcHeadMeta.SIZE);
         
         RpcDataPackage rpcDataPackage2 = new RpcDataPackage();
         rpcDataPackage2.read(bytes);

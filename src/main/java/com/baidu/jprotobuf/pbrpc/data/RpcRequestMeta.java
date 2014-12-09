@@ -42,16 +42,16 @@ public class RpcRequestMeta implements Readable, Writerable {
     private String methodName;
     
     /**
-     * 非PbRpc规范，用于传输额外的参数
-     */
-    @Protobuf(fieldType = FieldType.BYTES)
-    private byte[] extraParam;
-    
-    /**
      * 用于打印日志。可用于存放BFE_LOGID。该参数可选。
      */
     @Protobuf
     private Long logId;
+    
+    /**
+     * 非PbRpc规范，用于传输额外的参数
+     */
+    @Protobuf(fieldType = FieldType.BYTES)
+    private byte[] extraParam;
 
     /**
      * get the serivceName

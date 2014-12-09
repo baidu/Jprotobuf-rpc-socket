@@ -224,7 +224,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
             throws InterruptedException, ExecutionException {
         setUp(multiSize, requestData, responseData);
 
-        ExecutorService pool = Executors.newFixedThreadPool(2);
+        ExecutorService pool = Executors.newFixedThreadPool(multiSize);
 
         long time = System.currentTimeMillis();
         List<Future<?>> futures = new ArrayList<Future<?>>(multiSize);

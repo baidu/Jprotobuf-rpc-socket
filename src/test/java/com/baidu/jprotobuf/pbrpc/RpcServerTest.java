@@ -7,8 +7,6 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
-import java.util.Arrays;
-
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
