@@ -40,14 +40,13 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
     private String serviceName;
     private String methodName;
     private Method method;
-    private ProtobufRPCService protobufPRCService;
     private Class inputClass;
     private Class outputClass;
     private Object service;
 
     private ServerAttachmentHandler attachmentHandler;
-    private String inputIDl;
-    private String outputIDL;
+    protected String inputIDl;
+    protected String outputIDL;
     
     /**
      * get the method
@@ -91,7 +90,6 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
         super();
         this.method = method;
         this.service = service;
-        this.protobufPRCService = protobufPRCService;
         
         serviceName = protobufPRCService.serviceName();
         methodName = protobufPRCService.methodName();

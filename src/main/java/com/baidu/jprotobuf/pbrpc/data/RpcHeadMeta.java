@@ -39,7 +39,7 @@ public class RpcHeadMeta implements Writerable, Readable {
     private byte[] magicCode;
     
     /**
-     * total size
+     * message body size include
      */
     private int messageSize;
     
@@ -124,11 +124,6 @@ public class RpcHeadMeta implements Writerable, Readable {
      * @see com.baidu.jprotobuf.remoting.pbrpc.Writerable#read()
      */
     public byte[] write() {
-/*        
-        byte[] ret = new byte[SIZE];
-        System.arraycopy(magicCode, 0, ret, 0, 4);
-        System.arraycopy(messageSize, 0, ret, 0, 4);*/
-        
         ByteBuffer allocate = ByteBuffer.allocate(SIZE);
         allocate.put(magicCode);
         allocate.putInt(messageSize);

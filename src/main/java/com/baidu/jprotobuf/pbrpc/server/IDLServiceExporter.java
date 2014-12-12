@@ -19,6 +19,7 @@ package com.baidu.jprotobuf.pbrpc.server;
 import java.io.InputStream;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
+import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 
 /**
  * Service exporter supports for JProtobuf {@link IDLProxyObject}.<br>
@@ -28,7 +29,7 @@ import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
  * @since 1.0
  */
 public class IDLServiceExporter extends
-        AbstractServiceExporter<IDLProxyObject, IDLProxyObject> {
+        AbstractServiceExporter<IDLProxyObject, IDLProxyObject> implements RpcMetaAware {
     
     /**
      * input protobuf IDL
@@ -64,8 +65,45 @@ public class IDLServiceExporter extends
      * @see com.baidu.jprotobuf.pbrpc.server.ServiceExporter#execute(java.lang.Object)
      */
     public IDLProxyObject execute(IDLProxyObject input) throws Exception {
-        
-        return null;
+        IDLProxyObject output = getOutputIDLProxyObject();
+        getServiceInvoker().invoke(input, output);
+        return output;
     }
 
+    /**
+     * get the inputIDLProxyObject
+     * @return the inputIDLProxyObject
+     */
+    public IDLProxyObject getInputProxyObject() {
+        if (inputIDLProxyObject != null) {
+            return inputIDLProxyObject.newInstnace();
+        }
+        
+        return inputIDLProxyObject;
+    }
+    
+    /**
+     * get the outputIDLProxyObject
+     * @return the outputIDLProxyObject
+     */
+    protected IDLProxyObject getOutputIDLProxyObject() {
+        if (outputIDLProxyObject != null) {
+            return outputIDLProxyObject.newInstnace();
+        }
+        return outputIDLProxyObject;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getInputMetaProto()
+     */
+    public String getInputMetaProto() {
+        return inputIDLStr;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getOutputMetaProto()
+     */
+    public String getOutputMetaProto() {
+        return outputIDLStr;
+    }
 }

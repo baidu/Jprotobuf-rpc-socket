@@ -87,7 +87,7 @@ public class RpcChannel {
                     RpcClientCallState callState = rpcClient.removePendingRequest(correlationId);
                     if (callState != null) {
                         callState.handleFailure(e.getMessage());
-                        LOG.log(Level.FINE, "id:" + correlationId + "is put in the queue");
+                        LOG.log(Level.FINE, "id:" + correlationId + " is put in the queue");
                     }
                 }
             } else {
