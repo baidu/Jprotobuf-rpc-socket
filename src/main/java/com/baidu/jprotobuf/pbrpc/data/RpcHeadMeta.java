@@ -151,5 +151,13 @@ public class RpcHeadMeta implements Writerable, Readable {
         
         allocate.clear();
     }
+    
+    public RpcHeadMeta copy() {
+        RpcHeadMeta rpcHeadMeta = new RpcHeadMeta();
+        rpcHeadMeta.setMagicCode(getMagicCode());
+        rpcHeadMeta.setMessageSize(getMessageSize());
+        rpcHeadMeta.setMetaSize(getMetaSize());
+        return rpcHeadMeta;
+    }
 
 }

@@ -42,6 +42,9 @@ public class RpcClientOptions {
     
     // in MILLISECONDS unit
     private int onceTalkTimeout = 1000;
+    
+    // if use chunkSize will split chunkSize 
+    private long chunkSize = -1;
 
     /**
      * get the onceTalkTimeout
@@ -219,6 +222,22 @@ public class RpcClientOptions {
      */
     public void setMinIdleSize(int minIdleSize) {
         this.minIdleSize = minIdleSize;
+    }
+
+    /**
+     * get the chunkSize
+     * @return the chunkSize
+     */
+    public long getChunkSize() {
+        return chunkSize;
+    }
+
+    /**
+     * set chunkSize value to chunkSize
+     * @param chunkSize the chunkSize to set
+     */
+    public void setChunkSize(long chunkSize) {
+        this.chunkSize = chunkSize;
     }
     
     

@@ -46,7 +46,7 @@ public class RpcMetaTest {
         ChunkInfo info = new ChunkInfo();
         info.setChunkId(100L);
         info.setStreamId(-1L);
-        meta.setChuckInfo(info);
+        meta.setChunkInfo(info);
         
         meta.setAttachmentSize(-10);
         byte[] authenticationData = new byte[] {1, 3, 5, 7};
@@ -79,8 +79,8 @@ public class RpcMetaTest {
         Assert.assertArrayEquals(meta.getAuthenticationData(), meta2.getAuthenticationData());
         Assert.assertEquals(meta.getCompressType(), meta2.getCompressType());
         Assert.assertEquals(meta.getCorrelationId(), meta2.getCorrelationId());
-        Assert.assertEquals(meta.getChuckInfo().getChunkId(), meta2.getChuckInfo().getChunkId());
-        Assert.assertEquals(meta.getChuckInfo().getStreamId(), meta2.getChuckInfo().getStreamId());
+        Assert.assertEquals(meta.getChunkInfo().getChunkId(), meta2.getChunkInfo().getChunkId());
+        Assert.assertEquals(meta.getChunkInfo().getStreamId(), meta2.getChunkInfo().getStreamId());
         Assert.assertEquals(meta.getRequest().getMethodName(), meta2.getRequest().getMethodName());
         Assert.assertEquals(meta.getRequest().getSerivceName(), meta2.getRequest().getSerivceName());
         Assert.assertEquals(meta.getRequest().getLogId(), meta2.getRequest().getLogId());

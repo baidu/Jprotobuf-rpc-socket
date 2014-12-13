@@ -31,7 +31,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @see RpcRequestMeta
  * @see RpcResponseMeta
  */
-public class RpcMeta implements Readable, Writerable {
+public class RpcMeta implements Readable, Writerable, Cloneable {
     
     public static final int COMPRESS_NO = 0;
     public static final int COMPRESS_SNAPPY = 1;
@@ -80,7 +80,7 @@ public class RpcMeta implements Readable, Writerable {
      * Chunk模式本质上是将一个大的数据流拆分成一个个小的Chunk包按序进行发送。如何拆分还原由通信双方确定
      */
     @Protobuf
-    private ChunkInfo chuckInfo;
+    private ChunkInfo chunkInfo;
     
     /**
      * 用于存放身份认证相关信息
@@ -178,22 +178,6 @@ public class RpcMeta implements Readable, Writerable {
     }
 
     /**
-     * get the chuckInfo
-     * @return the chuckInfo
-     */
-    public ChunkInfo getChuckInfo() {
-        return chuckInfo;
-    }
-
-    /**
-     * set chuckInfo value to chuckInfo
-     * @param chuckInfo the chuckInfo to set
-     */
-    public void setChuckInfo(ChunkInfo chuckInfo) {
-        this.chuckInfo = chuckInfo;
-    }
-
-    /**
      * get the authenticationData
      * @return the authenticationData
      */
@@ -229,7 +213,7 @@ public class RpcMeta implements Readable, Writerable {
         }
         try {
             RpcMeta meta = CODEC.decode(bytes);
-            copy(meta);
+            copyReference(meta);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -240,7 +224,7 @@ public class RpcMeta implements Readable, Writerable {
      * 
      * @param meta
      */
-    private void copy(RpcMeta meta) {
+    private void copyReference(RpcMeta meta) {
         if (meta == null) {
             return;
         }
@@ -250,7 +234,44 @@ public class RpcMeta implements Readable, Writerable {
         setAuthenticationData(meta.getAuthenticationData());
         setCompressType(meta.getCompressType());
         setCorrelationId(meta.getCorrelationId());
-        setChuckInfo(meta.getChuckInfo());
+        setChunkInfo(meta.getChunkInfo());
+    }
+    
+    public RpcMeta copy() {
+        RpcMeta rpcMeta = new RpcMeta();
+        
+        if (chunkInfo != null) {
+            rpcMeta.setChunkInfo(chunkInfo.copy());
+        }
+        if (request != null) {
+            rpcMeta.setRequest(request.copy());
+        }
+        if (response != null) {
+            rpcMeta.setResponse(response.copy());
+        }
+        rpcMeta.setAttachmentSize(attachmentSize);
+        rpcMeta.setAuthenticationData(authenticationData);
+        rpcMeta.setCompressType(compressType);
+        rpcMeta.setCorrelationId(correlationId);
+        
+        
+        return rpcMeta;
+    }
+
+    /**
+     * get the chunkInfo
+     * @return the chunkInfo
+     */
+    public ChunkInfo getChunkInfo() {
+        return chunkInfo;
+    }
+
+    /**
+     * set chunkInfo value to chunkInfo
+     * @param chunkInfo the chunkInfo to set
+     */
+    public void setChunkInfo(ChunkInfo chunkInfo) {
+        this.chunkInfo = chunkInfo;
     }
     
 }

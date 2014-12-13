@@ -17,6 +17,8 @@
 package com.baidu.jprotobuf.pbrpc.data;
 
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -68,4 +70,74 @@ public class RpcDataPackageTest {
         Assert.assertArrayEquals(rpcDataPackage.getData(), rpcDataPackage2.getData());
         
     }
+    
+    @Test
+    public void testChunk2() {
+        
+        RpcDataPackage dataPackage = getDataPackage();
+        
+        dataPackage.data(dataPackage.write());
+        
+        int count = dataPackage.getData().length / 23 + 1;
+        
+        List<RpcDataPackage> chunkList = dataPackage.chunk(23);
+        Assert.assertEquals(count, chunkList.size());
+        
+        RpcDataPackage mergedPackage = new RpcDataPackage();
+        for (RpcDataPackage rpcDataPackage : chunkList) {
+            mergedPackage.mergeData(rpcDataPackage.getData());
+        }
+        Assert.assertArrayEquals(dataPackage.getData(), mergedPackage.getData());
+    }
+    
+    @Test
+    public void testChunk() {
+        RpcDataPackage dataPackage = getDataPackage();
+        String serviceName = "hello";
+        String methodName = "testMethod";
+        dataPackage.serviceName(serviceName);
+        dataPackage.methodName(methodName);
+        byte[] attachment = new byte[] {1, 4};
+        dataPackage.attachment(attachment);
+        
+        List<RpcDataPackage> chunkList = dataPackage.chunk(0);
+        Assert.assertEquals(1, chunkList.size());
+        
+        chunkList = dataPackage.chunk(1);
+        Assert.assertEquals(4, chunkList.size());
+        
+        int pos = 0;
+        Long streamId = null;
+        
+        RpcDataPackage mergedPackage = new RpcDataPackage();
+        
+        for (RpcDataPackage data : chunkList) {
+            Assert.assertEquals("HULU", data.getHead().getMagicCodeAsString());
+            Assert.assertEquals(serviceName, data.getRpcMeta().getRequest().getSerivceName());
+            Assert.assertEquals(methodName, data.getRpcMeta().getRequest().getMethodName());
+            if (pos == 0) {
+                Assert.assertArrayEquals(attachment, data.getAttachment());
+                
+            } else {
+                Assert.assertNull(data.getAttachment());
+            }
+            
+            if (streamId != null) {
+                Assert.assertEquals(streamId, data.getRpcMeta().getChunkInfo().getStreamId());
+            }
+            streamId = data.getRpcMeta().getChunkInfo().getStreamId();
+            if (pos == 3) {
+                Assert.assertEquals(-1,  data.getRpcMeta().getChunkInfo().getChunkId());
+            } else {
+                Assert.assertEquals(pos,  data.getRpcMeta().getChunkInfo().getChunkId()); 
+            }
+            
+            pos++;
+            
+            mergedPackage.mergeData(data.getData());
+        }
+        
+        Assert.assertArrayEquals(dataPackage.getData(), mergedPackage.getData());
+    }
+    
 }

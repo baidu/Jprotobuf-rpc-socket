@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
+import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
@@ -40,6 +42,8 @@ import com.baidu.jprotobuf.pbrpc.data.RpcHeadMeta;
 public class RpcDataPackageDecoder extends FrameDecoder {
 
     private static Logger LOG = Logger.getLogger(RpcDataPackageDecoder.class.getName());
+    
+    private static final Map<Long, RpcDataPackage> tempTrunkPackages = new ConcurrentHashMap<Long, RpcDataPackage>();
 
     /*
      * (non-Javadoc)
@@ -107,6 +111,29 @@ public class RpcDataPackageDecoder extends FrameDecoder {
         RpcDataPackage rpcDataPackage = new RpcDataPackage();
         
         rpcDataPackage.read(totalBytes);
+        
+        // check if a chunk package
+        if (rpcDataPackage.isChunkPackage()) {
+            
+            Long chunkStreamId = rpcDataPackage.getChunkStreamId();
+            
+            RpcDataPackage chunkDataPackage = tempTrunkPackages.get(chunkStreamId);
+            if (chunkDataPackage == null) {
+                chunkDataPackage = rpcDataPackage;
+                tempTrunkPackages.put(chunkStreamId, rpcDataPackage);
+            } else {
+                chunkDataPackage.mergeData(rpcDataPackage.getData());
+            }
+            
+            if (rpcDataPackage.isFinalPackage()) {
+                chunkDataPackage.chunkInfo(chunkStreamId, -1);
+                tempTrunkPackages.remove(chunkStreamId);
+                
+                return chunkDataPackage;
+            }
+            
+            return null;
+        }
 
         long rpcMessageDecoderEnd = System.nanoTime();
         LOG.log(Level.FINE, "[profiling] nshead decode cost : " + (rpcMessageDecoderEnd - rpcMessageDecoderStart)

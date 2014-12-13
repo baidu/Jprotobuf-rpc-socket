@@ -30,7 +30,6 @@ public class EchoServiceImpl {
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage());
-
         return ret;
     }
 

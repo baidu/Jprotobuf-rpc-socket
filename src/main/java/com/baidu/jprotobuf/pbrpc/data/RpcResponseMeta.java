@@ -138,6 +138,15 @@ public class RpcResponseMeta implements Readable, Writerable {
             throw  new RuntimeException(e.getMessage(), e);
         }
     }
+
+    /**
+     * @return
+     */
+    public RpcResponseMeta copy() {
+        RpcResponseMeta rpcResponseMeta = new RpcResponseMeta();
+        rpcResponseMeta.copy(this);
+        return rpcResponseMeta;
+    }
     
     
 }

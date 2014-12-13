@@ -45,7 +45,7 @@ public class ChunkInfo implements Readable, Writerable {
      * 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证
      */
     @Protobuf(required = true)
-    private long chunkId;
+    private long chunkId = -1;
 
     /**
      * get the streamId
@@ -114,6 +114,16 @@ public class ChunkInfo implements Readable, Writerable {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * @return
+     */
+    public ChunkInfo copy() {
+        ChunkInfo chunkInfo = new ChunkInfo();
+        chunkInfo.setChunkId(chunkId);
+        chunkInfo.setStreamId(streamId);
+        return chunkInfo;
     }
 
 }

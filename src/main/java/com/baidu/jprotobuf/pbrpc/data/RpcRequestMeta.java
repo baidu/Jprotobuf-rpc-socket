@@ -138,6 +138,7 @@ public class RpcRequestMeta implements Readable, Writerable {
         setLogId(meta.getLogId());
         setMethodName(meta.getMethodName());
         setServiceName(meta.getSerivceName());
+        setExtraParam(meta.getExtraParam());
     }
 
     /* (non-Javadoc)
@@ -165,6 +166,15 @@ public class RpcRequestMeta implements Readable, Writerable {
      */
     public void setExtraParam(byte[] extraParam) {
         this.extraParam = extraParam;
+    }
+
+    /**
+     * @return
+     */
+    public RpcRequestMeta copy() {
+        RpcRequestMeta rpcRequestMeta = new RpcRequestMeta();
+        rpcRequestMeta.copy(this);
+        return rpcRequestMeta;
     }
     
     
