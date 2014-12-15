@@ -38,6 +38,11 @@ import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
  */
 public class RpcServer extends ServerBootstrap {
 
+    /**
+     * Default stop check interval
+     */
+    private static final int DEFAULT_CHECK_INTERVAL = 1000;
+
     private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
 
     private AtomicBoolean stop = new AtomicBoolean(false);
@@ -107,7 +112,7 @@ public class RpcServer extends ServerBootstrap {
 
     public void waitForStop() throws InterruptedException {
         while (!stop.get()) {
-            Thread.sleep(1000);
+            Thread.sleep(DEFAULT_CHECK_INTERVAL);
         }
         shutdown();
     }
@@ -130,7 +135,7 @@ public class RpcServer extends ServerBootstrap {
     @Override
     public void shutdown() {
         super.shutdown();
-        //rpcServerPipelineFactory.close();
+        rpcServerPipelineFactory.close();
     }
 
     public void setStop(AtomicBoolean stop) {
