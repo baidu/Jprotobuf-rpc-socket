@@ -80,7 +80,7 @@ public class RpcServerOptions {
     /**
      * time out set for chunk package wait in ms.
      */
-    private int chunkPackageTimeout = 3000 * 1000;
+    private int chunkPackageTimeout = 300 * 1000;
 
     public int getKeepAliveTime() {
         return keepAliveTime;
