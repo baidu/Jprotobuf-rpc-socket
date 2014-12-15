@@ -15,18 +15,20 @@
  */
 package com.baidu.jprotobuf.pbrpc.compress;
 
-import java.io.IOException;
-
 /**
- * Compress interface.
+ * Test class for {@link SnappyCompress}
  *
  * @author xiemalin
- * @since 1.4
+ * @since 2.13
  */
-public interface Compress {
+public class SnappyCompressTest extends BaseCompressTest {
 
-    byte[] compress(byte[] array) throws IOException;
-    
-    
-    byte[] unCompress(byte[] array) throws IOException;
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.compress.BaseCompressTest#createCompress()
+     */
+    @Override
+    protected Compress createCompress() {
+        return new SnappyCompress();
+    }
+
 }

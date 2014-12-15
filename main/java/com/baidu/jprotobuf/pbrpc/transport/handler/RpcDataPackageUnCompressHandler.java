@@ -23,6 +23,7 @@ import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.compress.Compress;
 import com.baidu.jprotobuf.pbrpc.compress.GZipCompress;
+import com.baidu.jprotobuf.pbrpc.compress.SnappyCompress;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 
@@ -57,6 +58,8 @@ public class RpcDataPackageUnCompressHandler extends OneToOneDecoder {
             Compress compress = null;
             if (compressType == RpcMeta.COMPERESS_GZIP) {
                 compress = new GZipCompress();
+            } else if (compressType == RpcMeta.COMPRESS_SNAPPY) {
+                compress = new SnappyCompress();
             }
 
             if (compress != null) {
