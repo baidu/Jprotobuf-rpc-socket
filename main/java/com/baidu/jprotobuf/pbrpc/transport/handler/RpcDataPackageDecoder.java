@@ -83,9 +83,9 @@ public class RpcDataPackageDecoder extends FrameDecoder {
                         while (iter.hasNext()) {
                             Entry<Long, RpcDataPackage> entry = iter.next();
                             
-                            if (entry.getValue().getTimeStamp() + chunkPackageTimeout > System.currentTimeMillis()) {
+                            if (entry.getValue().getTimeStamp() > System.currentTimeMillis() + chunkPackageTimeout) {
                                 // get time out chunk package, do clean action
-                                tempTrunkPackages.remove(entry.getValue());
+                                tempTrunkPackages.remove(entry.getKey());
                                 LOG.log(Level.SEVERE, "Found chunk package time out long than " + chunkPackageTimeout
                                         + "(ms) will clean up correlationId:"
                                         + entry.getValue().getRpcMeta().getCorrelationId());
@@ -115,6 +115,8 @@ public class RpcDataPackageDecoder extends FrameDecoder {
      */
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buf) throws Exception {
+        
+        //LOG.log(Level.INFO, "receive data from channel id:" + channel.getId());
 
         // Make sure if the length field was received.
         if (buf.readableBytes() < RpcHeadMeta.SIZE) {

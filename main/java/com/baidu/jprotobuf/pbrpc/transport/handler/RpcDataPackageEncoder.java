@@ -107,8 +107,9 @@ public class RpcDataPackageEncoder extends OneToOneEncoder {
         }
 
         List<RpcDataPackage> list = dataPackage.chunk(chunkSize);
-        LOG.log(Level.SEVERE, "Using chunk mod, CorrelationId:" + dataPackage.getRpcMeta().getCorrelationId() 
-                + " package will thunk into " + list.size() + " package(s).");
+        LOG.log(Level.FINE, "Using chunk mod, CorrelationId:" + dataPackage.getRpcMeta().getCorrelationId()
+                + " package will chunk into " + list.size() + " package(s) for each max message data size is "
+                + chunkSize + " byte(s) .");
         for (RpcDataPackage rpcDataPackage : list) {
             encodeBytes = rpcDataPackage.write();
             encodedMessage = ChannelBuffers.copiedBuffer(ctx.getChannel().getConfig().getBufferFactory()
