@@ -123,42 +123,48 @@ public class EchoServiceImpl {
 - Linux 64G内存 6核 12线程 
 - Intel(R) Xeon(R) CPU           E5645  @ 2.40GHz
 
-性能测试结果如下：
-平均QPS: 20000+
+性能测试结果如下(客户端与服务端部署在同一台机器中)：
+单线程：平均QPS: 9000+
+多线程：QPS: 最高 40000+
 ```property
 ---------------------Performance Result-------------------------
-send byte size: 40;receive byte size: 46
+send byte size: 44;receive byte size: 50
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                7535|                     0|               14285|                   1|
+|              100000|               11807|                     0|                8469|                   1|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 1135;receive byte size: 1135
+send byte size: 44;receive byte size: 50
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|               10055|                     0|               10000|                   1|
+|              100000|               10407|                     0|                9608|                   1|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 40;receive byte size: 46
+send byte size: 1139;receive byte size: 1139
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                5022|                     0|               20000|                   2|
+|              100000|               11513|                     0|                8685|                   1|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 40;receive byte size: 46
+send byte size: 44;receive byte size: 50
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                4969|                     0|               25000|                   4|
+|              100000|                5904|                     0|               16937|                   2|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 40;receive byte size: 46
+send byte size: 44;receive byte size: 50
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                4927|                     0|               25000|                  20|
+|              100000|                3754|                     0|               26638|                   4|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 1135;receive byte size: 1135
+send byte size: 44;receive byte size: 50
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                5861|                     0|               20000|                  20|
+|              100000|                1736|                     0|               57603|                  20|
 ---------------------Performance Result-------------------------
 ---------------------Performance Result-------------------------
-send byte size: 1135;receive byte size: 1135
+send byte size: 1139;receive byte size: 1139
 |         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
-|              100000|                5814|                     0|               20000|                  40|
-
+|              100000|                2381|                     0|               41999|                  20|
+---------------------Performance Result-------------------------
+---------------------Performance Result-------------------------
+send byte size: 1139;receive byte size: 1139
+|         total count|       time took(ms)|           average(ms)|                 QPS|             threads|
+|              100000|                2012|                     0|               49701|                  40|
+---------------------Performance Result-------------------------
 ```
