@@ -116,6 +116,7 @@ public class EchoServiceImpl {
 ```
 上面的代码实现把 EchoServiceImpl 的RPC服务发布出去
 
+[更多使用说明](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/User-Guide)
 
 ## 性能测试 ##
 
