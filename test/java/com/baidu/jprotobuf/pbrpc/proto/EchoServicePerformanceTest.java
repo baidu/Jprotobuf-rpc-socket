@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.baidu.jprotobuf.pbrpc;
+package com.baidu.jprotobuf.pbrpc.proto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,10 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Test;
 
+import com.baidu.jprotobuf.pbrpc.BasePerformaceTest;
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
@@ -76,8 +78,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
         pbrpcProxy.setPort(PORT);
         echoService = pbrpcProxy.proxy();
 
-        echoInfo = new EchoInfo();
-        echoInfo.setMessage(requestData);
+        echoInfo = EchoInfo.newBuilder().setMessage(requestData).build();
         echoService.echo(echoInfo);
         in = buildPackage(requestData.getBytes(), null, null, "echoService", "echo");
         out = buildPackage(responseData.getBytes(), null, null, "echoService", "echo");
@@ -197,8 +198,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
         List<Future<?>> futures = new ArrayList<Future<?>>(10000);
         for (int i = 0; i < 10000; i++) {
-            final EchoInfo echoInfo = new EchoInfo();
-            echoInfo.setMessage(i + "");
+            final EchoInfo echoInfo = EchoInfo.newBuilder().setMessage(i + "").build();
             final int order = i;
             Runnable runnable = new Runnable() {
 

@@ -29,6 +29,8 @@ public class EchoServicePerformanceMain {
      * @param args
      */
     public static void main(String[] args) throws Exception {
+        
+        System.out.println("-------------------jprotobuf-----------------------------");
         EchoServicePerformanceTest test =  new EchoServicePerformanceTest();
         
         test.performanceOneTreadTest();
@@ -54,6 +56,33 @@ public class EchoServicePerformanceMain {
         
         test.performance40TreadsTestWithLongText();
         test.tearDown();
+        
+        com.baidu.jprotobuf.pbrpc.proto.EchoServicePerformanceTest test2 = new com.baidu.jprotobuf.pbrpc.proto.EchoServicePerformanceTest();
+        System.out.println("-------------------protobuf-----------------------------");
+        
+        test2.performanceOneTreadTest();
+        test2.tearDown();
+        
+        test2.performanceOneTreadTest2();
+        test2.tearDown();
+
+        test2.performanceOneTreadTestWithLongText();
+        test2.tearDown();
+        
+        test2.performanceTwoTreadsTest();
+        test2.tearDown();
+        
+        test2.performanceFourTreadsTest();
+        test2.tearDown();
+        
+        test2.performance20TreadsTest();
+        test2.tearDown();
+        
+        test2.performance20TreadsTestWithLongText();
+        test2.tearDown();
+        
+        test2.performance40TreadsTestWithLongText();
+        test2.tearDown();
         
         System.exit(0);
     }

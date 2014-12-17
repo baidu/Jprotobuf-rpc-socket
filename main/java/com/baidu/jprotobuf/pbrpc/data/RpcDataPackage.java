@@ -221,7 +221,6 @@ public class RpcDataPackage implements Readable, Writerable {
         chunkInfo.setChunkId(chunkId);
         RpcMeta rpcMeta = initRpcMeta();
         rpcMeta.setChunkInfo(chunkInfo);
-        ;
         return this;
     }
 
