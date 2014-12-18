@@ -1,7 +1,14 @@
 Jprotobuf-rpc-socket
 ====================
 
-Protobuf RPC是一种基于TCP协议的二进制RPC通信协议。它以Protobuf作为基本的数据交换格式，并基于Protobuf内置的RPC Service形式，规定了通信双方之间的数据交换协议，以实现完整的RPC调用。
+Protobuf RPC是一种基于TCP协议的二进制高性能RPC通信协议实现。它以Protobuf作为基本的数据交换格式，支持完全基于POJO的发布方式，极大的简化了开发复杂性。<br>
+Features:<br>
+- 完全支持POJO方式发布，使用非常简单
+- 内置连接池，具备更高的性能  QPS: 5w+
+- 支持自动重连功能
+- 支持附件发送
+- 压缩功能，支持GZip与Snappy
+- 支持多包拆分与合并功能
 
 关联项目：
 [https://github.com/jhunters/jprotobuf](https://github.com/jhunters/jprotobuf "https://github.com/jhunters/jprotobuf")
