@@ -81,6 +81,26 @@ public class RpcServerOptions {
      * time out set for chunk package wait in ms.
      */
     private int chunkPackageTimeout = 300 * 1000;
+    
+    // if use chunkSize will split chunkSize
+    private long chunkSize = -1;
+    
+
+    /**
+     * get the chunkSize
+     * @return the chunkSize
+     */
+    public long getChunkSize() {
+        return chunkSize;
+    }
+
+    /**
+     * set chunkSize value to chunkSize
+     * @param chunkSize the chunkSize to set
+     */
+    public void setChunkSize(long chunkSize) {
+        this.chunkSize = chunkSize;
+    }
 
     public int getKeepAliveTime() {
         return keepAliveTime;

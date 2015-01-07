@@ -85,7 +85,7 @@ public class RpcClientPipelineFactory implements ChannelPipelineFactory {
         
         // receive data from server
         // receive byte array to encode to RpcDataPackage
-        channelPipe.addLast(CLIENT_DECODER, new RpcDataPackageDecoder(-1));
+        channelPipe.addLast(CLIENT_DECODER, new RpcDataPackageDecoder(rpcClient.getRpcClientOptions().getChunkPackageTimeout()));
         // do uncompress handle
         channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
         // do client handler

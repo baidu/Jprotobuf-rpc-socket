@@ -101,7 +101,7 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
         // check if need to compress for data and attachment
         channelPipe.addFirst(COMPRESS, new RpcDataPackageCompressHandler());
         // encode RpcDataPackage to byte array
-        channelPipe.addFirst(SERVER_DATA_PACK, new RpcDataPackageEncoder());
+        channelPipe.addFirst(SERVER_DATA_PACK, new RpcDataPackageEncoder(rpcServerOptions.getChunkSize()));
 
         return channelPipe;
     }

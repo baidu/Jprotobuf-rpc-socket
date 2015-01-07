@@ -59,8 +59,10 @@ public class RpcServer extends ServerBootstrap {
     public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
         this(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
         this.rpcServiceRegistry = rpcServiceRegistry;
-
-        rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions = serverOptions;
+        if (rpcServerOptions == null) {
+            rpcServerOptions = new RpcServerOptions();
+        }
         rpcServerPipelineFactory = new RpcServerPipelineFactory(rpcServiceRegistry,
                 rpcServerOptions);
         setPipelineFactory(rpcServerPipelineFactory);
