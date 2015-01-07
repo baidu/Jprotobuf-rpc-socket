@@ -34,7 +34,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/Baidu-ecom/Jprotobuf-rpc-socket.git</connection>
 		<developerConnection>scm:git:git@github.com:Baidu-ecom/Jprotobuf-rpc-socket.git</developerConnection>
-		<url>https://github.com/Baidu-ecom/Jprotobuf-rpc-socket</url>
+		<url>https://github.com/Baidu-ecom/Jprotobuf-rpc-socket</url> 
 	</scm>
 
 	<licenses>
