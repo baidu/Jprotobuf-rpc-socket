@@ -16,13 +16,11 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
@@ -35,82 +33,61 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientCallState;
  * @author xiemalin
  * @since 1.0
  */
-public class RpcClientServiceHandler extends SimpleChannelUpstreamHandler {
+public class RpcClientServiceHandler extends
+		SimpleChannelInboundHandler<RpcDataPackage> {
 
-    /**
-     * log this class
-     */
-    private static final Logger LOG = Logger.getLogger(RpcClientServiceHandler.class.getName());
-    
-    /**
-     * RPC client
-     */
-    private RpcClient rpcClient;
+	/**
+	 * log this class
+	 */
+	private static final Logger LOG = Logger
+			.getLogger(RpcClientServiceHandler.class.getName());
 
-    /**
-     * @param rpcClient
-     */
-    public RpcClientServiceHandler(RpcClient rpcClient) {
-        super();
-        this.rpcClient = rpcClient;
-    }
+	/**
+	 * RPC client
+	 */
+	private RpcClient rpcClient;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.netty.channel.SimpleChannelUpstreamHandler#messageReceived(
-     * org.jboss.netty.channel.ChannelHandlerContext,
-     * org.jboss.netty.channel.MessageEvent)
-     */
-    @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        if (!(e.getMessage() instanceof RpcDataPackage)) {
-            return;
-        }
+	/**
+	 * @param rpcClient
+	 */
+	public RpcClientServiceHandler(RpcClient rpcClient) {
+		this.rpcClient = rpcClient;
+	}
 
-        RpcDataPackage dataPackage = (RpcDataPackage) e.getMessage();
-        Long correlationId = dataPackage.getRpcMeta().getCorrelationId();
-        RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
-        
-        Integer errorCode = ErrorCodes.ST_SUCCESS;
-        RpcResponseMeta response = dataPackage.getRpcMeta().getResponse();
-        if (response != null) {
-            errorCode = response.getErrorCode();
-        }
-        
-        if (! ErrorCodes.isSuccess(errorCode)) {
-            if (state != null) {
-                state.handleFailure(errorCode, response.getErrorText());
-            } else {
-                ctx.sendUpstream(e);
-                throw new Exception(response.getErrorText());
-            }
-        } else {
-            if (state != null) {
-                state.setDataPackage(dataPackage);
-                state.handleResponse(state.getDataPackage());
-            } 
-        }
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx,
+			RpcDataPackage dataPackage) throws Exception {
+		Long correlationId = dataPackage.getRpcMeta().getCorrelationId();
+		RpcClientCallState state = rpcClient
+				.removePendingRequest(correlationId);
 
-        ctx.sendUpstream(e);
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.netty.channel.SimpleChannelHandler#exceptionCaught(org.jboss
-     * .netty.channel.ChannelHandlerContext,
-     * org.jboss.netty.channel.ExceptionEvent)
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        LOG.log(Level.SEVERE, e.getCause().getMessage(), e.getCause());
-        
-        if (e.getChannel().isOpen()) {
-            e.getChannel().close();
-        }
-    }
+		Integer errorCode = ErrorCodes.ST_SUCCESS;
+		RpcResponseMeta response = dataPackage.getRpcMeta().getResponse();
+		if (response != null) {
+			errorCode = response.getErrorCode();
+		}
+
+		if (!ErrorCodes.isSuccess(errorCode)) {
+			if (state != null) {
+				state.handleFailure(errorCode, response.getErrorText());
+			} else {
+				ctx.fireChannelRead(dataPackage);
+				throw new Exception(response.getErrorText());
+			}
+		} else {
+			if (state != null) {
+				state.setDataPackage(dataPackage);
+				state.handleResponse(state.getDataPackage());
+			}
+		}
+		ctx.fireChannelRead(dataPackage);
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+			throws Exception {
+		LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
+		ctx.close();
+	}
 
 }

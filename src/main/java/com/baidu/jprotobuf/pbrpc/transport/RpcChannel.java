@@ -16,15 +16,14 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import java.util.concurrent.TimeUnit;
+import io.netty.util.Timeout;
 
-import org.jboss.netty.util.Timeout;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.google.protobuf.RpcCallback;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * RPC request and response channel processor.
@@ -91,7 +90,7 @@ public class RpcChannel {
                     }
                 }
             } else {
-                channel.getFuture().getChannel().write(state.getDataPackage());
+                channel.getFuture().channel().writeAndFlush(state.getDataPackage());
             }
 
             long callMethodEnd = System.currentTimeMillis();

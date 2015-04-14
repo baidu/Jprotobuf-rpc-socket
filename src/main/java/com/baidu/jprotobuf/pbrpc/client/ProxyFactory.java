@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
  * @author xiemalin
  * @since 1.0
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class ProxyFactory {
 
     /**

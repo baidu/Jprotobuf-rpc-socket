@@ -15,10 +15,10 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import java.nio.ByteOrder;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 
-import org.jboss.netty.handler.timeout.IdleState;
-import org.jboss.netty.handler.timeout.IdleStateEvent;
+import java.nio.ByteOrder;
 
 public class RpcServerOptions {
     

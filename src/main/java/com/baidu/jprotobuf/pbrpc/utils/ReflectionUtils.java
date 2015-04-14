@@ -37,7 +37,7 @@ public class ReflectionUtils {
      * @param mc the callback to invoke for each method
      * @see #doWithMethods(Class, MethodCallback, MethodFilter)
      */
-    public static void doWithMethods(Class targetClass, MethodCallback mc) throws IllegalArgumentException {
+    public static void doWithMethods(Class<?> targetClass, MethodCallback mc) throws IllegalArgumentException {
         doWithMethods(targetClass, mc, null);
     }
 
@@ -50,7 +50,7 @@ public class ReflectionUtils {
      * @param mc the callback to invoke for each method
      * @param mf the filter that determines the methods to apply the callback to
      */
-    public static void doWithMethods(Class targetClass, MethodCallback mc, MethodFilter mf)
+    public static void doWithMethods(Class<?> targetClass, MethodCallback mc, MethodFilter mf)
             throws IllegalArgumentException {
 
         // Keep backing up the inheritance hierarchy.

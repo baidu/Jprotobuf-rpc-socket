@@ -16,16 +16,18 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.DefaultMessageSizeEstimator;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
 
 /**
  * RPC client handler class.
@@ -35,41 +37,44 @@ import org.jboss.netty.util.Timer;
  * @date 2013/03/07 10:30:20
  * @version 1.0.0
  */
-public class RpcClient extends ClientBootstrap {
+public class RpcClient extends Bootstrap {
 
     // 会话状态存储
-    private final Map<Long, RpcClientCallState> requestMap = new ConcurrentHashMap<Long, RpcClientCallState>(); 
-    
+    private final Map<Long, RpcClientCallState> requestMap =
+            new ConcurrentHashMap<Long, RpcClientCallState>();
+
     private AtomicLong correlationId = new AtomicLong(1); // session标识
     private Timer timer = new HashedWheelTimer(); // 初始化定时器
     private RpcClientOptions rpcClientOptions;
     private ChannelPool channelPool;
+    private NioEventLoopGroup workerGroup;
 
     public RpcClient() {
-        this(new NioClientSocketChannelFactory());
+        this(NioSocketChannel.class);
     }
-    
+
     public RpcClient(RpcClientOptions rpcClientOptions) {
-        this(new NioClientSocketChannelFactory(), rpcClientOptions);
+        this(NioSocketChannel.class, rpcClientOptions);
     }
 
-    public RpcClient(ChannelFactory channelFactory) {
-        this(channelFactory, new RpcClientOptions());
+    public RpcClient(Class<? extends Channel> clientChannelClass) {
+        this(NioSocketChannel.class, new RpcClientOptions());
     }
 
-    public RpcClient(ChannelFactory channelFactory, RpcClientOptions rpcClientOptions) {
-
-        super(channelFactory);
-        setPipelineFactory(new RpcClientPipelineFactory(this));
+    public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
+        this.workerGroup = new NioEventLoopGroup();
+        this.group(workerGroup);
+        this.channel(clientChannelClass);
+        this.handler(new RpcClientPipelineinitializer(this));
         this.rpcClientOptions = rpcClientOptions;
-        this.setOption("reuseAddress", rpcClientOptions.isReuseAddress());
-        this.setOption("connectTimeoutMillis", rpcClientOptions.getConnectTimeout());
-        this.setOption("sendBufferSize", rpcClientOptions.getSendBufferSize());
-        this.setOption("receiveBufferSize", rpcClientOptions.getReceiveBufferSize());
-        this.setOption("keepAlive", rpcClientOptions.isKeepAlive());
-        this.setOption("tcpNoDelay", rpcClientOptions.getTcpNoDelay());
-        this.setOption("receiveBufferSizePredictorFactory",
-                new FixedReceiveBufferSizePredictorFactory(rpcClientOptions.getReceiveBufferSize()));
+        this.option(ChannelOption.SO_REUSEADDR, rpcClientOptions.isReuseAddress());
+        this.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, rpcClientOptions.getConnectTimeout());
+        this.option(ChannelOption.SO_SNDBUF, rpcClientOptions.getSendBufferSize());
+        this.option(ChannelOption.SO_RCVBUF, rpcClientOptions.getSendBufferSize());
+        this.option(ChannelOption.SO_KEEPALIVE, rpcClientOptions.isKeepAlive());
+        this.option(ChannelOption.TCP_NODELAY, rpcClientOptions.getTcpNoDelay());
+        this.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR,
+                new DefaultMessageSizeEstimator(rpcClientOptions.getReceiveBufferSize()));
 
     }
 
@@ -83,7 +88,7 @@ public class RpcClient extends ClientBootstrap {
     public RpcClientCallState removePendingRequest(long seqId) {
         return requestMap.remove(seqId);
     }
-    
+
     /**
      * @brief 应用层注册用户请求状态
      * @param seqId
@@ -124,6 +129,7 @@ public class RpcClient extends ClientBootstrap {
 
     /**
      * get the channelPool
+     * 
      * @return the channelPool
      */
     protected ChannelPool getChannelPool() {
@@ -132,26 +138,30 @@ public class RpcClient extends ClientBootstrap {
 
     /**
      * set channelPool value to channelPool
+     * 
      * @param channelPool the channelPool to set
      */
     protected void setChannelPool(ChannelPool channelPool) {
         this.channelPool = channelPool;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.jboss.netty.bootstrap.Bootstrap#shutdown()
      */
-    @Override
     public void shutdown() {
+        if (this.workerGroup != null) {
+            this.workerGroup.shutdownGracefully();
+        }
         if (channelPool != null) {
             channelPool.stop();
         }
         if (timer != null) {
             timer.stop();
         }
-        super.shutdown();
     }
-    
+
     /**
      * do shutdown action
      */

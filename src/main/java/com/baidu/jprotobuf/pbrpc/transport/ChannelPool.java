@@ -37,7 +37,6 @@ public class ChannelPool {
     private final GenericObjectPool pool;
     
     public ChannelPool(RpcClient rpcClient, String host, int port) {
-        super();
         this.clientConfig = rpcClient.getRpcClientOptions();
         objectFactory = new ChannelPoolObjectFactory(rpcClient, host, port);
         pool = new GenericObjectPool(objectFactory);
@@ -69,8 +68,8 @@ public class ChannelPool {
             if (!clientConfig.isShortConnection()) {
                 pool.returnObject(channel);
             } else {
-                if (channel.getFuture().getChannel().isOpen()) {
-                    channel.getFuture().getChannel().close();
+                if (channel.getFuture().channel().isOpen()) {
+                    channel.getFuture().channel().close();
                 }
             }
         } catch (Exception e) {

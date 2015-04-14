@@ -28,6 +28,7 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
  * @author xiemalin
  * @since 1.0
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class AnnotationRpcHandler extends AbstractRpcHandler {
 
     private Codec inputCodec;

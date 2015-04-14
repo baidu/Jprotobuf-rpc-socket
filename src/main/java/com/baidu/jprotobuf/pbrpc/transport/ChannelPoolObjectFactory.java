@@ -15,13 +15,14 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+
 import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
 
 
 /**
@@ -37,7 +38,6 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
     private final int port;
 
     public ChannelPoolObjectFactory(RpcClient rpcClient, String host, int port) {
-        super();
         this.rpcClient = rpcClient;
         this.host = host;
         this.port = port;
@@ -63,7 +63,7 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
         // Wait until the connection is made successfully.
         future.awaitUninterruptibly();
         if (!future.isSuccess()) {
-            LOGGER.log(Level.SEVERE, "failed to get result from stp", future.getCause());
+            LOGGER.log(Level.SEVERE, "failed to get result from stp", future.cause());
         } else {
             connection.setIsConnected(true);
         }
@@ -76,16 +76,16 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
 
     public void destroyObject(Object object) throws Exception {
         Connection c = (Connection) object;
-        Channel channel = c.getFuture().getChannel();
-        if (channel.isOpen() && channel.isConnected()) {
+        Channel channel = c.getFuture().channel();
+        if (channel.isOpen() && channel.isActive()) {
             channel.close();
         }
     }
 
     public boolean validateObject(Object object) {
         Connection c = (Connection) object;
-        Channel channel = c.getFuture().getChannel();
-        return channel.isOpen() && channel.isConnected();
+        Channel channel = c.getFuture().channel();
+        return channel.isOpen() && channel.isActive();
     }
 
     public void activateObject(Object channel) throws Exception {

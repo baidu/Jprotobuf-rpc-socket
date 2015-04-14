@@ -29,6 +29,7 @@ import com.google.protobuf.GeneratedMessage;
  * @author xiemalin
  * @since 1.2
  */
+@SuppressWarnings({"unchecked"})
 public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
 
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";

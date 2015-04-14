@@ -16,7 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import org.jboss.netty.util.Timeout;
+import io.netty.util.Timeout;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;

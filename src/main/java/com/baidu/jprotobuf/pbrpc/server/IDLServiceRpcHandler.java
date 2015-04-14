@@ -26,13 +26,13 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
  */
 public class IDLServiceRpcHandler implements RpcHandler {
     
-    private IDLServiceExporter idlServiceExporter;
+    @SuppressWarnings("unused")
+	private IDLServiceExporter idlServiceExporter;
     
     /**
      * @param idlServiceExporter
      */
     public IDLServiceRpcHandler(IDLServiceExporter idlServiceExporter) {
-        super();
         this.idlServiceExporter = idlServiceExporter;
     }
 
