@@ -148,13 +148,13 @@ public class RpcServer extends ServerBootstrap {
         return stop.get();
     }
 
-    public void shutdown() {
+	public void shutdown() {
 		if (channel != null && channel.isOpen()) {
-			channel.closeFuture().syncUninterruptibly();
+			channel.close();
 		}
-        bossGroup.shutdownGracefully().syncUninterruptibly();
-        workerGroup.shutdownGracefully().syncUninterruptibly();
-    }
+		bossGroup.shutdownGracefully().syncUninterruptibly();
+		workerGroup.shutdownGracefully().syncUninterruptibly();
+	}
 
     public void setStop(AtomicBoolean stop) {
         this.stop = stop;

@@ -22,7 +22,9 @@ import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.PooledObjectFactory;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 
 /**
@@ -31,7 +33,7 @@ import org.apache.commons.pool.PoolableObjectFactory;
  * @author sunzhongyi, xuyuepeng
  * @author xiemalin
  */
-public class ChannelPoolObjectFactory implements PoolableObjectFactory {
+public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection> {
     private static final Logger LOGGER = Logger.getLogger(ChannelPoolObjectFactory.class.getName());
     private final RpcClient rpcClient;
     private final String host;
@@ -44,11 +46,10 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
     }
 
     public Connection fetchConnection() {
-        Connection connection = new Connection(rpcClient);
-        return connection;
+    	return new Connection(rpcClient);
     }
 
-    public Object makeObject() throws Exception {
+    public PooledObject<Connection> makeObject() throws Exception {
         Connection connection = fetchConnection();
 
         InetSocketAddress address;
@@ -70,30 +71,37 @@ public class ChannelPoolObjectFactory implements PoolableObjectFactory {
 
         future.addListener(new RpcChannelFutureListener(connection));
         connection.setFuture(future);
-
-        return connection;
+        
+        return new DefaultPooledObject<Connection>(connection);
     }
 
-    public void destroyObject(Object object) throws Exception {
-        Connection c = (Connection) object;
-        Channel channel = c.getFuture().channel();
-        if (channel.isOpen() && channel.isActive()) {
-            channel.close();
-        }
-    }
+    @Override
+	public void destroyObject(PooledObject<Connection> p) throws Exception {
+		Connection c = p.getObject();
+		Channel channel = c.getFuture().channel();
+		if (channel.isOpen() && channel.isActive()) {
+			channel.close();
+		}
+	}
 
-    public boolean validateObject(Object object) {
-        Connection c = (Connection) object;
+    @Override
+	public boolean validateObject(PooledObject<Connection> p) {
+		Connection c = p.getObject();
         Channel channel = c.getFuture().channel();
         return channel.isOpen() && channel.isActive();
-    }
+	}
+    
+    @Override
+	public void activateObject(PooledObject<Connection> p) throws Exception {
+		 // nothing to do
+		
+	}
 
-    public void activateObject(Object channel) throws Exception {
-        // nothing to do
-    }
-
-    public void passivateObject(Object channel) throws Exception {
-        // nothing to do
-    }
+    @Override
+	public void passivateObject(PooledObject<Connection> p) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
 
 }

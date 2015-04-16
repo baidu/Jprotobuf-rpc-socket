@@ -19,8 +19,8 @@ package com.baidu.jprotobuf.pbrpc.transport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.PooledObjectFactory;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 
 /**
  * Adapter for netty channel. Used by Mcpack Netty Client {@link NettyClient}.
@@ -33,16 +33,16 @@ public class ChannelPool {
     
     private final RpcClientOptions clientConfig;
     
-    private final PoolableObjectFactory objectFactory;
-    private final GenericObjectPool pool;
+    private final PooledObjectFactory<Connection> objectFactory;
+    private final GenericObjectPool<Connection> pool;
     
     public ChannelPool(RpcClient rpcClient, String host, int port) {
         this.clientConfig = rpcClient.getRpcClientOptions();
         objectFactory = new ChannelPoolObjectFactory(rpcClient, host, port);
-        pool = new GenericObjectPool(objectFactory);
+        pool = new GenericObjectPool<Connection>(objectFactory);
         pool.setMaxIdle(clientConfig.getThreadPoolSize());
-        pool.setMaxActive(clientConfig.getThreadPoolSize());
-        pool.setMaxWait(clientConfig.getMaxWait());
+        pool.setMaxTotal(clientConfig.getThreadPoolSize());
+        pool.setMaxWaitMillis(clientConfig.getMaxWait());
         pool.setMinEvictableIdleTimeMillis(clientConfig.getMinEvictableIdleTime());
         pool.setTestOnBorrow(true);
         pool.setTestOnReturn(true);
@@ -52,9 +52,9 @@ public class ChannelPool {
         Connection channel = null;
         try {
             if (!clientConfig.isShortConnection()) {
-                channel = (Connection) pool.borrowObject();
+                channel = pool.borrowObject();
             } else {
-                channel = (Connection) objectFactory.makeObject();
+                channel = objectFactory.makeObject().getObject();
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
