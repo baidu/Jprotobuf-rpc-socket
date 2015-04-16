@@ -71,7 +71,7 @@ public class RpcClientServiceHandler extends
 			if (state != null) {
 				state.handleFailure(errorCode, response.getErrorText());
 			} else {
-				ctx.fireChannelRead(dataPackage);
+				ctx.fireChannelReadComplete();
 				throw new Exception(response.getErrorText());
 			}
 		} else {
@@ -80,7 +80,7 @@ public class RpcClientServiceHandler extends
 				state.handleResponse(state.getDataPackage());
 			}
 		}
-		ctx.fireChannelRead(dataPackage);
+		ctx.fireChannelReadComplete();
 	}
 
 	@Override
