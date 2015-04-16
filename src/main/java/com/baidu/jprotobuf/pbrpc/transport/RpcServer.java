@@ -18,6 +18,9 @@ package com.baidu.jprotobuf.pbrpc.transport;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
@@ -51,6 +54,7 @@ public class RpcServer extends ServerBootstrap {
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private Channel channel;
 
     /**
      * rpcServiceRegistry
@@ -103,8 +107,21 @@ public class RpcServer extends ServerBootstrap {
     }
 
     public void start(int port) {
-        LOG.log(Level.FINE, "Starting ...");
-        this.bind(new InetSocketAddress(port));
+		LOG.log(Level.FINE, "Starting ...");
+		this.bind(new InetSocketAddress(port)).addListener(
+				new ChannelFutureListener() {
+
+					@Override
+					public void operationComplete(ChannelFuture future)
+							throws Exception {
+						if (future.isSuccess()) {
+							channel = future.channel();
+							// TODO notifyStarted();
+						} else {
+							// TODO notifyFailed(future.cause());
+						}
+					}
+				});
     }
 
     public void start(SocketAddress sa) {
@@ -132,6 +149,9 @@ public class RpcServer extends ServerBootstrap {
     }
 
     public void shutdown() {
+		if (channel != null && channel.isOpen()) {
+			channel.closeFuture().syncUninterruptibly();
+		}
         bossGroup.shutdownGracefully().syncUninterruptibly();
         workerGroup.shutdownGracefully().syncUninterruptibly();
     }
