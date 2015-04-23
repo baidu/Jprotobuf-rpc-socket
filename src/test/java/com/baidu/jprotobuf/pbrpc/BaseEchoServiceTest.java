@@ -26,6 +26,7 @@ import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 /**
  * Base test class for echo RPC server and client
@@ -43,7 +44,11 @@ public abstract class BaseEchoServiceTest extends BaseTest {
     
     @Before
     public void setUp() {
-        rpcServer = new RpcServer();
+        RpcServerOptions rpcServerOptions = getRpcServerOptions();
+        if (rpcServerOptions == null) {
+            rpcServerOptions = new RpcServerOptions();
+        }
+        rpcServer = new RpcServer(rpcServerOptions);
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
@@ -61,7 +66,11 @@ public abstract class BaseEchoServiceTest extends BaseTest {
     }
     
     protected void startServer() {
-        rpcServer = new RpcServer();
+        RpcServerOptions rpcServerOptions = getRpcServerOptions();
+        if (rpcServerOptions == null) {
+            rpcServerOptions = new RpcServerOptions();
+        }
+        rpcServer = new RpcServer(rpcServerOptions);
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
@@ -79,6 +88,11 @@ public abstract class BaseEchoServiceTest extends BaseTest {
     protected RpcClientOptions getRpcClientOptions() {
         return null;
     }
+    
+    protected RpcServerOptions getRpcServerOptions() {
+        return null;
+    }
+    
     
     @After
     public void tearDown() {

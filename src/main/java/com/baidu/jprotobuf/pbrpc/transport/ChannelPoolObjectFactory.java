@@ -75,7 +75,6 @@ public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection>
         return new DefaultPooledObject<Connection>(connection);
     }
 
-    @Override
 	public void destroyObject(PooledObject<Connection> p) throws Exception {
 		Connection c = p.getObject();
 		Channel channel = c.getFuture().channel();
@@ -84,20 +83,17 @@ public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection>
 		}
 	}
 
-    @Override
 	public boolean validateObject(PooledObject<Connection> p) {
 		Connection c = p.getObject();
         Channel channel = c.getFuture().channel();
         return channel.isOpen() && channel.isActive();
 	}
     
-    @Override
 	public void activateObject(PooledObject<Connection> p) throws Exception {
 		 // nothing to do
 		
 	}
 
-    @Override
 	public void passivateObject(PooledObject<Connection> p) throws Exception {
 		// TODO Auto-generated method stub
 		

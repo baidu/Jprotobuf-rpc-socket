@@ -111,7 +111,6 @@ public class RpcServer extends ServerBootstrap {
 		this.bind(new InetSocketAddress(port)).addListener(
 				new ChannelFutureListener() {
 
-					@Override
 					public void operationComplete(ChannelFuture future)
 							throws Exception {
 						if (future.isSuccess()) {

@@ -36,9 +36,9 @@ public abstract class BasePerformaceTest extends BaseTest {
         System.out.println("send byte size: " + in.write().length + ";receive byte size: " + out.write().length);
         System.out
                 .println(String.format(formatString, "total count", "time took(ms)", "average(ms)", "QPS", "threads"));
-        long avg = (totaltime / totalCount);
-        long qps = totalCount / ((totaltime / 1000) == 0 ? 1 : (totaltime / 1000));
-        System.out.println(String.format(formatString, totalCount, totaltime, avg, qps, threadCount));
+        double avg = (totaltime * 1.0 / totalCount);
+        double qps = totalCount * 1000.0 / totaltime;
+        System.out.println(String.format(formatString, totalCount, totaltime, new Double(avg).longValue(), new Double(qps).longValue(), threadCount));
         System.out.println("---------------------Performance Result-------------------------");
     }
 

@@ -35,7 +35,7 @@ public class IDLServiceExporter extends
     /**
      * input protobuf IDL
      */
-	private InputStream inputIDL;
+    private InputStream inputIDL;
 
     /**
      * input protobuf IDL defined object name for multiple message object

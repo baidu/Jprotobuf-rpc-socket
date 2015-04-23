@@ -44,4 +44,11 @@ public class EchoServiceImpl {
     public EchoInfo dealWithGzipEnable(EchoInfo info) {
         return doEcho(info);
     }
+    
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echoSnappy", 
+            attachmentHandler = EchoServerAttachmentHandler.class)
+    public EchoInfo dealWithSnappyEnable(EchoInfo info) {
+        return doEcho(info);
+    }
+    
 }

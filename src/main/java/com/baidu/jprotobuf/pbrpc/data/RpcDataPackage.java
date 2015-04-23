@@ -89,6 +89,13 @@ public class RpcDataPackage implements Readable, Writerable {
         return chunkInfo.getStreamId();
     }
 
+    /**
+     * To split current {@link RpcDataPackage} by chunkSize. if chunkSize great than data length will not do split.<br>
+     * {@link List} return will never be {@code null} or empty.
+     * 
+     * @param chunkSize target size to split 
+     * @return {@link List} of {@link RpcDataPackage} after split
+     */
     public List<RpcDataPackage> chunk(long chunkSize) {
         if (chunkSize < 1 || data == null || chunkSize > data.length) {
             return Arrays.asList(this);
@@ -221,7 +228,6 @@ public class RpcDataPackage implements Readable, Writerable {
         chunkInfo.setChunkId(chunkId);
         RpcMeta rpcMeta = initRpcMeta();
         rpcMeta.setChunkInfo(chunkInfo);
-        ;
         return this;
     }
 
@@ -411,13 +417,15 @@ public class RpcDataPackage implements Readable, Writerable {
         }
         rpcMeta.setAttachmentSize(attachmentSize);
 
-        // get rpc meta data
+        // get RPC meta data
         byte[] rpcMetaBytes = rpcMeta.write();
         int rpcMetaSize = rpcMetaBytes.length;
         totolSize += rpcMetaSize;
         head.setMetaSize(rpcMetaSize);
-        head.setMessageSize(totolSize);
-
+        head.setMessageSize(totolSize); // set message body size
+        
+        // total size should add head size
+        totolSize = totolSize + RpcHeadMeta.SIZE;
         try {
             // join all byte array
             ByteArrayOutputStream baos = new ByteArrayOutputStream(totolSize);
@@ -475,7 +483,7 @@ public class RpcDataPackage implements Readable, Writerable {
         int attachmentSize = rpcMeta.getAttachmentSize();
 
         // read message data
-        // message data size = totalsize - metasize - headsize - attachmentSize
+        // message data size = totalsize - metasize - attachmentSize
         int totalSize = head.getMessageSize();
         int dataSize = totalSize - metaSize - attachmentSize;
 
@@ -493,15 +501,15 @@ public class RpcDataPackage implements Readable, Writerable {
     }
 
     public static RpcDataPackage buildRpcDataPackage(RpcMethodInfo methodInfo, Object[] args) throws IOException {
-        RpcDataPackage dataPacage = new RpcDataPackage();
-        dataPacage.magicCode(ProtocolConstant.MAGIC_CODE);
-        dataPacage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethodName());
-        dataPacage.compressType(methodInfo.getProtobufPRC().compressType().value());
+        RpcDataPackage dataPackage = new RpcDataPackage();
+        dataPackage.magicCode(ProtocolConstant.MAGIC_CODE);
+        dataPackage.serviceName(methodInfo.getServiceName()).methodName(methodInfo.getMethodName());
+        dataPackage.compressType(methodInfo.getProtobufPRC().compressType().value());
         // set data
         if (args != null && args.length == 1) {
             byte[] data = methodInfo.inputEncode(args[0]);
             if (data != null) {
-                dataPacage.data(data);
+                dataPackage.data(data);
             }
         }
 
@@ -509,7 +517,7 @@ public class RpcDataPackage implements Readable, Writerable {
         LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
         if (logIDGenerator != null) {
             long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
-            dataPacage.logId(logId);
+            dataPackage.logId(logId);
         }
 
         // set attachment
@@ -518,10 +526,10 @@ public class RpcDataPackage implements Readable, Writerable {
             byte[] attachment = attachmentHandler.handleRequest(methodInfo.getServiceName(), methodInfo.getMethod()
                     .getName(), args);
             if (attachment != null) {
-                dataPacage.attachment(attachment);
+                dataPackage.attachment(attachment);
             }
         }
-        return dataPacage;
+        return dataPackage;
     }
 
 }

@@ -8,6 +8,7 @@
 package com.baidu.jprotobuf.pbrpc;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 /**
  * Test case for trunk data test
@@ -27,5 +28,13 @@ public class TrunkEchoServiceTest extends EchoServiceTest {
         return rpcClientOptions;
     }
     
-    
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
+     */
+    @Override
+    protected RpcServerOptions getRpcServerOptions() {
+        RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setChunkSize(3);
+        return rpcServerOptions;
+    }
 }

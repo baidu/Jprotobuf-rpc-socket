@@ -45,6 +45,27 @@ public class RpcClientOptions {
     
     // if use chunkSize will split chunkSize 
     private long chunkSize = -1;
+    
+    /**
+     * time out set for chunk package wait in ms.
+     */
+    private int chunkPackageTimeout = 300 * 1000;
+
+    /**
+     * get the chunkPackageTimeout
+     * @return the chunkPackageTimeout
+     */
+    public int getChunkPackageTimeout() {
+        return chunkPackageTimeout;
+    }
+
+    /**
+     * set chunkPackageTimeout value to chunkPackageTimeout
+     * @param chunkPackageTimeout the chunkPackageTimeout to set
+     */
+    public void setChunkPackageTimeout(int chunkPackageTimeout) {
+        this.chunkPackageTimeout = chunkPackageTimeout;
+    }
 
     /**
      * get the onceTalkTimeout

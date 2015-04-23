@@ -33,6 +33,7 @@ public class IDLServiceRpcHandler implements RpcHandler {
      * @param idlServiceExporter
      */
     public IDLServiceRpcHandler(IDLServiceExporter idlServiceExporter) {
+        super();
         this.idlServiceExporter = idlServiceExporter;
     }
 
