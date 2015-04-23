@@ -29,9 +29,10 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
  * @author xiemalin
  * @since 1.0
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class PojoRpcMethodInfo extends RpcMethodInfo {
     
-    private Codec inputCodec;
+	private Codec inputCodec;
     
     private Codec outputCodec;
 
@@ -55,7 +56,7 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
     /* (non-Javadoc)
      * @see com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo#inputDecode(java.lang.Object)
      */
-    @Override
+	@Override
     public byte[] inputEncode(Object input) throws IOException {
         if (inputCodec != null) {
             return inputCodec.encode(input);

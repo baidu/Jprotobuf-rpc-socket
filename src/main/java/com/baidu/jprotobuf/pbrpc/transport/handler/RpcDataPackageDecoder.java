@@ -16,22 +16,22 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
@@ -44,7 +44,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcHeadMeta;
  * @since 1.0
  * @see RpcDataPackage
  */
-public class RpcDataPackageDecoder extends FrameDecoder {
+public class RpcDataPackageDecoder extends ByteToMessageDecoder {
 
     /**
      * Default chunk package wait time out check interval
@@ -63,7 +63,6 @@ public class RpcDataPackageDecoder extends FrameDecoder {
      * @param chunkPackageTimeout
      */
     public RpcDataPackageDecoder(final int chunkPackageTimeout) {
-        super();
         if (chunkPackageTimeout <= 0) {
             return;
         }
@@ -104,6 +103,15 @@ public class RpcDataPackageDecoder extends FrameDecoder {
             }
         });
     }
+    
+	@Override
+	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
+			List<Object> out) throws Exception {
+		Object decoded = decode(ctx, in);
+		if(decoded!=null){
+			out.add(decoded);
+		}
+	}
 
     /*
      * (non-Javadoc)
@@ -113,8 +121,7 @@ public class RpcDataPackageDecoder extends FrameDecoder {
      * .channel.ChannelHandlerContext, org.jboss.netty.channel.Channel,
      * org.jboss.netty.buffer.ChannelBuffer)
      */
-    @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buf) throws Exception {
+    protected Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
 
         // Make sure if the length field was received.
         if (buf.readableBytes() < RpcHeadMeta.SIZE) {
@@ -134,7 +141,7 @@ public class RpcDataPackageDecoder extends FrameDecoder {
 
         // Read the RPC head
         long rpcMessageDecoderStart = System.nanoTime();
-        ByteBuffer buffer = buf.toByteBuffer(buf.readerIndex(), RpcHeadMeta.SIZE);
+        ByteBuffer buffer = buf.nioBuffer(buf.readerIndex(), RpcHeadMeta.SIZE);
 
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         byte[] bytes = new byte[RpcHeadMeta.SIZE];
@@ -212,5 +219,7 @@ public class RpcDataPackageDecoder extends FrameDecoder {
         }
         
     }
+
+
 
 }

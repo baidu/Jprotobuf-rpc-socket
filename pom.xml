@@ -74,18 +74,24 @@
 			<artifactId>jprotobuf-rpc-common</artifactId>
 			<version>1.4</version>
 			<scope>compile</scope>
-		</dependency>			
+		</dependency>
 		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.5.5</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+			<version>2.3</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
-			<artifactId>netty</artifactId>
-			<version>3.9.0.Final</version>
+			<artifactId>netty-all</artifactId>
+			<version>4.0.27.Final</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.18.1-GA</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -94,7 +100,7 @@
 			<version>1.1.1.6</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 	<build>

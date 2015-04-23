@@ -16,8 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +42,7 @@ public class RpcChannelFutureListener implements ChannelFutureListener {
     public void operationComplete(ChannelFuture future) throws Exception {
 
         if (!future.isSuccess()) {
-            LOG.log(Level.WARNING, "build channel:" + future.getChannel().getId() + " failed");
+            LOG.log(Level.WARNING, "build channel:" + future.channel() + " failed");
             conn.setIsConnected(false);
             return;
         }
@@ -51,7 +51,7 @@ public class RpcChannelFutureListener implements ChannelFutureListener {
         while (null != (requestState = conn.consumeRequest())) {
             LOG.log(Level.FINEST, "[correlationId:" + requestState.getDataPackage().getRpcMeta().getCorrelationId()
                     + "] send over from queue");
-            conn.getFuture().getChannel().write(requestState.getDataPackage());
+            conn.getFuture().channel().writeAndFlush(requestState.getDataPackage());
         }
     }
 

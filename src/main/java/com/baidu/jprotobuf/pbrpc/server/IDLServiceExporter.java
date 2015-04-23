@@ -28,13 +28,14 @@ import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
  * @author xiemalin
  * @since 1.0
  */
+@SuppressWarnings("unused")
 public class IDLServiceExporter extends
         AbstractServiceExporter<IDLProxyObject, IDLProxyObject> implements RpcMetaAware {
     
     /**
      * input protobuf IDL
      */
-    private InputStream inputIDL;
+	private InputStream inputIDL;
 
     /**
      * input protobuf IDL defined object name for multiple message object

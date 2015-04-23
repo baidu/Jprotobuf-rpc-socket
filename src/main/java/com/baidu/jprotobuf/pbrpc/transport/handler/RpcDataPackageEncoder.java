@@ -16,17 +16,14 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import static org.jboss.netty.channel.Channels.write;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 
@@ -36,85 +33,74 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
  * @author xiemalin
  * @since 1.0
  */
-public class RpcDataPackageEncoder extends OneToOneEncoder {
+public class RpcDataPackageEncoder extends
+		MessageToMessageEncoder<RpcDataPackage> {
 
-    /**
-     * log this class
-     */
-    private static final Logger LOG = Logger.getLogger(RpcDataPackageEncoder.class.getName());
+	/**
+	 * log this class
+	 */
+	private static final Logger LOG = Logger
+			.getLogger(RpcDataPackageEncoder.class.getName());
 
-    private long chunkSize = -1;
+	private long chunkSize = -1;
 
-    /**
-     * get the chunkSize
+	/**
+	 * get the chunkSize
+	 * 
+	 * @return the chunkSize
+	 */
+	public long getChunkSize() {
+		return chunkSize;
+	}
+
+	/**
+	 * set chunkSize value to chunkSize
+	 * 
+	 * @param chunkSize
+	 *            the chunkSize to set
+	 */
+	public void setChunkSize(long chunkSize) {
+		this.chunkSize = chunkSize;
+	}
+
+	/**
      * 
-     * @return the chunkSize
      */
-    public long getChunkSize() {
-        return chunkSize;
-    }
+	public RpcDataPackageEncoder() {
+	}
 
-    /**
-     * set chunkSize value to chunkSize
-     * 
-     * @param chunkSize
-     *            the chunkSize to set
-     */
-    public void setChunkSize(long chunkSize) {
-        this.chunkSize = chunkSize;
-    }
+	/**
+	 * @param chunkSize
+	 */
+	public RpcDataPackageEncoder(long chunkSize) {
+		this.chunkSize = chunkSize;
+	}
 
-    /**
-     * 
-     */
-    public RpcDataPackageEncoder() {
-    }
+	@Override
+	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
+			List<Object> out) throws Exception {
 
-    /**
-     * @param chunkSize
-     */
-    public RpcDataPackageEncoder(long chunkSize) {
-        super();
-        this.chunkSize = chunkSize;
-    }
+		RpcDataPackage dataPackage = (RpcDataPackage) msg;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.netty.handler.codec.oneone.OneToOneEncoder#encode(org.jboss
-     * .netty.channel.ChannelHandlerContext, org.jboss.netty.channel.Channel,
-     * java.lang.Object)
-     */
-    @Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-        if (!(msg instanceof RpcDataPackage)) {
-            return msg;
-        }
+		byte[] encodeBytes = dataPackage.write();
+		if (encodeBytes != null) {
+			LOG.log(Level.FINE, "Client send content byte size:"
+					+ encodeBytes.length);
+		}
 
-        RpcDataPackage dataPackage = (RpcDataPackage) msg;
+		ByteBuf encodedMessage = Unpooled.copiedBuffer(encodeBytes);
 
-        byte[] encodeBytes = dataPackage.write();
-        if (encodeBytes != null) {
-            LOG.log(Level.FINE, "Client send content byte size:" + encodeBytes.length);
-        }
+		if (chunkSize < 0) {
+			out.add(encodedMessage);
+			return ;
+		}
 
-        ChannelBuffer encodedMessage = ChannelBuffers.copiedBuffer(ctx.getChannel().getConfig().getBufferFactory()
-                .getDefaultOrder(), encodeBytes);
-
-        if (chunkSize < 0) {
-            return encodedMessage;
-        }
-
-        List<RpcDataPackage> list = dataPackage.chunk(chunkSize);
-        for (RpcDataPackage rpcDataPackage : list) {
-            encodeBytes = rpcDataPackage.write();
-            encodedMessage = ChannelBuffers.copiedBuffer(ctx.getChannel().getConfig().getBufferFactory()
-                    .getDefaultOrder(), encodeBytes);
-            write(channel, encodedMessage);
-        }
-
-        return null;
-    }
+		List<RpcDataPackage> list = dataPackage.chunk(chunkSize);
+		for (RpcDataPackage rpcDataPackage : list) {
+			encodeBytes = rpcDataPackage.write();
+			encodedMessage = Unpooled.copiedBuffer(encodeBytes);
+			out.add(encodedMessage);
+		}
+	}
 
 }

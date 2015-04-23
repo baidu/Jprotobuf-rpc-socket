@@ -16,11 +16,11 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import io.netty.util.Timeout;
+import io.netty.util.TimerTask;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.jboss.netty.util.Timeout;
-import org.jboss.netty.util.TimerTask;
 
 /**
  * Time task to process each request timeout event

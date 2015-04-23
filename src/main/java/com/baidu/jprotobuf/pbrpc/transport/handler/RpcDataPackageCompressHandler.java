@@ -16,9 +16,10 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageEncoder;
+
+import java.util.List;
 
 import com.baidu.jprotobuf.pbrpc.compress.Compress;
 import com.baidu.jprotobuf.pbrpc.compress.GZipCompress;
@@ -31,39 +32,27 @@ import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
  * @author xiemalin
  * @since 1.4
  */
-public class RpcDataPackageCompressHandler extends OneToOneEncoder {
+public class RpcDataPackageCompressHandler extends
+		MessageToMessageEncoder<RpcDataPackage> {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.netty.handler.codec.oneone.OneToOneEncoder#encode(org.jboss
-     * .netty.channel.ChannelHandlerContext, org.jboss.netty.channel.Channel,
-     * java.lang.Object)
-     */
-    @Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-        if (!(msg instanceof RpcDataPackage)) {
-            return msg;
-        }
-        
-        // if select compress type should do compress here
-        RpcDataPackage dataPackage = (RpcDataPackage) msg;
-        
-        // check if do compress
-        Integer compressType = dataPackage.getRpcMeta().getCompressType();
-        Compress compress = null;
-        if (compressType == RpcMeta.COMPERESS_GZIP) {
-            compress = new GZipCompress();
-        }
-        
-        if (compress != null) {
-            byte[] data = dataPackage.getData();
-            data = compress.compress(data);
-            dataPackage.data(data);
-        }
-        
-        return dataPackage;
-    }
+	@Override
+	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
+			List<Object> out) throws Exception {
+		RpcDataPackage dataPackage = (RpcDataPackage) msg;
+
+		// check if do compress
+		Integer compressType = dataPackage.getRpcMeta().getCompressType();
+		Compress compress = null;
+		if (compressType == RpcMeta.COMPERESS_GZIP) {
+			compress = new GZipCompress();
+		}
+
+		if (compress != null) {
+			byte[] data = dataPackage.getData();
+			data = compress.compress(data);
+			dataPackage.data(data);
+		}
+		out.add(dataPackage);
+	}
 
 }
