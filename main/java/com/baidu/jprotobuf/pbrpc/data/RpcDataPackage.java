@@ -89,6 +89,13 @@ public class RpcDataPackage implements Readable, Writerable {
         return chunkInfo.getStreamId();
     }
 
+    /**
+     * To split current {@link RpcDataPackage} by chunkSize. if chunkSize great than data length will not do split.<br>
+     * {@link List} return will never be {@code null} or empty.
+     * 
+     * @param chunkSize target size to split 
+     * @return {@link List} of {@link RpcDataPackage} after split
+     */
     public List<RpcDataPackage> chunk(long chunkSize) {
         if (chunkSize < 1 || data == null || chunkSize > data.length) {
             return Arrays.asList(this);
@@ -410,7 +417,7 @@ public class RpcDataPackage implements Readable, Writerable {
         }
         rpcMeta.setAttachmentSize(attachmentSize);
 
-        // get rpc meta data
+        // get RPC meta data
         byte[] rpcMetaBytes = rpcMeta.write();
         int rpcMetaSize = rpcMetaBytes.length;
         totolSize += rpcMetaSize;

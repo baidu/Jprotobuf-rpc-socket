@@ -142,10 +142,8 @@ public class RpcHeadMeta implements Writerable, Readable {
         }
         
         ByteBuffer allocate = ByteBuffer.wrap(bytes);
-        magicCode = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            magicCode[i] = allocate.get();
-        }
+        magicCode = new byte[4]; // magic code size must be 4.
+        allocate.get(magicCode);
         messageSize = allocate.getInt();
         metaSize = allocate.getInt();
         

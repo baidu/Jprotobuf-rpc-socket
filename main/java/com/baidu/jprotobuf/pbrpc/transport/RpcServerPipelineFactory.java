@@ -80,9 +80,8 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
 
         // receive request data
         channelPipe.addLast(
-                RPC_CHANNEL_STATE_AWARE_HANDLER,
-                new IdleStateHandler(this.idleTimer, this.rpcServerOptions.getKeepAliveTime(), this.rpcServerOptions
-                        .getKeepAliveTime(), 0));
+                RPC_CHANNEL_STATE_AWARE_HANDLER, new IdleStateHandler(this.idleTimer, 
+                        this.rpcServerOptions.getKeepAliveTime(), this.rpcServerOptions.getKeepAliveTime(), 0));
         channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
         
         
@@ -91,6 +90,8 @@ public class RpcServerPipelineFactory implements ChannelPipelineFactory {
         rpcDataPackageDecoderList.add(rpcDataPackageDecoder);
         // receive byte array to encode to RpcDataPackage
         channelPipe.addLast(DECODER, rpcDataPackageDecoder);
+        
+        
         // do uncompress handle
         channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
         // to process RPC service handler of request object RpcDataPackage and
