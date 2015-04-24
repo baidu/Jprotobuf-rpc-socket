@@ -24,7 +24,7 @@
 		<junit.version>4.10</junit.version>
 		<github.global.server>github</github.global.server>
 	</properties>
-
+ 
 
 	<issueManagement>
 		<system>GitHub Issues</system>
