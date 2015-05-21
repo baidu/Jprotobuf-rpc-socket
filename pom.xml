@@ -11,7 +11,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>2.15-SNAPSHOT</version>
+	<version>2.16-SNAPSHOT</version>
 
 	<name>Jprotobuf-rpc-socket</name>
 	<description>A RPC implemention based on TCP protocol for Google protobuf</description>

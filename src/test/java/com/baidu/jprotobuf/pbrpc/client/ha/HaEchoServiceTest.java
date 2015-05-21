@@ -112,7 +112,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
     @Test
     public void testFailOverAndRecover() throws Exception {
 
-        // first check all servers running ok
+        // first check all servers running OK?
         testNoServerFail();
 
         // random stop one server
@@ -139,7 +139,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
     
     @Test
     public void testDynamicServerListChanges() throws Exception {
-        // first check all servers running OK
+        // first check all servers running OK?
         testNoServerFail();
         
         // delete one from naming service
