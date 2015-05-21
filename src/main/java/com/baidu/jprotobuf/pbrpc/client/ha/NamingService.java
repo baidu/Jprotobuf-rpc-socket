@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.baidu.jprotobuf.pbrpc.client.ha;
 
-package com.baidu.jprotobuf.pbrpc.meta;
-
-import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
+import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
- * {@link RpcServiceMetaService}
+ * 
+ * Naming service interface.
  *
  * @author xiemalin
- * @since 2.1
+ * @since 2.15
  */
-public interface RpcServiceMetaService {
+public interface NamingService {
 
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
-    RpcServiceMetaList getRpcServiceMetaInfo();
-    
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
-    void ping();
+    /**
+     * get server list from naming service.
+     * @return server list.
+     * @throws Exception in case of any exception
+     */
+    List<InetSocketAddress> list() throws Exception;
+  
 }

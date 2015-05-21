@@ -36,7 +36,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * Protobuf RPC proxy utility class.
  * 
  * @author xiemalin
- * @since 1.o
+ * @since 1.0
  * @see ProxyFactory
  */
 public class ProtobufRpcProxy<T> implements InvocationHandler {

@@ -26,9 +26,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.Future;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +44,11 @@ import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
  */
 public class RpcServer extends ServerBootstrap {
 
+    /**
+     * 
+     */
+    private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
+
     private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
 
     private AtomicBoolean stop = new AtomicBoolean(false);
@@ -55,6 +60,16 @@ public class RpcServer extends ServerBootstrap {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel channel;
+    
+    private InetSocketAddress inetSocketAddress;
+
+    /**
+     * get the inetSocketAddress
+     * @return the inetSocketAddress
+     */
+    public InetSocketAddress getInetSocketAddress() {
+        return inetSocketAddress;
+    }
 
     /**
      * rpcServiceRegistry
@@ -107,30 +122,31 @@ public class RpcServer extends ServerBootstrap {
     }
 
     public void start(int port) {
-		LOG.log(Level.FINE, "Starting ...");
-		this.bind(new InetSocketAddress(port)).addListener(
-				new ChannelFutureListener() {
-
-					public void operationComplete(ChannelFuture future)
-							throws Exception {
-						if (future.isSuccess()) {
-							channel = future.channel();
-							// TODO notifyStarted();
-						} else {
-							// TODO notifyFailed(future.cause());
-						}
-					}
-				});
+		InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
+		start(inetSocketAddress);
     }
 
-    public void start(SocketAddress sa) {
+    public void start(InetSocketAddress sa) {
         LOG.log(Level.FINE, "Starting on: " + sa);
-        this.bind(sa);
+        this.bind(sa).addListener(
+                new ChannelFutureListener() {
+
+                    public void operationComplete(ChannelFuture future)
+                            throws Exception {
+                        if (future.isSuccess()) {
+                            channel = future.channel();
+                            // TODO notifyStarted();
+                        } else {
+                            // TODO notifyFailed(future.cause());
+                        }
+                    }
+                });
+        this.inetSocketAddress = sa;
     }
 
     public void waitForStop() throws InterruptedException {
         while (!stop.get()) {
-            Thread.sleep(1000);
+            Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
         }
         shutdown();
     }
@@ -148,11 +164,14 @@ public class RpcServer extends ServerBootstrap {
     }
 
 	public void shutdown() {
+	    stop();
 		if (channel != null && channel.isOpen()) {
 			channel.close();
 		}
-		bossGroup.shutdownGracefully().syncUninterruptibly();
-		workerGroup.shutdownGracefully().syncUninterruptibly();
+		
+		bossGroup.shutdownGracefully();
+		workerGroup.shutdownGracefully();
+		
 	}
 
     public void setStop(AtomicBoolean stop) {

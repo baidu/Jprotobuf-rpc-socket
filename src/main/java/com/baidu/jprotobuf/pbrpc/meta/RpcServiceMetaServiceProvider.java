@@ -69,4 +69,9 @@ public class RpcServiceMetaServiceProvider {
         ret.setRpcServiceMetas(list);
         return ret;
     }
+    
+    @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
+    public void ping() {
+        // here just to test service is available
+    }
 }

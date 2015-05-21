@@ -13,22 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.baidu.jprotobuf.pbrpc.client.ha;
 
-package com.baidu.jprotobuf.pbrpc.meta;
-
-import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
+import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
- * {@link RpcServiceMetaService}
+ * A dummy {@link NamingService} implements support default server list.
  *
  * @author xiemalin
- * @since 2.1
+ * @since 2.15
  */
-public interface RpcServiceMetaService {
-
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
-    RpcServiceMetaList getRpcServiceMetaInfo();
+public class DummyNamingService implements NamingService {
     
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
-    void ping();
+    private List<InetSocketAddress> list;
+    
+    /**
+     * @param list
+     */
+    public DummyNamingService(List<InetSocketAddress> list) {
+        super();
+        this.list = list;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list()
+     */
+    public List<InetSocketAddress> list() throws Exception {
+        return list;
+    }
+
 }

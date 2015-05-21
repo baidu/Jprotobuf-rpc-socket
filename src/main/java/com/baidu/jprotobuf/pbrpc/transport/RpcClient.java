@@ -47,7 +47,7 @@ public class RpcClient extends Bootstrap {
     private Timer timer = new HashedWheelTimer(); // 初始化定时器
     private RpcClientOptions rpcClientOptions;
     private ChannelPool channelPool;
-    private NioEventLoopGroup workerGroup;
+    private NioEventLoopGroup workerGroup; 
 
     public RpcClient() {
         this(NioSocketChannel.class);

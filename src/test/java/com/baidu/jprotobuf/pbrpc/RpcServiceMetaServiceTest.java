@@ -45,7 +45,7 @@ public class RpcServiceMetaServiceTest extends BaseEchoServiceTest {
         RpcServiceMetaService proxy = pbrpcProxy.proxy();
         
         RpcServiceMetaList rpcServiceMetaInfo = proxy.getRpcServiceMetaInfo();
-        Assert.assertEquals(5, rpcServiceMetaInfo.getRpcServiceMetas().size());
+        Assert.assertEquals(6, rpcServiceMetaInfo.getRpcServiceMetas().size());
         
         List<RpcServiceMeta> rpcServiceMetas = rpcServiceMetaInfo.getRpcServiceMetas();
         for (RpcServiceMeta rpcServiceMeta : rpcServiceMetas) {

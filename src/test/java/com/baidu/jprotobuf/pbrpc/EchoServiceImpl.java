@@ -25,11 +25,28 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
  * @since 1.0
  */
 public class EchoServiceImpl {
+    
+    private Integer order;
+    
+    /**
+     * 
+     */
+    public EchoServiceImpl() {
+    }
+
+    /**
+     * @param order
+     */
+    public EchoServiceImpl(Integer order) {
+        super();
+        this.order = order;
+    }
+
 
     @ProtobufRPCService(serviceName = "echoService", methodName = "echo")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
-        ret.setMessage("hello:" + info.getMessage());
+        ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
         return ret;
     }
 
