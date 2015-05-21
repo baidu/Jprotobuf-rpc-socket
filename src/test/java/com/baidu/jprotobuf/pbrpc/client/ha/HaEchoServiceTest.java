@@ -33,7 +33,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  * @author xiemalin
  * @since 2.15
  */
-public class HaEchoServiceTest extends HaBaseEchoServiceTest {
+public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
     RpcClient rpcClient = new RpcClient();
     EchoService proxy;

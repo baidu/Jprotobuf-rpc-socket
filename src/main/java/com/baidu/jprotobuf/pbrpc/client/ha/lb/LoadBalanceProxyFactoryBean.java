@@ -15,10 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.log4j.Logger;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanNameAware;
@@ -91,7 +92,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
      * Logger for this class
      */
     private static final Logger LOGGER = Logger
-            .getLogger(LoadBalanceProxyFactoryBean.class);
+            .getLogger(LoadBalanceProxyFactoryBean.class.getName());
 
     private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -247,7 +248,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
         targetBeans = Collections.synchronizedMap(targetBeans);
         
         if (!isFailOver()) {
-            LOGGER.warn("LoadBalanceProxy is shut down failover action due to not set FailOverInterceptor");
+            LOGGER.log(Level.WARNING, "LoadBalanceProxy is shut down failover action due to not set FailOverInterceptor");
         }
     }
 
@@ -357,7 +358,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
                 Throwable t = getRealException(e);
                 if (isFailOver() && failOverInterceptor.isDoFailover(t, beanKey)) {
                     LOGGER
-                            .error("do failover action due to last access throws exception: "
+                            .log(Level.SEVERE, "do failover action due to last access throws exception: "
                                     + t.getLocalizedMessage());
                     failedTarget(bean, invocation, beanKey);
                     return invoke(invocation); // do fail over action
@@ -534,7 +535,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
 	public void setHeartBeat(boolean heartBeat) {
 		this.heartBeat = heartBeat;
 		if (!heartBeat) {
-		    LOGGER.warn("LoadBalance heartbeat is set to disabled");
+		    LOGGER.log(Level.WARNING, "LoadBalance heartbeat is set to disabled");
 		}
 	}
 

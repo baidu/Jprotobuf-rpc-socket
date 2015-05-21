@@ -35,9 +35,9 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 2.15
  */
-public class HaBaseEchoServiceTest {
+public class HaEchoServiceTestBase {
     
-    private static final Logger LOG = Logger.getLogger(HaBaseEchoServiceTest.class.getName());
+    private static final Logger LOG = Logger.getLogger(HaEchoServiceTestBase.class.getName());
 
     private NamingService namingService;
     
@@ -57,7 +57,7 @@ public class HaBaseEchoServiceTest {
     /**
      * 
      */
-    public HaBaseEchoServiceTest() {
+    public HaEchoServiceTestBase() {
 
         list = new ArrayList<InetSocketAddress>();
 

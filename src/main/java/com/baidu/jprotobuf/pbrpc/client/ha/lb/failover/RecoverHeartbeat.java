@@ -4,8 +4,8 @@
 package com.baidu.jprotobuf.pbrpc.client.ha.lb.failover;
 
 import java.util.Map;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean.FactoryBeanInvokeInfo;
@@ -22,7 +22,7 @@ public class RecoverHeartbeat implements Runnable {
      * Logger for this class
      */
     private static final Logger LOGGER = Logger
-            .getLogger(RecoverHeartbeat.class);
+            .getLogger(RecoverHeartbeat.class.getName());
 
     private LoadBalanceProxyFactoryBean proxyFactoryBean;
 
@@ -41,7 +41,7 @@ public class RecoverHeartbeat implements Runnable {
     private long getRecoverInterval() {
         long recoverInterval = proxyFactoryBean.getRecoverInterval();
         if (recoverInterval <= TOO_FREQUENT) {
-            LOGGER.warn("failover recover interval " + recoverInterval
+            LOGGER.log(Level.WARNING, "failover recover interval " + recoverInterval
                     + " is too frequent, using default:"
                     + DEFAULT_RECOVER_INTERVAL);
             recoverInterval = DEFAULT_RECOVER_INTERVAL;
@@ -98,8 +98,8 @@ public class RecoverHeartbeat implements Runnable {
                             .isRecover(invokeInfo.getBean(), invokeInfo
                                     .getInvocation(), invokeInfo.getBeanKey());
                 } catch (Exception e) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(e);
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.log(Level.FINE, e.getMessage());
                     }
                     available = false;
                 }
@@ -108,7 +108,7 @@ public class RecoverHeartbeat implements Runnable {
                     LOGGER.info(invokeInfo.getBeanKey()
                             + " recover heart beat test success!");
                 } else {
-                    LOGGER.warn(invokeInfo.getBeanKey()
+                    LOGGER.log(Level.WARNING, invokeInfo.getBeanKey()
                             + " recover heart beat test failed!");
                 }
             }
@@ -116,14 +116,13 @@ public class RecoverHeartbeat implements Runnable {
             try {
                 Thread.sleep(getRecoverInterval());
             } catch (Exception e) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(e);
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    LOGGER.log(Level.FINE, e.getMessage());
                 }
             }
         }
         runing = false;
-        LOGGER
-                .info("all heart beat test success. recover heart beat thread exit");
+        LOGGER.info("all heart beat test success. recover heart beat thread exit");
     }
 
 }
