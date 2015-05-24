@@ -35,7 +35,7 @@ public interface EchoService {
      * @param info
      * @return
      */
-    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 450)
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1000)
     EchoInfo echo(EchoInfo info);
     
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 450, 

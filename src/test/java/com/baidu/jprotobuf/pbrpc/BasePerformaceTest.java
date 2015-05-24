@@ -30,6 +30,8 @@ public abstract class BasePerformaceTest extends BaseTest {
     String formatString = "|%20s|%20s|%22s|%20s|%20s|";
 
     String formatString2 = "|%10d|%10d|%12d|%10d|%10d|";
+    
+    protected int totalRequestSize = 1000;
 
     protected void printResult(RpcDataPackage in, RpcDataPackage out, int totalCount, long totaltime, int threadCount) {
         System.out.println("---------------------Performance Result-------------------------");

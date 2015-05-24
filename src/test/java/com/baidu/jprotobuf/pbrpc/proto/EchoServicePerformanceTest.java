@@ -52,8 +52,6 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 1000;
-
     Runnable runnable = new Runnable() {
 
         public void run() {
