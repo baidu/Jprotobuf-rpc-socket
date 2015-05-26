@@ -111,8 +111,7 @@ public abstract class NamingServiceSupportLoadBalanceStrategy implements LoadBal
                     return;
                 }
                 list = new ArrayList<InetSocketAddress>(serverList);
-                LOG.info("Found a new servers list from naming service: list=" + list);
-                reInit(list);
+                reInit(serverList);
             } catch (Exception e) {
                 LOG.log(Level.WARNING, e.getMessage(), e.getCause());
             }

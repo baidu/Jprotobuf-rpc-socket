@@ -38,7 +38,7 @@ public interface EchoService {
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1000)
     EchoInfo echo(EchoInfo info);
     
-    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 450, 
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1000, 
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)
     EchoInfo echoWithAttachement(EchoInfo info);
     
