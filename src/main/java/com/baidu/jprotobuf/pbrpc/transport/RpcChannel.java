@@ -68,9 +68,10 @@ public class RpcChannel {
         long callMethodStart = System.currentTimeMillis();
 
         // register timer
-        Timeout timeout = rpcClient.getTimer().newTimeout(
-                new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient), onceTalkTimeout,
-                TimeUnit.MILLISECONDS);
+        Timeout timeout =
+                rpcClient.getTimer().newTimeout(
+                        new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient,
+                                onceTalkTimeout, TimeUnit.MILLISECONDS), onceTalkTimeout, TimeUnit.MILLISECONDS);
 
         RpcClientCallState state = new RpcClientCallState(callback, rpcDataPackage, timeout);
 
@@ -97,6 +98,16 @@ public class RpcChannel {
             LOG.log(Level.FINE, "profiling callMethod cost " + (callMethodEnd - callMethodStart) + "ms");
         } finally {
             channelPool.returnChannel(channel);
+        }
+
+    }
+
+    /**
+     * 
+     */
+    public void close() {
+        if (channelPool != null) {
+            channelPool.stop();
         }
 
     }

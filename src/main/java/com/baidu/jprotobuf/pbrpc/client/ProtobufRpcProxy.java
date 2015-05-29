@@ -54,6 +54,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     
     private boolean lookupStubOnStartup = true;
     
+    private T instance;
+    
     /**
      * get the lookupStubOnStartup
      * @return the lookupStubOnStartup
@@ -105,7 +107,11 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         this.rpcClient = rpcClient;
     }
 
-    public T proxy() {
+    public synchronized T proxy() {
+        
+        if (instance != null) {
+            return instance;
+        }
 
         // to parse interface
         Method[] methods = interfaceClass.getMethods();
@@ -153,13 +159,20 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         if (lookupStubOnStartup) {
             rpcChannel.testChannlConnect();
         }
-        T proxy = ProxyFactory.createProxy(interfaceClass, this);
-        return proxy;
+        
+        instance = ProxyFactory.createProxy(interfaceClass, this);
+        return instance;
     }
 
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
         return rpcDataPackage;
+    }
+    
+    public void close() {
+        if (rpcChannel != null) {
+            rpcChannel.close();
+        }
     }
     
     /*

@@ -41,6 +41,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
     protected RpcServer rpcServer;
     protected EchoService echoService;
     private RpcClient rpcClient;
+    private ProtobufRpcProxy<EchoService> pbrpcProxy;
     
     @Before
     public void setUp() {
@@ -60,7 +61,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         }
         rpcClient = new RpcClient(options);
         
-        ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
+        pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(PORT);
         echoService = pbrpcProxy.proxy();
     }
@@ -100,6 +101,9 @@ public abstract class BaseEchoServiceTest extends BaseTest {
             rpcClient.stop();
         } catch (Exception e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
+        }
+        if (pbrpcProxy !=  null) {
+            pbrpcProxy.close();
         }
         stopServer();
     }

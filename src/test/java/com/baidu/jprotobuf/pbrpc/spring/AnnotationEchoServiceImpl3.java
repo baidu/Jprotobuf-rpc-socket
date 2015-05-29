@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.baidu.jprotobuf.pbrpc.meta;
+package com.baidu.jprotobuf.pbrpc.spring;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
+import org.springframework.stereotype.Component;
+
+import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
+import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
 
 /**
- * {@link RpcServiceMetaService}
- *
+ * Echo service for annotation exporter 
+ * 
  * @author xiemalin
- * @since 2.1
+ * @since 2.17
  */
-public interface RpcServiceMetaService {
-
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME, onceTalkTimeout = 100000)
-    RpcServiceMetaList getRpcServiceMetaInfo();
+@Component
+@RpcExporter(port = "1033")
+public class AnnotationEchoServiceImpl3 extends EchoServiceImpl { 
     
-    @ProtobufRPC(serviceName = RpcServiceMetaServiceProvider.RPC_META_SERVICENAME)
-    void ping();
+ 
+    
 }

@@ -38,6 +38,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
 /**
  * a common utility proxy factory bean to support Spring beans load balance support.<br>
  * a example
+ * 
  * <pre>
  * {@code
  * <bean id="lbRmiService" class="com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean">
@@ -77,12 +78,12 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
  * </bean>
  * }
  * </pre>
+ * 
  * @author xiemalin
  * @since 1.0.0.0
  */
-public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
-        implements BeanClassLoaderAware, FactoryBean, InitializingBean,
-        MethodInterceptor, DisposableBean, BeanNameAware {
+public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor implements BeanClassLoaderAware,
+        FactoryBean, InitializingBean, MethodInterceptor, DisposableBean, BeanNameAware {
     /**
      * 
      */
@@ -91,8 +92,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger
-            .getLogger(LoadBalanceProxyFactoryBean.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LoadBalanceProxyFactoryBean.class.getName());
 
     private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -104,7 +104,8 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
 
     private FailOverInterceptor failOverInterceptor;
 
-    private Map<String, FactoryBeanInvokeInfo> failedFactoryBeans = new ConcurrentHashMap<String, FactoryBeanInvokeInfo>();
+    private Map<String, FactoryBeanInvokeInfo> failedFactoryBeans =
+            new ConcurrentHashMap<String, FactoryBeanInvokeInfo>();
 
     private RecoverHeartbeat recoverHeartbeat;
 
@@ -113,12 +114,14 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     private FailOverEvent failOverEvent;
 
     private StrategyInterceptor strategyInterceptor;
-    
+
     private boolean heartBeat = true;
 
     private long recoverInterval = 1000L;
-    
+
     private String beanName = "";
+    
+    private Throwable lastestException;
 
     public void setFailOverEvent(FailOverEvent failOverEvent) {
         this.failOverEvent = failOverEvent;
@@ -134,6 +137,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
 
     /**
      * add target bean
+     * 
      * @param key
      * @param targetBean
      */
@@ -160,8 +164,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     }
 
     /**
-     * @param failOverInterceptor
-     *            the failOverInterceptor to set
+     * @param failOverInterceptor the failOverInterceptor to set
      */
     public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;
@@ -189,27 +192,23 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     // /---- InitializingBean implement
     public void afterPropertiesSet() throws Exception {
         if (getServiceInterface() == null) {
-            throw new IllegalArgumentException(
-                    "Property 'serviceInterfaces' is required");
+            throw new IllegalArgumentException("Property 'serviceInterfaces' is required");
         }
 
         // check all the target Factory beans must valid
         if (targetBeans == null) {
-            throw new IllegalArgumentException(
-                    "Property 'targetFactoryBeans' is required");
+            throw new IllegalArgumentException("Property 'targetFactoryBeans' is required");
         }
         for (Map.Entry<String, Object> entry : targetBeans.entrySet()) {
             Object o = entry.getValue();
             if (!getServiceInterface().isAssignableFrom(o.getClass())) {
-                throw new IllegalArgumentException(
-                        "target facotry bean class '" + entry.getKey()
-                                + "' must implement serviceInterface");
+                throw new IllegalArgumentException("target facotry bean class '" + entry.getKey()
+                        + "' must implement serviceInterface");
             }
 
             if (!isAssignableFrom(getExtraServiceInterfaces(), o.getClass())) {
-                throw new IllegalArgumentException(
-                        "target facotry bean class '" + entry.getKey()
-                                + "' must implement all the extraInterfaces ");
+                throw new IllegalArgumentException("target facotry bean class '" + entry.getKey()
+                        + "' must implement all the extraInterfaces ");
             }
         }
         ProxyFactory pf = new ProxyFactory(getServiceInterface(), this);
@@ -224,7 +223,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
         // default using Random strategy
         if (loadBalanceStrategy == null) {
             Map<String, Integer> lbFactors = new HashMap<String, Integer>();
-            
+
             for (String key : targetBeans.keySet()) {
                 lbFactors.put(key, DEFAULT_LB_FACTOR);
             }
@@ -233,22 +232,21 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
             // valid balance strategy targets
             Set<String> targets = loadBalanceStrategy.getTargets();
             if (targets == null || targets.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "the targets of loadBalanceStrategy can not be empty");
+                throw new IllegalArgumentException("the targets of loadBalanceStrategy can not be empty");
             }
             for (String key : targets) {
                 if (!targetBeans.containsKey(key)) {
-                    throw new IllegalArgumentException("the target key '" + key
-                            + "' of loadBalanceStrategy is invalid");
+                    throw new IllegalArgumentException("the target key '" + key + "' of loadBalanceStrategy is invalid");
                 }
             }
         }
 
         // for synchronized lock
         targetBeans = Collections.synchronizedMap(targetBeans);
-        
+
         if (!isFailOver()) {
-            LOGGER.log(Level.WARNING, "LoadBalanceProxy is shut down failover action due to not set FailOverInterceptor");
+            LOGGER.log(Level.WARNING,
+                    "LoadBalanceProxy is shut down failover action due to not set FailOverInterceptor");
         }
     }
 
@@ -283,19 +281,16 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     }
 
     /**
-     * Return the ClassLoader that this accessor operates in, to be used for
-     * deserializing and for generating proxies.
+     * Return the ClassLoader that this accessor operates in, to be used for deserializing and for generating proxies.
      */
     protected ClassLoader getBeanClassLoader() {
         return this.beanClassLoader;
     }
 
-    private void failedTarget(Object bean, MethodInvocation invocation,
-            String beanKey) throws Throwable {
+    private void failedTarget(Object bean, MethodInvocation invocation, String beanKey) throws Throwable {
         loadBalanceStrategy.removeTarget(beanKey);
         // add to failed target list
-        FactoryBeanInvokeInfo info = new FactoryBeanInvokeInfo(bean, getMethod(
-                bean, invocation), beanKey);
+        FactoryBeanInvokeInfo info = new FactoryBeanInvokeInfo(bean, getMethod(bean, invocation), beanKey);
         failedFactoryBeans.put(beanKey, info);
         executeHeartBeat(); // execute heart beat for factory bean recover
                             // detecting
@@ -323,7 +318,15 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
             }
         }
         if (key == null) {
-            key = loadBalanceStrategy.elect();
+            try {
+                key = loadBalanceStrategy.elect();
+            } catch (Exception e) {
+                String message = "A error found: " + e.getMessage() + "";
+                if (lastestException != null) {
+                    message += " with last exception message:" + lastestException.getMessage();
+                }
+                throw new RuntimeException(message, e);
+            }
         }
 
         if (strategyInterceptor != null) {
@@ -339,8 +342,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
         if (isFailOver()) { // support fail over
             boolean isAvailable;
             try {
-                isAvailable = failOverInterceptor.isAvailable(bean, getMethod(
-                        bean, invocation), beanKey);
+                isAvailable = failOverInterceptor.isAvailable(bean, getMethod(bean, invocation), beanKey);
             } catch (Exception e) {
                 isAvailable = false;
             }
@@ -356,10 +358,10 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
                 return doInvoke(bean, invocation);
             } catch (Throwable e) {
                 Throwable t = getRealException(e);
+                lastestException = t;
                 if (isFailOver() && failOverInterceptor.isDoFailover(t, beanKey)) {
-                    LOGGER
-                            .log(Level.SEVERE, "do failover action due to last access throws exception: "
-                                    + t.getLocalizedMessage());
+                    LOGGER.log(Level.SEVERE,
+                            "do failover action due to last access throws exception: " + t.getLocalizedMessage());
                     failedTarget(bean, invocation, beanKey);
                     return invoke(invocation); // do fail over action
                 }
@@ -370,9 +372,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
 
         throw new NullPointerException("target bean is null");
     }
-    
+
     private Throwable getRealException(Throwable t) {
-    	do {
+        do {
             if (t instanceof UndeclaredThrowableException) {
                 t = ((UndeclaredThrowableException) t).getCause();
             }
@@ -380,26 +382,22 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
             if (t instanceof InvocationTargetException) {
                 t = ((InvocationTargetException) t).getTargetException();
             }
-		} while ((t instanceof UndeclaredThrowableException) ||
-				(t instanceof InvocationTargetException));
-    	
-    	return t;
-    	
+        } while ((t instanceof UndeclaredThrowableException) || (t instanceof InvocationTargetException));
+
+        return t;
+
     }
 
     // --- others
-    private Object doInvoke(Object bean, MethodInvocation invocation)
-            throws Throwable {
+    private Object doInvoke(Object bean, MethodInvocation invocation) throws Throwable {
         Object[] args = invocation.getArguments();
         Method m = getMethod(bean, invocation);
         return m.invoke(bean, args);
     }
 
-    private Method getMethod(Object bean, MethodInvocation invocation)
-            throws Throwable {
+    private Method getMethod(Object bean, MethodInvocation invocation) throws Throwable {
         String methodName = invocation.getMethod().getName();
-        Method m = bean.getClass().getMethod(methodName,
-                invocation.getMethod().getParameterTypes());
+        Method m = bean.getClass().getMethod(methodName, invocation.getMethod().getParameterTypes());
         return m;
     }
 
@@ -430,9 +428,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     }
 
     private synchronized void executeHeartBeat() {
-    	if (!isHeartBeat()) { //if close heart beat manually
-    		return;
-    	}
+        if (!isHeartBeat()) { // if close heart beat manually
+            return;
+        }
         if (exe == null || exe.isShutdown()) {
             exe = Executors.newFixedThreadPool(1, new ThreadFactory() {
                 public Thread newThread(Runnable r) {
@@ -500,16 +498,14 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
     }
 
     /**
-     * @param strategyInterceptor
-     *            the strategyInterceptor to set
+     * @param strategyInterceptor the strategyInterceptor to set
      */
     public void setStrategyInterceptor(StrategyInterceptor strategyInterceptor) {
         this.strategyInterceptor = strategyInterceptor;
     }
 
     /**
-     * @param recoverInterval
-     *            the recoverInterval to set
+     * @param recoverInterval the recoverInterval to set
      */
     public void setRecoverInterval(long recoverInterval) {
         this.recoverInterval = recoverInterval;
@@ -522,25 +518,25 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor
         return recoverInterval;
     }
 
-	/**
-	 * @return the heartBeat
-	 */
-	protected boolean isHeartBeat() {
-		return heartBeat;
-	}
+    /**
+     * @return the heartBeat
+     */
+    protected boolean isHeartBeat() {
+        return heartBeat;
+    }
 
-	/**
-	 * @param heartBeat the heartBeat to set
-	 */
-	public void setHeartBeat(boolean heartBeat) {
-		this.heartBeat = heartBeat;
-		if (!heartBeat) {
-		    LOGGER.log(Level.WARNING, "LoadBalance heartbeat is set to disabled");
-		}
-	}
+    /**
+     * @param heartBeat the heartBeat to set
+     */
+    public void setHeartBeat(boolean heartBeat) {
+        this.heartBeat = heartBeat;
+        if (!heartBeat) {
+            LOGGER.log(Level.WARNING, "LoadBalance heartbeat is set to disabled");
+        }
+    }
 
     public void setBeanName(String beanName) {
         this.beanName = beanName;
-        
+
     }
 }

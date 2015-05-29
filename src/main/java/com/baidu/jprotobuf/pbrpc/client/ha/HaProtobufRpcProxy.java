@@ -16,10 +16,13 @@
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -45,7 +48,33 @@ public class HaProtobufRpcProxy<T> {
     private LoadBalanceStrategy loadBalanceStrategy;
     private FailOverInterceptor failOverInterceptor;
     private LoadBalanceProxyFactoryBean lbProxyBean;
+
+    private T instance;
+    private List<ProtobufRpcProxy<T>> protobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>();
     
+    private boolean lookupStubOnStartup = true;
+    
+    /**
+     * get the lookupStubOnStartup
+     * @return the lookupStubOnStartup
+     */
+    public boolean isLookupStubOnStartup() {
+        return lookupStubOnStartup;
+    }
+
+    /**
+     * set lookupStubOnStartup value to lookupStubOnStartup
+     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     */
+    public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
+        this.lookupStubOnStartup = lookupStubOnStartup;
+    }
+
+    /**
+     * log this class
+     */
+    protected static final Log LOGGER = LogFactory.getLog(HaProtobufRpcProxy.class);
+
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService) {
         this(rpcClient, interfaceClass, namingService, null, null);
     }
@@ -62,38 +91,51 @@ public class HaProtobufRpcProxy<T> {
         }
 
     }
+    
+    protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
+        ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
+        return protobufRpcProxy;
+    }
 
-    public T proxy() throws Exception {
+    public synchronized T proxy() throws Exception {
+
+        if (instance != null) {
+            return instance;
+        }
+
         // get server list from NamingService
         List<InetSocketAddress> servers = namingService.list();
-        
+
         if (CollectionUtils.isEmpty(servers)) {
             throw new RuntimeException("Can not proxy rpc client due to get a blank server list from namingService.");
         }
-        
+
         lbProxyBean = new LoadBalanceProxyFactoryBean();
         lbProxyBean.setServiceInterface(interfaceClass);
-        
+
         Map<String, String> serverUrls = new HashMap<String, String>(servers.size());
         Map<String, Object> targetBeans = new HashMap<String, Object>();
         for (InetSocketAddress address : servers) {
             String serviceUrl = address.getHostName() + ":" + address.getPort();
             serverUrls.put(serviceUrl, serviceUrl);
-            
-            ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
+
+            ProtobufRpcProxy<T> protobufRpcProxy = onBuildProtobufRpcProxy(rpcClient, interfaceClass);
             protobufRpcProxy.setHost(address.getHostName());
             protobufRpcProxy.setPort(address.getPort());
-            
+            protobufRpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
+
             T rpc = protobufRpcProxy.proxy();
-            
+
+            protobufRpcProxyList.add(protobufRpcProxy);
+
             targetBeans.put(serviceUrl, rpc);
         }
-        
+
         if (loadBalanceStrategy == null) {
             loadBalanceStrategy = new RoundRobinLoadBalanceStrategy(namingService);
         }
         lbProxyBean.setLoadBalanceStrategy(loadBalanceStrategy);
-        
+
         if (failOverInterceptor == null) {
             SocketFailOverInterceptor socketFailOverInterceptor = new SocketFailOverInterceptor();
             socketFailOverInterceptor.setRecoverServiceUrls(serverUrls);
@@ -102,16 +144,26 @@ public class HaProtobufRpcProxy<T> {
         lbProxyBean.setFailOverInterceptor(failOverInterceptor);
         lbProxyBean.setTargetBeans(targetBeans);
         lbProxyBean.afterPropertiesSet();
-        
-        return (T) lbProxyBean.getObject();
+
+        instance = (T) lbProxyBean.getObject();
+        return instance;
     }
-    
+
     public void close() {
         if (lbProxyBean != null) {
             try {
                 lbProxyBean.destroy();
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
+                LOGGER.fatal(e.getMessage(), e);
+            }
+        }
+        if (protobufRpcProxyList != null) {
+            for (ProtobufRpcProxy<T> proxy : protobufRpcProxyList) {
+                try {
+                    proxy.close();
+                } catch (Exception e) {
+                    LOGGER.fatal(e.getMessage(), e);
+                }
             }
         }
     }

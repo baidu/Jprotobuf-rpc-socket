@@ -16,6 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import java.util.concurrent.TimeUnit;
+
 import io.netty.util.Timeout;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
@@ -126,9 +128,9 @@ public class RpcClientCallState {
         this.timeout = timeout;
     }
 
-    public void handleTimeout() {
+    public void handleTimeout(long timeout, TimeUnit timeUnit) {
         dataPackage.errorCode(ErrorCodes.ST_READ_TIMEOUT);
-        dataPackage.errorText(ErrorCodes.MSG_READ_TIMEOUT);
+        dataPackage.errorText(ErrorCodes.MSG_READ_TIMEOUT + timeout + "(" + timeUnit + ")");
 
         callback(dataPackage);
     }

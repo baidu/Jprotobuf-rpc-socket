@@ -46,6 +46,27 @@ public class RpcClientOptions {
     // if use chunkSize will split chunkSize 
     private long chunkSize = -1;
     
+    public void copyFrom(RpcClientOptions options) {
+        if (options == null) {
+            return;
+        }
+        this.connectTimeout = options.connectTimeout;
+        this.sendBufferSize = options.sendBufferSize;
+        this.receiveBufferSize = options.receiveBufferSize;
+        this.tcpNoDelay = options.tcpNoDelay;
+        this.keepAlive = options.keepAlive;
+        this.reuseAddress = options.reuseAddress;
+        this.idleTimeout = options.idleTimeout;
+        this.shortConnection = options.shortConnection;
+        this.threadPoolSize = options.threadPoolSize;
+        this.maxIdleSize = options.maxIdleSize;
+        this.minIdleSize = options.minIdleSize;
+        this.minEvictableIdleTime = options.minEvictableIdleTime;
+        this.maxWait = options.maxWait;
+        this.onceTalkTimeout = options.onceTalkTimeout;
+        this.chunkSize = options.chunkSize;
+    }
+    
     /**
      * time out set for chunk package wait in ms.
      */

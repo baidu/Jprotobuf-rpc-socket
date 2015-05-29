@@ -40,50 +40,57 @@ public class RpcServiceRegistry {
      * registered service map. the key if unique represent service name
      */
     private Map<String, RpcHandler> serviceMap = new HashMap<String, RpcHandler>();
-    
+
     /**
      * if override exist allowed. default is not allowed
      */
     private boolean dummyOverride = false;
-    
+
     /**
      * default constructor
      */
     public RpcServiceRegistry() {
+    }
+    
+    public void doRegisterMetaService() {
         RpcServiceMetaServiceProvider metaService = new RpcServiceMetaServiceProvider(this);
         registerService(metaService);
     }
     
-    
+    public void unRegisterAll() {
+        serviceMap.clear();
+    }
+
     /**
      * set dummyOverride value to dummyOverride
+     * 
      * @param dummyOverride the dummyOverride to set
      */
     public void setDummyOverride(boolean dummyOverride) {
         this.dummyOverride = dummyOverride;
     }
-    
+
     public void registerService(final Object target) {
         if (target == null) {
             throw new IllegalArgumentException("Param 'target' is null.");
         }
-        
+
         Class<? extends Object> cls = target.getClass();
-        
+
         ReflectionUtils.doWithMethods(cls, new ReflectionUtils.MethodCallback() {
-            
+
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                
+
                 ProtobufRPCService protobufPRCService = method.getAnnotation(ProtobufRPCService.class);
                 if (protobufPRCService != null) {
                     doRegiterService(method, target, protobufPRCService);
                 }
-                
+
             }
         });
-        
+
     }
-    
+
     protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
         AbstractRpcHandler rpcHandler;
@@ -97,21 +104,33 @@ public class RpcServiceRegistry {
         }
         return rpcHandler;
     }
-    
+
     private void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
-        serviceMap.put(getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName()), rpcHandler);
+        String methodSignature = getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName());
+        
+        if (serviceMap.containsKey(methodSignature)) {
+            if (dummyOverride) {
+                serviceMap.put(methodSignature, rpcHandler);
+            } else {
+                throw new RuntimeException("serviceName '" + rpcHandler.getServiceName() + " ' and methodName '"
+                        + method.getName() + "' aready exist.");
+            }
+        } else {
+            serviceMap.put(methodSignature, rpcHandler);
+        }
+
     }
-    
+
     private String getMethodSignature(String serviceName, String method) {
-         return serviceName + "!" + method;
+        return serviceName + "!" + method;
     }
-    
+
     public RpcHandler lookupService(String serviceName, String methodName) {
         String methodSignature = getMethodSignature(serviceName, methodName);
         return serviceMap.get(methodSignature);
     }
-    
+
     public Collection<RpcHandler> getServices() {
         return serviceMap.values();
     }
@@ -123,21 +142,24 @@ public class RpcServiceRegistry {
         if (serviceExporter == null) {
             throw new IllegalArgumentException("Param 'serviceExporter' is null.");
         }
-        
+
         String serviceName = serviceExporter.getServiceName();
         if (StringUtils.isEmpty(serviceName)) {
             throw new IllegalArgumentException(" serviceName from 'serviceExporter' is empty.");
         }
-        
+
         String methodSignature = getMethodSignature(serviceName, serviceExporter.getMethodName());
-        
+
         if (serviceMap.containsKey(methodSignature)) {
             if (dummyOverride) {
                 serviceMap.put(methodSignature, new IDLServiceRpcHandler(serviceExporter));
+            } else {
+                throw new RuntimeException("serviceName '" + serviceName + " ' and methodName '"
+                        + serviceExporter.getMethodName() + "' aready exist.");
             }
         } else {
             serviceMap.put(methodSignature, new IDLServiceRpcHandler(serviceExporter));
         }
-        
+
     }
 }

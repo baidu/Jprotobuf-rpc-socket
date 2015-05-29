@@ -25,7 +25,7 @@ public class RpcServerOptions {
     public RpcServerOptions() {
         
         tcpNoDelay = true;
-        this.byteOrder = ByteOrder.LITTLE_ENDIAN;
+        this.byteOrder = ByteOrder.BIG_ENDIAN;
         keepAlive = true;
         keepAliveTime = 60;
         
@@ -84,6 +84,21 @@ public class RpcServerOptions {
     
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
+    
+    public void copyFrom(RpcServerOptions options) {
+        this.chunkSize = options.chunkSize;
+        this.chunkPackageTimeout = options.chunkPackageTimeout;
+        this.keepAliveTime = options.keepAliveTime;
+        this.connectTimeout = options.connectTimeout;
+        this.writerIdleTime = options.writerIdleTime;
+        this.readerIdleTime = options.readerIdleTime;
+        this.sendBufferSize = options.sendBufferSize;
+        this.receiveBufferSize = options.receiveBufferSize;
+        this.backlog = options.backlog;
+        this.soLinger = options.soLinger;
+        this.byteOrder = options.byteOrder;
+        this.keepAlive = options.keepAlive;
+    }
     
 
     /**

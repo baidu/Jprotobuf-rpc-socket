@@ -26,7 +26,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.concurrent.Future;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,6 +77,10 @@ public class RpcServer extends ServerBootstrap {
 
     public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
             RpcServiceRegistry rpcServiceRegistry) {
+        if (rpcServiceRegistry == null) {
+            throw new RuntimeException("protperty 'rpcServiceRegistry ' is null.");
+        }
+        
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
         this.group(this.bossGroup, this.workerGroup);
@@ -95,6 +98,8 @@ public class RpcServer extends ServerBootstrap {
         this.childOption(ChannelOption.SO_SNDBUF, serverOptions.getSendBufferSize());
 
         this.rpcServiceRegistry = rpcServiceRegistry;
+        // do register meta service
+        rpcServiceRegistry.doRegisterMetaService();
         this.rpcServerOptions = new RpcServerOptions();
         this.rpcServerPipelineInitializer =
                 new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions);
@@ -103,6 +108,10 @@ public class RpcServer extends ServerBootstrap {
 
     public RpcServer(RpcServerOptions serverOptions) {
         this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry());
+    }
+    
+    public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
+        this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry);
     }
 
     public RpcServer() {

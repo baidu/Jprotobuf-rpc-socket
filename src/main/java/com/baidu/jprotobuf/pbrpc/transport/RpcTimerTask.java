@@ -19,6 +19,7 @@ package com.baidu.jprotobuf.pbrpc.transport;
 import io.netty.util.Timeout;
 import io.netty.util.TimerTask;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,9 +36,14 @@ public class RpcTimerTask implements TimerTask {
     private long correlationId;
     private RpcClient rpcClient;
 
-    public RpcTimerTask(long correlationId, RpcClient client) {
+    private final long time;
+    private final TimeUnit timeUnit;
+
+    public RpcTimerTask(long correlationId, RpcClient client, long timeOut, TimeUnit timeUnit) {
         this.correlationId = correlationId;
         this.rpcClient = client;
+        this.time = timeOut;
+        this.timeUnit = timeUnit;
     }
 
     public void run(Timeout timeout) throws Exception {
@@ -45,7 +51,7 @@ public class RpcTimerTask implements TimerTask {
         LOG.log(Level.FINE, "correlationId:" + correlationId + " timeout");
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         if (null != state) {
-            state.handleTimeout();
+            state.handleTimeout(time, timeUnit);
         } else {
             LOG.log(Level.FINE, "correlationId:" + correlationId
                     + ": is timeout and no PendingClientCallState found for correlationId " + correlationId);

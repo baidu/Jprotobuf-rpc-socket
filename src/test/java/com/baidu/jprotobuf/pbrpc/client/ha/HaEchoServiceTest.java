@@ -37,14 +37,14 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
     RpcClient rpcClient = new RpcClient();
     EchoService proxy;
+    HaProtobufRpcProxy<EchoService> pbrpcProxy;
 
     @Before
     public void setUp() {
         super.setUp();
 
         try {
-            HaProtobufRpcProxy<EchoService> pbrpcProxy =
-                    new HaProtobufRpcProxy<EchoService>(rpcClient, EchoService.class, getNamingService());
+            pbrpcProxy = new HaProtobufRpcProxy<EchoService>(rpcClient, EchoService.class, getNamingService());
 
             int serverSize = getNamingService().list().size();
             Assert.assertEquals(5, serverSize);
@@ -58,6 +58,8 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
     @After
     public void tearDown() {
         super.tearDown();
+        
+        pbrpcProxy.close();
         rpcClient.stop();
     }
 
@@ -136,12 +138,12 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         Assert.assertEquals(5, returnValues.size());
 
     }
-    
+
     @Test
     public void testDynamicServerListChanges() throws Exception {
         // first check all servers running OK
         testNoServerFail();
-        
+
         // delete one from naming service
         list.remove(0);
         try {
@@ -159,7 +161,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         }
         // after one RPC server removed
         Assert.assertEquals(4, returnValues.size());
-        
+
     }
 
 }
