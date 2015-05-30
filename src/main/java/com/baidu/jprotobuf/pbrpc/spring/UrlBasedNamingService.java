@@ -18,16 +18,24 @@ import org.springframework.util.NumberUtils;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 
 /**
+ * {@link URL} based naming service provider.<br>
+ * <pre>
+ * {@code
+ *  <bean id="namingService" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
+ *       <constructor-arg>
+ *           <value>localhost:1031;localhost:1032;localhost:1033</value>
+ *       </constructor-arg>
+ *   </bean>
+ * }
+ * </pre>
  * 
- * {@link URL} based naming service provider.
- *
  * @author xiemalin
  * @since 2.17
  */
 public class UrlBasedNamingService implements NamingService {
-    
+
     private List<InetSocketAddress> list;
-    
+
     /**
      * url pattern with host:port and split by comma.<br>
      * eg: localhost:1031;localhost:1032
@@ -39,21 +47,22 @@ public class UrlBasedNamingService implements NamingService {
             list = Collections.emptyList();
             return;
         }
-        
+
         list = new ArrayList<InetSocketAddress>();
         String[] array = url.split(";");
         for (String uri : array) {
-            
             String[] uris = uri.split(":");
             if (uris != null && uris.length == 2) {
                 list.add(new InetSocketAddress(uris[0], NumberUtils.parseNumber(uris[1], Integer.class)));
             }
-            
+
         }
-        
+
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list()
      */
     @Override
