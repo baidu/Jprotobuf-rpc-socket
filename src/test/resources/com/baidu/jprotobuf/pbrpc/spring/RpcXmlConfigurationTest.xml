@@ -20,6 +20,7 @@
 				<ref local="echoService" />
 			</list>
 		</property>
+		<property name="connectTimeout" value="1000"></property>
 	</bean>
 
 
