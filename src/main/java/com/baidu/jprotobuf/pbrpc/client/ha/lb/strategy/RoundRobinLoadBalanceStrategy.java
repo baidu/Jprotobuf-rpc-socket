@@ -1,5 +1,17 @@
-/**
- * 
+/*
+ * Copyright 2002-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy;
 
@@ -26,7 +38,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
  * @see RoundRobinLoadBalanceStrategy
  * @since 2.16
  */
-public class RoundRobinLoadBalanceStrategy extends NamingServiceSupportLoadBalanceStrategy {
+public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceStrategy {
 
     private static final int MIN_LB_FACTOR = 1;
 
@@ -60,18 +72,7 @@ public class RoundRobinLoadBalanceStrategy extends NamingServiceSupportLoadBalan
     public RoundRobinLoadBalanceStrategy(NamingService namingService) {
 
         this.namingService = namingService;
-        // get server list from NamingService
-        List<InetSocketAddress> servers;
-        try {
-            servers = namingService.list();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        if (CollectionUtils.isEmpty(servers)) {
-            throw new RuntimeException("Can not initialize due to get a blank server list from namingService.");
-        }
-
-        init(servers);
+        doReInit(namingService);
     }
 
     public RoundRobinLoadBalanceStrategy(Map<String, Integer> lbFactors) {
@@ -80,10 +81,7 @@ public class RoundRobinLoadBalanceStrategy extends NamingServiceSupportLoadBalan
 
     protected void init(List<InetSocketAddress> servers) {
         Map<String, Integer> lbFactors = parseLbFactors(servers);
-
         init(lbFactors);
-
-        startUpdateNamingServiceTask(servers);
     }
 
     /**
@@ -99,7 +97,7 @@ public class RoundRobinLoadBalanceStrategy extends NamingServiceSupportLoadBalan
         return lbFactors;
     }
 
-    protected void init(Map<String, Integer> lbFactors) {
+    protected synchronized void init(Map<String, Integer> lbFactors) {
         currentTargets = Collections.synchronizedMap(lbFactors);
         failedTargets = Collections.synchronizedMap(new HashMap<String, Integer>(currentTargets.size()));
         reInitTargets(currentTargets);
@@ -234,16 +232,20 @@ public class RoundRobinLoadBalanceStrategy extends NamingServiceSupportLoadBalan
         return failedTargets.keySet();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceSupportLoadBalanceStrategy#reInit(java.util.List)
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategy#doReInit(com.baidu.jprotobuf.pbrpc.client.ha.NamingService)
      */
     @Override
-    protected void reInit(List<InetSocketAddress> list) {
-        Map<String, Integer> lbFactors = parseLbFactors(list);
-        reInitTargets(lbFactors);
-
+    public void doReInit(NamingService namingService) {
+     // get server list from NamingService
+        List<InetSocketAddress> servers;
+        try {
+            servers = namingService.list();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        init(servers);
+        
     }
+
 }

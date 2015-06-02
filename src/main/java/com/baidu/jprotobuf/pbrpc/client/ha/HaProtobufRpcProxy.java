@@ -21,15 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.util.CollectionUtils;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RoundRobinLoadBalanceStrategy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 
@@ -40,22 +43,24 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  * @author xiemalin
  * @since 2.16
  */
-public class HaProtobufRpcProxy<T> {
+public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implements MethodInterceptor {
 
     private final RpcClient rpcClient;
     private final Class<T> interfaceClass;
     private final NamingService namingService;
-    private LoadBalanceStrategy loadBalanceStrategy;
+    private NamingServiceLoadBalanceStrategy loadBalanceStrategy;
     private FailOverInterceptor failOverInterceptor;
     private LoadBalanceProxyFactoryBean lbProxyBean;
+    private T proxyInstance;
 
     private T instance;
     private List<ProtobufRpcProxy<T>> protobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>();
-    
+
     private boolean lookupStubOnStartup = true;
-    
+
     /**
      * get the lookupStubOnStartup
+     * 
      * @return the lookupStubOnStartup
      */
     public boolean isLookupStubOnStartup() {
@@ -64,6 +69,7 @@ public class HaProtobufRpcProxy<T> {
 
     /**
      * set lookupStubOnStartup value to lookupStubOnStartup
+     * 
      * @param lookupStubOnStartup the lookupStubOnStartup to set
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
@@ -80,7 +86,7 @@ public class HaProtobufRpcProxy<T> {
     }
 
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
-            LoadBalanceStrategy loadBalanceStrategy, FailOverInterceptor failOverInterceptor) {
+            NamingServiceLoadBalanceStrategy loadBalanceStrategy, FailOverInterceptor failOverInterceptor) {
         this.rpcClient = rpcClient;
         this.interfaceClass = interfaceClass;
         this.namingService = namingService;
@@ -89,25 +95,38 @@ public class HaProtobufRpcProxy<T> {
         if (namingService == null) {
             throw new NullPointerException("param 'namingService' is null.");
         }
+        proxyInstance = (T) new ProxyFactory(interfaceClass, this).getProxy();
 
     }
-    
+
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
         return protobufRpcProxy;
     }
 
     public synchronized T proxy() throws Exception {
-
         if (instance != null) {
             return instance;
         }
 
         // get server list from NamingService
         List<InetSocketAddress> servers = namingService.list();
+        // start update naming service task
+        startUpdateNamingServiceTask(servers);
 
+        instance = doProxy(servers);
+        return proxyInstance;
+    }
+    
+    /**
+     * @param servers
+     * @return
+     * @throws Exception
+     */
+    private T doProxy(List<InetSocketAddress> serversList) throws Exception {
+        List<InetSocketAddress> servers = serversList;
         if (CollectionUtils.isEmpty(servers)) {
-            throw new RuntimeException("Can not proxy rpc client due to get a blank server list from namingService.");
+            servers = new ArrayList<InetSocketAddress>();
         }
 
         lbProxyBean = new LoadBalanceProxyFactoryBean();
@@ -145,11 +164,21 @@ public class HaProtobufRpcProxy<T> {
         lbProxyBean.setTargetBeans(targetBeans);
         lbProxyBean.afterPropertiesSet();
 
-        instance = (T) lbProxyBean.getObject();
-        return instance;
+        return (T) lbProxyBean.getObject();
     }
 
     public void close() {
+        doClose(lbProxyBean, protobufRpcProxyList);
+        super.close();
+    }
+
+    /**
+     * do close action
+     * 
+     * @param lbProxyBean {@link LoadBalanceProxyFactoryBean}
+     * @param protobufRpcProxyList list of {@link ProtobufRpcProxy}
+     */
+    private void doClose(LoadBalanceProxyFactoryBean lbProxyBean, List<ProtobufRpcProxy<T>> protobufRpcProxyList) {
         if (lbProxyBean != null) {
             try {
                 lbProxyBean.destroy();
@@ -166,6 +195,62 @@ public class HaProtobufRpcProxy<T> {
                 }
             }
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingServiceChangeListener#getNamingService()
+     */
+    @Override
+    public NamingService getNamingService() {
+        return namingService;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingServiceChangeListener#reInit(java.util.List)
+     */
+    @Override
+    protected void reInit(final List<InetSocketAddress> list) throws Exception {
+        // store old
+        LoadBalanceProxyFactoryBean oldLbProxyBean = lbProxyBean;
+        List<ProtobufRpcProxy<T>> oldProtobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>(protobufRpcProxyList);
+        protobufRpcProxyList.clear();
+
+        // reinit naming service
+        loadBalanceStrategy.doReInit(new NamingService() {
+            @Override
+            public List<InetSocketAddress> list() throws Exception {
+                return list;
+            }
+        });
+        
+        
+        // create a new instance
+        T instance = doProxy(list);
+        this.instance = instance;
+        try {
+            // try to close old
+            doClose(oldLbProxyBean, oldProtobufRpcProxyList);
+        } catch (Exception e) {
+            LOGGER.fatal(e.getMessage(), e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+     */
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        if (instance == null) {
+            throw new NullPointerException("target instance is null may be not initial correct.");
+        }
+        Object result = invocation.getMethod().invoke(instance, invocation.getArguments());
+        return result;
     }
 
 }

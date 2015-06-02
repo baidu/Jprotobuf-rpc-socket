@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.jprotobuf.pbrpc.spring;
+package com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy;
+
+import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 
 /**
- * Placehoader resolved call back 
- * 
+ * {@link NamingService} support load balance strategy
+ *
  * @author xiemalin
  * @since 2.17
  */
-public interface PlaceholderResolved {
+public interface NamingServiceLoadBalanceStrategy extends LoadBalanceStrategy {
 
     /**
-     * parsed placeholder value returned.
-     * @param placeholder
-     * @return parsed string
+     * do reinit once by the naming service
+     * @param namingService {@link NamingService}
      */
-    String doResolved(String placeholder);
+    void doReInit(NamingService namingService);
 }

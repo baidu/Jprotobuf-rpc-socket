@@ -15,6 +15,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
+import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -140,7 +141,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
     }
 
     @Test
-    public void testDynamicServerListChanges() throws Exception {
+    public void testDynamicServerListChangesRemove() throws Exception {
         // first check all servers running OK
         testNoServerFail();
 
@@ -161,6 +162,31 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         }
         // after one RPC server removed
         Assert.assertEquals(4, returnValues.size());
+
+    }
+    
+    @Test
+    public void testDynamicServerListChangesAdd() throws Exception {
+        // first check all servers running OK
+        testNoServerFail();
+
+        // delete one from naming service
+        list.add(new InetSocketAddress(1036));
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+        }
+        // to check naming service get size
+        int serverSize = getNamingService().list().size();
+        Assert.assertEquals(6, serverSize);
+        EchoInfo echoInfo = new EchoInfo("");
+        Set<String> returnValues = new HashSet<String>();
+        for (int i = 0; i < serverSize * 2; i++) {
+            EchoInfo echo = proxy.echo(echoInfo);
+            returnValues.add(echo.getMessage());
+        }
+        // after one RPC server removed
+        Assert.assertEquals(6, returnValues.size());
 
     }
 

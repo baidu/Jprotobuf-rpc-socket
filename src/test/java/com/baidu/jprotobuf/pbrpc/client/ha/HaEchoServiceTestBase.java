@@ -111,6 +111,12 @@ public class HaEchoServiceTestBase {
             rpcServer.start(inetSocketAddress);
             servers.add(rpcServer);
         }
+        
+        RpcServer rpcServer = new RpcServer();
+        EchoServiceImpl echoServiceImpl = new EchoServiceImpl(order++);
+        rpcServer.registerService(echoServiceImpl);
+        rpcServer.start(new InetSocketAddress(1036));
+        servers.add(rpcServer);
     }
     
     public void stopOneServer() {
