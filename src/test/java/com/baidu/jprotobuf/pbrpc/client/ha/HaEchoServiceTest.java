@@ -149,7 +149,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.remove(0);
-        SleepUtils.dummySleep(2000);
+        SleepUtils.dummySleep(6000);
         // to check naming service get size
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(4, serverSize);
