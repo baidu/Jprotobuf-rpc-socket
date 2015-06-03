@@ -51,6 +51,13 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
     private NamingService namingService;
 
     /**
+     * defalut load factor for {@link RoundRobinLoadBalanceStrategy}
+     */
+    private static final int DEFAULT_LOAD_FACTOR = 1;
+
+    private String serviceSignature;
+
+    /**
      * get the namingService
      * 
      * @return the namingService
@@ -60,19 +67,15 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
     }
 
     /**
-     * defalut load factor for {@link RoundRobinLoadBalanceStrategy}
-     */
-    private static final int DEFAULT_LOAD_FACTOR = 1;
-
-    /**
      * Constructor with load balance factors.
      * 
      * @param lbFactors
      */
-    public RoundRobinLoadBalanceStrategy(NamingService namingService) {
+    public RoundRobinLoadBalanceStrategy(String serviceSignature, NamingService namingService) {
 
+        this.serviceSignature = serviceSignature;
         this.namingService = namingService;
-        doReInit(namingService);
+        doReInit(serviceSignature, namingService);
     }
 
     public RoundRobinLoadBalanceStrategy(Map<String, Integer> lbFactors) {
@@ -232,20 +235,28 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return failedTargets.keySet();
     }
 
-    /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategy#doReInit(com.baidu.jprotobuf.pbrpc.client.ha.NamingService)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategy#doReInit(com.baidu.jprotobuf
+     * .pbrpc.client.ha.NamingService)
      */
     @Override
-    public void doReInit(NamingService namingService) {
-     // get server list from NamingService
+    public void doReInit(String serviceSignagure, NamingService namingService) {
+        // get server list from NamingService
+        
+        Set<String> serviceSignatures = new HashSet<String>();
+        serviceSignatures.add(serviceSignagure);
+        
         List<InetSocketAddress> servers;
         try {
-            servers = namingService.list();
+            servers = namingService.list(serviceSignatures).get(serviceSignagure);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         init(servers);
-        
+
     }
 
 }

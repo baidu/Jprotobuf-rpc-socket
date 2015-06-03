@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy;
+package com.baidu.jprotobuf.pbrpc.client;
 
-import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import java.net.InetSocketAddress;
 
 /**
- * {@link NamingService} support load balance strategy
+ * This interface is used to call back on {@link ProtobufRpcProxy} on create connection for each serviceSignature.<br>
+ * serviceSignature should be unique to each service for same business.
  *
  * @author xiemalin
- * @since 2.17
+ * @since 2.19
  */
-public interface NamingServiceLoadBalanceStrategy extends LoadBalanceStrategy {
+public interface ServiceLocatorCallback {
 
-    /**
-     * do reinit once by the naming service
-     * @param namingService {@link NamingService}
-     */
-    void doReInit(String serviceSignature, NamingService namingService);
+    InetSocketAddress fetchAddress(String serviceSignature);
 }

@@ -17,7 +17,9 @@ package com.baidu.jprotobuf.pbrpc.client.ha;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +42,8 @@ public class HaEchoServiceTestBase {
     private static final Logger LOG = Logger.getLogger(HaEchoServiceTestBase.class.getName());
 
     private NamingService namingService;
+    
+    protected Set<String> defaultServices = new HashSet<String>();
     
     /**
      * get the namingService
@@ -86,6 +90,7 @@ public class HaEchoServiceTestBase {
     
     @Before
     public void setUp() {
+        defaultServices.add("");
         try {
             startServers();
         } catch (Exception e) {
@@ -100,7 +105,7 @@ public class HaEchoServiceTestBase {
     
     public void startServers() throws Exception {
         
-        List<InetSocketAddress> list = namingService.list();
+        List<InetSocketAddress> list = namingService.list(defaultServices).get("");
         
         servers = new ArrayList<RpcServer>(list.size());
         int order = 1;

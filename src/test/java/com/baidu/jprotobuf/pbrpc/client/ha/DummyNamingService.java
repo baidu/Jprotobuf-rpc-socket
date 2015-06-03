@@ -16,7 +16,10 @@
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A dummy {@link NamingService} implements support default server list.
@@ -41,6 +44,23 @@ public class DummyNamingService implements NamingService {
      */
     public List<InetSocketAddress> list() throws Exception {
         return list;
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list(java.util.Set)
+     */
+    @Override
+    public Map<String, List<InetSocketAddress>> list(Set<String> serviceSignatures) throws Exception {
+        Map<String, List<InetSocketAddress>> ret = new HashMap<String, List<InetSocketAddress>>();
+        
+        if (serviceSignatures == null || serviceSignatures.isEmpty()) {
+            return ret;
+        }
+        for (String string : serviceSignatures) {
+            ret.put(string, list);
+        }
+        
+        return ret;
     }
 
 }

@@ -18,16 +18,20 @@ package com.baidu.jprotobuf.pbrpc.client.ha;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * A listenr for {@link NamingService} changed call back.
- *
+ * 
  * @author xiemalin
  * @since 2.18
  */
@@ -37,14 +41,14 @@ public abstract class NamingServiceChangeListener {
 
     private Timer timer;
     private TimerTask updateListTask;
-    
+
     /**
      * delay in milliseconds before NamingService result refresh update task is to be executed.
      */
     private long delay = 1000;
-    
+
     /**
-     *  time in milliseconds between successive NamingService result refresh update task executions.
+     * time in milliseconds between successive NamingService result refresh update task executions.
      */
     private long period = 1000;
 
@@ -68,15 +72,15 @@ public abstract class NamingServiceChangeListener {
         this.period = period;
     }
 
-    protected abstract void reInit(List<InetSocketAddress> list) throws Exception;
+    protected abstract void reInit(String service, List<InetSocketAddress> list) throws Exception;
 
-    protected void startUpdateNamingServiceTask(List<InetSocketAddress> list) {
+    protected void startUpdateNamingServiceTask(Map<String, List<InetSocketAddress>> serviceMap) {
         if (getNamingService() == null) {
             return;
         }
 
         this.timer = new Timer(true);
-        updateListTask = new UpdateNamingServiceTask(this, list);
+        updateListTask = new UpdateNamingServiceTask(this, serviceMap);
         this.timer.scheduleAtFixedRate(updateListTask, delay, period);
     }
 
@@ -88,29 +92,56 @@ public abstract class NamingServiceChangeListener {
 
     private final class UpdateNamingServiceTask extends TimerTask {
         NamingServiceChangeListener loadBalancer;
-        private List<InetSocketAddress> list;
+        private Map<String, List<InetSocketAddress>> serviceMap;
 
         public UpdateNamingServiceTask(NamingServiceChangeListener loadBalancer,
-                List<InetSocketAddress> list) {
+                Map<String, List<InetSocketAddress>> serviceMap) {
             this.loadBalancer = loadBalancer;
-            this.list = new ArrayList<InetSocketAddress>(list);
+            this.serviceMap = new HashMap<String, List<InetSocketAddress>>();
+
+            // copy map
+            Iterator<Entry<String, List<InetSocketAddress>>> iter = serviceMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                Entry<String, List<InetSocketAddress>> entry = iter.next();
+                this.serviceMap.put(entry.getKey(), new ArrayList<InetSocketAddress>(entry.getValue()));
+            }
+
         }
 
         @Override
         public void run() {
             try {
-                List<InetSocketAddress> serverList = loadBalancer.getNamingService().list();
-                if (serverList == null) {
-                    serverList = Collections.emptyList();
-                } 
-                
-                // to check changes
-                if (list.equals(serverList)) {
-                    return;
+
+                Set<String> serviceNames = serviceMap.keySet();
+
+                Map<String, List<InetSocketAddress>> eServcieMap = loadBalancer.getNamingService().list(serviceNames);
+                if (eServcieMap == null) {
+                    eServcieMap = Collections.emptyMap();
                 }
-                LOG.log(Level.WARNING, "A new changed list geting from naming service: " + serverList);
-                list = new ArrayList<InetSocketAddress>(serverList);
-                reInit(serverList);
+
+                Iterator<Entry<String, List<InetSocketAddress>>> iter = serviceMap.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Entry<String, List<InetSocketAddress>> next = iter.next();
+                    String service = next.getKey();
+                    List<InetSocketAddress> oldList = next.getValue();
+                    if (oldList == null) {
+                        oldList = Collections.emptyList();
+                    }
+                    List<InetSocketAddress> newList = eServcieMap.get(service);
+                    if (newList == null) {
+                        newList = Collections.emptyList();
+                    }
+
+                    if (oldList.equals(newList)) {
+                        continue;
+                    }
+
+                    LOG.log(Level.WARNING, "A new changed list geting from naming service name='" + service + "' "
+                            + "value=" + newList);
+                    List<InetSocketAddress> list = new ArrayList<InetSocketAddress>(newList);
+                    next.setValue(list);
+                    reInit(service, list);
+                }
             } catch (Exception e) {
                 LOG.log(Level.WARNING, e.getMessage(), e.getCause());
             }

@@ -19,8 +19,14 @@ package com.baidu.jprotobuf.pbrpc.client;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
@@ -43,11 +49,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     private Map<String, RpcMethodInfo> cachedRpcMethods = new HashMap<String, RpcMethodInfo>();
     
+    private static Logger LOG = Logger.getLogger(ProtobufRpcProxy.class.getName());
+    
     /**
      * RPC client.
      */
     private final RpcClient rpcClient;
-    private RpcChannel rpcChannel;
+    private Map<String, RpcChannel> rpcChannelMap = new HashMap<String, RpcChannel>();
     
     private String host;
     private int port;
@@ -56,6 +64,17 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     
     private T instance;
     
+    private ServiceLocatorCallback serviceLocatorCallback;
+    
+    
+    /**
+     * set serviceLocatorCallback value to serviceLocatorCallback
+     * @param serviceLocatorCallback the serviceLocatorCallback to set
+     */
+    public void setServiceLocatorCallback(ServiceLocatorCallback serviceLocatorCallback) {
+        this.serviceLocatorCallback = serviceLocatorCallback;
+    }
+
     /**
      * get the lookupStubOnStartup
      * @return the lookupStubOnStartup
@@ -78,6 +97,34 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     public void setHost(String host) {
         this.host = host;
+    }
+    
+    public Set<String> getServiceSignatures() {
+        if (!cachedRpcMethods.isEmpty()) {
+            return new HashSet<String>(cachedRpcMethods.keySet());
+        }
+        
+        Set<String> serviceSignatures = new HashSet<String>();
+        Method[] methods = interfaceClass.getMethods();
+        for (Method method : methods) {
+            ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
+            if (protobufPRC != null) {
+                String serviceName = protobufPRC.serviceName();
+                String methodName = protobufPRC.methodName();
+                if (StringUtils.isEmpty(methodName)) {
+                    methodName = method.getName();
+                }
+
+                String methodSignature = serviceName + '!' + methodName;
+                serviceSignatures.add(methodSignature);
+            }
+        }
+        // if not protobufRpc method defined throw exception
+        if (serviceSignatures.isEmpty()) {
+            throw new IllegalArgumentException("This no protobufRpc method in interface class:"
+                    + interfaceClass.getName());
+        }
+        return serviceSignatures;
     }
 
     /**
@@ -146,6 +193,25 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 
                 cachedRpcMethods.put(methodSignature, methodInfo);
                 
+                
+                // do create rpc channal
+                String eHost = host;
+                int ePort = port;
+                if (serviceLocatorCallback != null) {
+                    InetSocketAddress address = serviceLocatorCallback.fetchAddress(methodSignature);
+                    if (address == null) {
+                        throw new RuntimeException("fetch a null address from serviceLocatorCallback" +
+                        		" by serviceSignature '" + methodSignature + "'");
+                    }
+                    eHost = address.getHostName();
+                    port = address.getPort();
+                }
+                RpcChannel rpcChannel = new RpcChannel(rpcClient, eHost, ePort);
+                if (lookupStubOnStartup) {
+                    rpcChannel.testChannlConnect();
+                }
+                
+                rpcChannelMap.put(methodSignature, rpcChannel);
             }
         }
         
@@ -153,11 +219,6 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         if (cachedRpcMethods.isEmpty()) {
             throw new IllegalArgumentException("This no protobufRpc method in interface class:"
                     + interfaceClass.getName());
-        }
-        
-        rpcChannel = new RpcChannel(rpcClient, host, port);
-        if (lookupStubOnStartup) {
-            rpcChannel.testChannlConnect();
         }
         
         instance = ProxyFactory.createProxy(interfaceClass, this);
@@ -170,9 +231,15 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     }
     
     public void close() {
-        if (rpcChannel != null) {
-            rpcChannel.close();
+        Collection<RpcChannel> rpcChannels = rpcChannelMap.values();
+        for (RpcChannel rpcChann : rpcChannels) {
+            try {
+                rpcChann.close();
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, e.getMessage(), e.getCause());
+            }
         }
+        
     }
     
     /*
@@ -211,6 +278,12 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         RpcDataPackage rpcDataPackage = buildRequestDataPackage(rpcMethodInfo, args);
         // set correlationId
         rpcDataPackage.getRpcMeta().setCorrelationId(rpcClient.getNextCorrelationId());
+        
+        RpcChannel rpcChannel = rpcChannelMap.get(methodSignature);
+        if (rpcChannel == null) {
+            throw new RuntimeException("No rpcChannel bind with serviceSignature '" + methodSignature + "'");
+        }
+        
         rpcChannel.doTransport(rpcDataPackage, callback, onceTalkTimeout);
         
         if (!callback.isDone()) {

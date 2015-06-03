@@ -19,7 +19,10 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.util.NumberUtils;
 
@@ -74,8 +77,17 @@ public class UrlBasedNamingService implements NamingService {
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list()
      */
     @Override
-    public List<InetSocketAddress> list() throws Exception {
-        return list;
+    public Map<String, List<InetSocketAddress>> list(Set<String> services) throws Exception {
+        Map<String, List<InetSocketAddress>> ret = new HashMap<String, List<InetSocketAddress>>();
+        
+        if (services == null || services.isEmpty()) {
+            return ret;
+        }
+        for (String string : services) {
+            ret.put(string, list);
+        }
+        
+        return ret;
     }
 
 }

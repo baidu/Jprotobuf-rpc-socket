@@ -17,11 +17,12 @@ package com.baidu.jprotobuf.pbrpc.client.ha;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * 
  * Naming service interface.
- *
+ * 
  * @author xiemalin
  * @since 2.15
  */
@@ -29,9 +30,11 @@ public interface NamingService {
 
     /**
      * get server list from naming service.
-     * @return server list.
+     * 
+     * @param serviceSignatures service signatures
+     * @return server list mapped by service signature.
      * @throws Exception in case of any exception
      */
-    List<InetSocketAddress> list() throws Exception;
-  
+    Map<String, List<InetSocketAddress>> list(Set<String> serviceSignatures) throws Exception;
+
 }
