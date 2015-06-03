@@ -27,6 +27,7 @@ import org.junit.Test;
 import com.baidu.jprotobuf.pbrpc.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.EchoService;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.utils.TestUtils;
 
 /**
  * Ha RpcProxy test.
@@ -36,6 +37,10 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  */
 public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
+    /**
+     * 
+     */
+    private static final String DEFAULT_KEY = "";
     RpcClient rpcClient = new RpcClient();
     EchoService proxy;
     HaProtobufRpcProxy<EchoService> pbrpcProxy;
@@ -47,7 +52,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         try {
             pbrpcProxy = new HaProtobufRpcProxy<EchoService>(rpcClient, EchoService.class, getNamingService());
 
-            int serverSize = getNamingService().list(defaultServices).get("").size();
+            int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
             Assert.assertEquals(5, serverSize);
 
             proxy = pbrpcProxy.proxy();
@@ -66,8 +71,8 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
     @Test
     public void testNoServerFail() throws Exception {
-        int serverSize = getNamingService().list(defaultServices).get("").size();
-        EchoInfo echoInfo = new EchoInfo("");
+        int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
+        EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
@@ -88,8 +93,8 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         // random stop one server
         stopOneServer();
 
-        int serverSize = getNamingService().list(defaultServices).get("").size();
-        EchoInfo echoInfo = new EchoInfo("");
+        int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
+        EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize * 2; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
@@ -101,7 +106,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         // random stop one server
         stopOneServer();
 
-        serverSize = getNamingService().list(defaultServices).get("").size();
+        serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize * 2; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
@@ -123,13 +128,10 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         recoverServer();
 
-        try {
-            Thread.sleep(2000);
-        } catch (Exception e) {
-        }
+        TestUtils.dummySleep(2000);
 
-        int serverSize = getNamingService().list(defaultServices).get("").size();
-        EchoInfo echoInfo = new EchoInfo("");
+        int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
+        EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize * 2; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
@@ -147,14 +149,11 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.remove(0);
-        try {
-            Thread.sleep(2000);
-        } catch (Exception e) {
-        }
+        TestUtils.dummySleep(2000);
         // to check naming service get size
-        int serverSize = getNamingService().list(defaultServices).get("").size();
+        int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(4, serverSize);
-        EchoInfo echoInfo = new EchoInfo("");
+        EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize * 2; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
@@ -172,14 +171,11 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.add(new InetSocketAddress(1036));
-        try {
-            Thread.sleep(2000);
-        } catch (Exception e) {
-        }
+        TestUtils.dummySleep(2000);
         // to check naming service get size
-        int serverSize = getNamingService().list(defaultServices).get("").size();
+        int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(6, serverSize);
-        EchoInfo echoInfo = new EchoInfo("");
+        EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
         for (int i = 0; i < serverSize * 2; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
