@@ -92,7 +92,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
  * </pre>
  * 
  * @author xiemalin
- * @since 1.0.0.0
+ * @since 2.17
  */
 public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor implements BeanClassLoaderAware,
         FactoryBean, InitializingBean, MethodInterceptor, DisposableBean, BeanNameAware {
@@ -409,7 +409,11 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     private Method getMethod(Object bean, MethodInvocation invocation) throws Throwable {
         String methodName = invocation.getMethod().getName();
-        Method m = bean.getClass().getMethod(methodName, invocation.getMethod().getParameterTypes());
+        if (bean == null) {
+            System.out.println("error");
+        }
+        Class<? extends Object> cls = bean.getClass();
+        Method m = cls.getMethod(methodName, invocation.getMethod().getParameterTypes());
         return m;
     }
 

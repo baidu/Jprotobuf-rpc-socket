@@ -171,13 +171,13 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.add(new InetSocketAddress(1036));
-        SleepUtils.dummySleep(2000);
+        SleepUtils.dummySleep(6000);
         // to check naming service get size
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(6, serverSize);
         EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
         Set<String> returnValues = new HashSet<String>();
-        for (int i = 0; i < serverSize * 2; i++) {
+        for (int i = 0; i < serverSize * 5; i++) {
             EchoInfo echo = proxy.echo(echoInfo);
             returnValues.add(echo.getMessage());
         }

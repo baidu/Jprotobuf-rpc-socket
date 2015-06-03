@@ -66,7 +66,7 @@ public class RpcClientOptions {
         this.onceTalkTimeout = options.onceTalkTimeout;
         this.chunkSize = options.chunkSize;
     }
-    
+
     /**
      * time out set for chunk package wait in ms.
      */

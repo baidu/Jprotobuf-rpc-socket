@@ -39,8 +39,8 @@ import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategy;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RoundRobinLoadBalanceStrategy;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -56,7 +56,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     private final RpcClient rpcClient;
     private final Class<T> interfaceClass;
     private final NamingService namingService;
-    private NamingServiceLoadBalanceStrategy loadBalanceStrategy;
+    private NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory;
     private FailOverInterceptor failOverInterceptor;
     private T proxyInstance;
 
@@ -97,11 +97,11 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     }
 
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
-            NamingServiceLoadBalanceStrategy loadBalanceStrategy, FailOverInterceptor failOverInterceptor) {
+            NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory, FailOverInterceptor failOverInterceptor) {
         this.rpcClient = rpcClient;
         this.interfaceClass = interfaceClass;
         this.namingService = namingService;
-        this.loadBalanceStrategy = loadBalanceStrategy;
+        this.loadBalanceStrategyFactory = loadBalanceStrategyFactory;
         this.failOverInterceptor = failOverInterceptor;
         if (namingService == null) {
             throw new NullPointerException("param 'namingService' is null.");
@@ -171,10 +171,10 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             targetBeans.put(serviceUrl, rpc);
         }
 
-        if (loadBalanceStrategy == null) {
-            loadBalanceStrategy = new RoundRobinLoadBalanceStrategy(service, namingService);
+        if (loadBalanceStrategyFactory == null) {
+            loadBalanceStrategyFactory = new RRNamingServiceLoadBalanceStrategyFactory();
         }
-        lbProxyBean.setLoadBalanceStrategy(loadBalanceStrategy);
+        lbProxyBean.setLoadBalanceStrategy(loadBalanceStrategyFactory.create(service, namingService));
 
         if (failOverInterceptor == null) {
             SocketFailOverInterceptor socketFailOverInterceptor = new SocketFailOverInterceptor();
@@ -250,20 +250,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         List<ProtobufRpcProxy<T>> oldProtobufRpcProxyList =
                 new ArrayList<ProtobufRpcProxy<T>>(protobufRpcProxyListMap.get(service));
 
-        // reinit naming service
-        loadBalanceStrategy.doReInit(service, new NamingService() {
-
-            @Override
-            public Map<String, List<InetSocketAddress>> list(Set<String> serviceSignatures) throws Exception {
-                Map<String, List<InetSocketAddress>> ret = new HashMap<String, List<InetSocketAddress>>();
-                ret.put(service, list);
-                return ret;
-            }
-
-        });
-
         // create a new instance
         doProxy(service, list);
+        
         try {
             // try to close old
             doClose(oldLbProxyBean, oldProtobufRpcProxyList);

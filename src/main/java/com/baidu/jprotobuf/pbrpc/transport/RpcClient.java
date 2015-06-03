@@ -75,7 +75,6 @@ public class RpcClient extends Bootstrap {
         this.option(ChannelOption.TCP_NODELAY, rpcClientOptions.getTcpNoDelay());
         this.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR,
                 new DefaultMessageSizeEstimator(rpcClientOptions.getReceiveBufferSize()));
-
     }
 
     /**
