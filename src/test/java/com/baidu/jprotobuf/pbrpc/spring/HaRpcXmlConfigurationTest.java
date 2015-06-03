@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.EchoService;
-import com.baidu.jprotobuf.pbrpc.utils.TestUtils;
+import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
  * Test class for {@link HaRpcServiceExporter} and {@link HaRpcProxyFactoryBean} by XML configuration.
@@ -87,7 +87,7 @@ public class HaRpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
         if (rpcServiceExporter1 != null) {
             rpcServiceExporter1.afterPropertiesSet();
         }
-        TestUtils.dummySleep(2500);
+        SleepUtils.dummySleep(2500);
         // server1 recover should test ok
         super.internalRpcRequestAndResponse(echoService);
         

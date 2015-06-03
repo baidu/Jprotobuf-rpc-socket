@@ -16,9 +16,9 @@ import java.util.logging.Logger;
  * @author xiemalin
  * @since 2.19
  */
-public class TestUtils {
+public class SleepUtils {
     
-    private static final Logger LOG = Logger.getLogger(TestUtils.class.getName());
+    private static final Logger LOG = Logger.getLogger(SleepUtils.class.getName());
 
     /**
      * time sleep for current thread.

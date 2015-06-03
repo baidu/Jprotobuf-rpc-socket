@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.baidu.jprotobuf.pbrpc.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.EchoService;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
-import com.baidu.jprotobuf.pbrpc.utils.TestUtils;
+import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
  * Ha RpcProxy test.
@@ -128,7 +128,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         recoverServer();
 
-        TestUtils.dummySleep(2000);
+        SleepUtils.dummySleep(2000);
 
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         EchoInfo echoInfo = new EchoInfo(DEFAULT_KEY);
@@ -149,7 +149,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.remove(0);
-        TestUtils.dummySleep(2000);
+        SleepUtils.dummySleep(2000);
         // to check naming service get size
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(4, serverSize);
@@ -171,7 +171,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         // delete one from naming service
         list.add(new InetSocketAddress(1036));
-        TestUtils.dummySleep(2000);
+        SleepUtils.dummySleep(2000);
         // to check naming service get size
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
         Assert.assertEquals(6, serverSize);
