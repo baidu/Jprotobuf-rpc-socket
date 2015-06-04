@@ -30,7 +30,8 @@ import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcProxy;
 @Service("echoServiceClient")
 public class AnnotationEchoServiceClient {
 
-    @RpcProxy(port = "1031", host = "127.0.0.1", serviceInterface = EchoService.class, lookupStubOnStartup = false)
+    @RpcProxy(port = "1031", host = "127.0.0.1", serviceInterface = EchoService.class, 
+            lookupStubOnStartup = false, rpcClientOptionsBeanName = "rpcClientOptions")
     public EchoService echoService;
 
     @HaRpcProxy(namingServiceBeanName = "namingService", serviceInterface = EchoService.class,

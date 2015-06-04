@@ -40,9 +40,10 @@ public class ChannelPool {
         this.clientConfig = rpcClient.getRpcClientOptions();
         objectFactory = new ChannelPoolObjectFactory(rpcClient, host, port);
         pool = new GenericObjectPool<Connection>(objectFactory);
-        pool.setMaxIdle(clientConfig.getThreadPoolSize());
+        pool.setMaxIdle(clientConfig.getMaxIdleSize());
         pool.setMaxTotal(clientConfig.getThreadPoolSize());
         pool.setMaxWaitMillis(clientConfig.getMaxWait());
+        pool.setMinIdle(clientConfig.getMinIdleSize());
         pool.setMinEvictableIdleTimeMillis(clientConfig.getMinEvictableIdleTime());
         pool.setTestOnBorrow(true);
         pool.setTestOnReturn(true);

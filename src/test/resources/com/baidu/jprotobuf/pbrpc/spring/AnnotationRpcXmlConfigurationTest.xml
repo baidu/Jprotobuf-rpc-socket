@@ -28,6 +28,12 @@
 			<value>localhost:1031;localhost:1032;localhost:1033</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">
+		<property name="threadPoolSize" value="20"></property>
+		<property name="maxIdleSize" value="10"></property>
+		<property name="minIdleSize" value="1"></property>
+	</bean>
 
 	<bean id="namingServiceOfPartialFailed" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
 		<constructor-arg>
