@@ -45,8 +45,8 @@ public class ChannelPool {
         pool.setMaxWaitMillis(clientConfig.getMaxWait());
         pool.setMinIdle(clientConfig.getMinIdleSize());
         pool.setMinEvictableIdleTimeMillis(clientConfig.getMinEvictableIdleTime());
-        pool.setTestOnBorrow(true);
-        pool.setTestOnReturn(true);
+        pool.setTestOnBorrow(clientConfig.isTestOnBorrow());
+        pool.setTestOnReturn(clientConfig.isTestOnReturn());
     }
     
     public Connection getChannel() {

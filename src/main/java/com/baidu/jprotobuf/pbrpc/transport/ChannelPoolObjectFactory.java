@@ -22,10 +22,9 @@ import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
-import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-
 
 /**
  * Pool Object Factory for netty channel
@@ -33,7 +32,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
  * @author sunzhongyi, xuyuepeng
  * @author xiemalin
  */
-public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection> {
+public class ChannelPoolObjectFactory extends BasePooledObjectFactory<Connection> {
     private static final Logger LOGGER = Logger.getLogger(ChannelPoolObjectFactory.class.getName());
     private final RpcClient rpcClient;
     private final String host;
@@ -45,11 +44,23 @@ public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection>
         this.port = port;
     }
 
-    public Connection fetchConnection() {
-    	return new Connection(rpcClient);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool2.BasePooledObjectFactory#create()
+     */
+    @Override
+    public Connection create() throws Exception {
+        return fetchConnection();
     }
 
-    public PooledObject<Connection> makeObject() throws Exception {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool2.BasePooledObjectFactory#wrap(java.lang.Object)
+     */
+    @Override
+    public PooledObject<Connection> wrap(Connection obj) {
         Connection connection = fetchConnection();
 
         InetSocketAddress address;
@@ -58,7 +69,6 @@ public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection>
         } else {
             address = new InetSocketAddress(host, port);
         }
-
         ChannelFuture future = this.rpcClient.connect(address);
 
         // Wait until the connection is made successfully.
@@ -75,29 +85,42 @@ public class ChannelPoolObjectFactory implements PooledObjectFactory<Connection>
         return new DefaultPooledObject<Connection>(connection);
     }
 
-	public void destroyObject(PooledObject<Connection> p) throws Exception {
-		Connection c = p.getObject();
-		Channel channel = c.getFuture().channel();
-		if (channel.isOpen() && channel.isActive()) {
-			channel.close();
-		}
-	}
+    public Connection fetchConnection() {
+        return new Connection(rpcClient);
+    }
 
-	public boolean validateObject(PooledObject<Connection> p) {
-		Connection c = p.getObject();
+    public void destroyObject(PooledObject<Connection> p) throws Exception {
+        Connection c = p.getObject();
+        Channel channel = c.getFuture().channel();
+        if (channel.isOpen() && channel.isActive()) {
+            channel.close();
+        }
+    }
+
+    public boolean validateObject(PooledObject<Connection> p) {
+        Connection c = p.getObject();
         Channel channel = c.getFuture().channel();
         return channel.isOpen() && channel.isActive();
-	}
-    
-	public void activateObject(PooledObject<Connection> p) throws Exception {
-		 // nothing to do
-		
-	}
 
-	public void passivateObject(PooledObject<Connection> p) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-	
+    }
+
+    /**
+     * activateObject will invoke every time before it borrow from the pool
+     * 
+     * @param p target pool object
+     * @throws Exception
+     */
+    public void activateObject(PooledObject<Connection> p) throws Exception {
+    }
+
+    /**
+     * is invoked on every instance when it is returned to the pool.
+     * 
+     * @param p target pool object
+     * @throws Exception
+     */
+    public void passivateObject(PooledObject<Connection> p) throws Exception {
+        p.getObject().clearRequests();
+    }
 
 }

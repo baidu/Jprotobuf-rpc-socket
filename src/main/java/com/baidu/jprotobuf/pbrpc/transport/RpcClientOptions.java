@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+
 /**
  * RPC client properties.
  * 
@@ -23,29 +24,32 @@ package com.baidu.jprotobuf.pbrpc.transport;
  * @since 1.0
  */
 public class RpcClientOptions {
-    
-    private int connectTimeout;  // connection time out in milliseconds
+
+    private int connectTimeout; // connection time out in milliseconds
     private int sendBufferSize;
     private int receiveBufferSize;
     private boolean tcpNoDelay;
     private boolean keepAlive;
     private boolean reuseAddress;
     private int idleTimeout;
-    
+
     // connection pool settings
     private boolean shortConnection = false;
     private int threadPoolSize = 20;
-    private int maxIdleSize = 8;
+    private int maxIdleSize = 20;
     private int minIdleSize = 2;
     private long minEvictableIdleTime = 1000L * 60L * 2;
     private long maxWait = 2000L; // max wait time in milliseconds for pool available
-    
+
+    private boolean testOnBorrow = true;
+    private boolean testOnReturn = false;
+
     // in MILLISECONDS unit
     private int onceTalkTimeout = 1000;
-    
-    // if use chunkSize will split chunkSize 
+
+    // if use chunkSize will split chunkSize
     private long chunkSize = -1;
-    
+
     public void copyFrom(RpcClientOptions options) {
         if (options == null) {
             return;
@@ -65,6 +69,8 @@ public class RpcClientOptions {
         this.maxWait = options.maxWait;
         this.onceTalkTimeout = options.onceTalkTimeout;
         this.chunkSize = options.chunkSize;
+        this.testOnBorrow = options.testOnBorrow;
+        this.testOnReturn = options.testOnReturn;
     }
 
     /**
@@ -74,6 +80,7 @@ public class RpcClientOptions {
 
     /**
      * get the chunkPackageTimeout
+     * 
      * @return the chunkPackageTimeout
      */
     public int getChunkPackageTimeout() {
@@ -82,6 +89,7 @@ public class RpcClientOptions {
 
     /**
      * set chunkPackageTimeout value to chunkPackageTimeout
+     * 
      * @param chunkPackageTimeout the chunkPackageTimeout to set
      */
     public void setChunkPackageTimeout(int chunkPackageTimeout) {
@@ -90,6 +98,7 @@ public class RpcClientOptions {
 
     /**
      * get the onceTalkTimeout
+     * 
      * @return the onceTalkTimeout
      */
     public int getOnceTalkTimeout() {
@@ -98,6 +107,7 @@ public class RpcClientOptions {
 
     /**
      * set onceTalkTimeout value to onceTalkTimeout
+     * 
      * @param onceTalkTimeout the onceTalkTimeout to set
      */
     public void setOnceTalkTimeout(int onceTalkTimeout) {
@@ -172,6 +182,7 @@ public class RpcClientOptions {
 
     /**
      * get the shortConnection
+     * 
      * @return the shortConnection
      */
     public boolean isShortConnection() {
@@ -180,6 +191,7 @@ public class RpcClientOptions {
 
     /**
      * set shortConnection value to shortConnection
+     * 
      * @param shortConnection the shortConnection to set
      */
     public void setShortConnection(boolean shortConnection) {
@@ -188,6 +200,7 @@ public class RpcClientOptions {
 
     /**
      * get the threadPoolSize
+     * 
      * @return the threadPoolSize
      */
     public int getThreadPoolSize() {
@@ -196,6 +209,7 @@ public class RpcClientOptions {
 
     /**
      * set threadPoolSize value to threadPoolSize
+     * 
      * @param threadPoolSize the threadPoolSize to set
      */
     public void setThreadPoolSize(int threadPoolSize) {
@@ -204,6 +218,7 @@ public class RpcClientOptions {
 
     /**
      * get the minEvictableIdleTime
+     * 
      * @return the minEvictableIdleTime
      */
     public long getMinEvictableIdleTime() {
@@ -212,6 +227,7 @@ public class RpcClientOptions {
 
     /**
      * set minEvictableIdleTime value to minEvictableIdleTime
+     * 
      * @param minEvictableIdleTime the minEvictableIdleTime to set
      */
     public void setMinEvictableIdleTime(long minEvictableIdleTime) {
@@ -220,6 +236,7 @@ public class RpcClientOptions {
 
     /**
      * get the maxWait
+     * 
      * @return the maxWait
      */
     public long getMaxWait() {
@@ -228,6 +245,7 @@ public class RpcClientOptions {
 
     /**
      * set maxWait value to maxWait
+     * 
      * @param maxWait the maxWait to set
      */
     public void setMaxWait(long maxWait) {
@@ -236,6 +254,7 @@ public class RpcClientOptions {
 
     /**
      * get the maxIdleSize
+     * 
      * @return the maxIdleSize
      */
     public int getMaxIdleSize() {
@@ -244,6 +263,7 @@ public class RpcClientOptions {
 
     /**
      * set maxIdleSize value to maxIdleSize
+     * 
      * @param maxIdleSize the maxIdleSize to set
      */
     public void setMaxIdleSize(int maxIdleSize) {
@@ -252,6 +272,7 @@ public class RpcClientOptions {
 
     /**
      * get the minIdleSize
+     * 
      * @return the minIdleSize
      */
     public int getMinIdleSize() {
@@ -260,6 +281,7 @@ public class RpcClientOptions {
 
     /**
      * set minIdleSize value to minIdleSize
+     * 
      * @param minIdleSize the minIdleSize to set
      */
     public void setMinIdleSize(int minIdleSize) {
@@ -268,6 +290,7 @@ public class RpcClientOptions {
 
     /**
      * get the chunkSize
+     * 
      * @return the chunkSize
      */
     public long getChunkSize() {
@@ -276,11 +299,43 @@ public class RpcClientOptions {
 
     /**
      * set chunkSize value to chunkSize
+     * 
      * @param chunkSize the chunkSize to set
      */
     public void setChunkSize(long chunkSize) {
         this.chunkSize = chunkSize;
     }
-    
-    
+
+    /**
+     * get the testOnBorrow
+     * @return the testOnBorrow
+     */
+    public boolean isTestOnBorrow() {
+        return testOnBorrow;
+    }
+
+    /**
+     * set testOnBorrow value to testOnBorrow
+     * @param testOnBorrow the testOnBorrow to set
+     */
+    public void setTestOnBorrow(boolean testOnBorrow) {
+        this.testOnBorrow = testOnBorrow;
+    }
+
+    /**
+     * get the testOnReturn
+     * @return the testOnReturn
+     */
+    public boolean isTestOnReturn() {
+        return testOnReturn;
+    }
+
+    /**
+     * set testOnReturn value to testOnReturn
+     * @param testOnReturn the testOnReturn to set
+     */
+    public void setTestOnReturn(boolean testOnReturn) {
+        this.testOnReturn = testOnReturn;
+    }
+
 }

@@ -68,6 +68,10 @@ public class Connection {
     public RpcClientCallState consumeRequest() {
         return requestQueue.poll();
     }
+    
+    public void clearRequests() {
+        requestQueue.clear();
+    }
 
     public RpcClient getRpcClient() {
         return this.client;
