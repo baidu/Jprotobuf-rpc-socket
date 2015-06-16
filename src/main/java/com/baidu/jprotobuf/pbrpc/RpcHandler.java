@@ -50,5 +50,22 @@ public interface RpcHandler {
      * @return target service instance
      */
     Object getService();
+    
+    /**
+     * @return input class or null if no parameter.
+     */
+    Class<?> getInputClass();
+    
+    /**
+     * @return output class or null if is a void return.
+     */
+    Class<?> getOutputClass();
+    
+    
+    /**
+     * @return RPC description
+     */
+    String getDescription();
+    
 
 }

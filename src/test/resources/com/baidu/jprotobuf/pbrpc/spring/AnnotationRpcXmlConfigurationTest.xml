@@ -28,7 +28,7 @@
 			<value>localhost:1031;localhost:1032;localhost:1033</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">
 		<property name="threadPoolSize" value="20"></property>
 		<property name="maxIdleSize" value="10"></property>
@@ -40,5 +40,10 @@
 			<value>localhost:1030;localhost:1039;localhost:1033</value>
 		</constructor-arg>
 	</bean>
+
+<!-- 	<bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter">
+		<property name="servicePort" value="1031"></property>
+		<property name="path" value="D://my.proto"></property>
+	</bean> -->
 
 </beans>

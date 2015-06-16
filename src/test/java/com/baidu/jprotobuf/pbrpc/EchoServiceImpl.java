@@ -43,7 +43,7 @@ public class EchoServiceImpl {
     }
 
 
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echo")
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo", description ="echo测试服务")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
@@ -51,19 +51,19 @@ public class EchoServiceImpl {
     }
 
     @ProtobufRPCService(serviceName = "echoService", methodName = "echoWithAttachement", 
-            attachmentHandler = EchoServerAttachmentHandler.class)
+            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件")
     public EchoInfo dealWithAttachement(EchoInfo info) {
         return doEcho(info);
     }
     
     @ProtobufRPCService(serviceName = "echoService", methodName = "echoGzip", 
-            attachmentHandler = EchoServerAttachmentHandler.class)
+            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件和Gzip压缩")
     public EchoInfo dealWithGzipEnable(EchoInfo info) {
         return doEcho(info);
     }
     
     @ProtobufRPCService(serviceName = "echoService", methodName = "echoSnappy", 
-            attachmentHandler = EchoServerAttachmentHandler.class)
+            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件和Snappy压缩")
     public EchoInfo dealWithSnappyEnable(EchoInfo info) {
         return doEcho(info);
     }

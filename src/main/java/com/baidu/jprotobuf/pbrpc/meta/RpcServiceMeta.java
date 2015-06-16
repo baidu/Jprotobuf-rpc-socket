@@ -26,17 +26,23 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class RpcServiceMeta {
 
-    @Protobuf
+    @Protobuf(required = true)
     private String serviceName;
     
-    @Protobuf
+    @Protobuf(required = true)
     private String methodName;
     
     @Protobuf
     private String inputProto;
     
+    @Protobuf 
+    private String inputObjName;
+    
     @Protobuf
     private String outputProto;
+    
+    @Protobuf 
+    private String outputObjName;
 
     /**
      * get the serviceName
@@ -100,6 +106,38 @@ public class RpcServiceMeta {
      */
     public void setOutputProto(String outputProto) {
         this.outputProto = outputProto;
+    }
+
+    /**
+     * get the inputObjName
+     * @return the inputObjName
+     */
+    public String getInputObjName() {
+        return inputObjName;
+    }
+
+    /**
+     * set inputObjName value to inputObjName
+     * @param inputObjName the inputObjName to set
+     */
+    public void setInputObjName(String inputObjName) {
+        this.inputObjName = inputObjName;
+    }
+
+    /**
+     * get the outputObjName
+     * @return the outputObjName
+     */
+    public String getOutputObjName() {
+        return outputObjName;
+    }
+
+    /**
+     * set outputObjName value to outputObjName
+     * @param outputObjName the outputObjName to set
+     */
+    public void setOutputObjName(String outputObjName) {
+        this.outputObjName = outputObjName;
     }
     
     

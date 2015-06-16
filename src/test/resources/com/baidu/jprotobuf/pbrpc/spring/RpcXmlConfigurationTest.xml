@@ -28,4 +28,10 @@
 		<property name="serviceInterface" value="com.baidu.jprotobuf.pbrpc.EchoService"></property>
 		<property name="port" value="1031"></property>
 	</bean>
+	
+<!-- 	<bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter">
+		<property name="servicePort" value="1031"></property>
+		<property name="path" value="D://my.proto"></property>
+	</bean> -->
+	
 </beans>

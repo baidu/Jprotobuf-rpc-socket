@@ -31,6 +31,11 @@ public class RpcServiceMetaList {
 
     @Protobuf(fieldType = FieldType.OBJECT)
     private List<RpcServiceMeta> rpcServiceMetas;
+    @Protobuf
+    private String typesIDL;
+    @Protobuf
+    private String rpcsIDL;
+    
 
     /**
      * get the rpcServiceMetas
@@ -47,4 +52,38 @@ public class RpcServiceMetaList {
     public void setRpcServiceMetas(List<RpcServiceMeta> rpcServiceMetas) {
         this.rpcServiceMetas = rpcServiceMetas;
     }
+
+    /**
+     * get the typesIDL
+     * @return the typesIDL
+     */
+    public String getTypesIDL() {
+        return typesIDL;
+    }
+
+    /**
+     * set typesIDL value to typesIDL
+     * @param typesIDL the typesIDL to set
+     */
+    public void setTypesIDL(String typesIDL) {
+        this.typesIDL = typesIDL;
+    }
+
+    /**
+     * get the rpcsIDL
+     * @return the rpcsIDL
+     */
+    public String getRpcsIDL() {
+        return rpcsIDL;
+    }
+
+    /**
+     * set rpcsIDL value to rpcsIDL
+     * @param rpcsIDL the rpcsIDL to set
+     */
+    public void setRpcsIDL(String rpcsIDL) {
+        this.rpcsIDL = rpcsIDL;
+    }
+    
+    
 }

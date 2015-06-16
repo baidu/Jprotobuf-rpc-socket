@@ -45,16 +45,22 @@ public class RpcServiceMetaServiceTest extends BaseEchoServiceTest {
         RpcServiceMetaService proxy = pbrpcProxy.proxy();
         
         RpcServiceMetaList rpcServiceMetaInfo = proxy.getRpcServiceMetaInfo();
-        Assert.assertEquals(6, rpcServiceMetaInfo.getRpcServiceMetas().size());
+        Assert.assertEquals(4, rpcServiceMetaInfo.getRpcServiceMetas().size());
         
         List<RpcServiceMeta> rpcServiceMetas = rpcServiceMetaInfo.getRpcServiceMetas();
         for (RpcServiceMeta rpcServiceMeta : rpcServiceMetas) {
             System.out.println("-----------------------RPC service meta info------------------");
             System.out.println("serviceName:" + rpcServiceMeta.getServiceName());
             System.out.println("methodName:" + rpcServiceMeta.getMethodName());
+            System.out.println("inputClass:" + rpcServiceMeta.getInputObjName());
+            System.out.println("outputClass:" + rpcServiceMeta.getOutputObjName());
             System.out.println("inputProto:" + rpcServiceMeta.getInputProto());
             System.out.println("outputProto:" + rpcServiceMeta.getOutputProto());
         }
+        
+        System.out.println("-----------------------Grouped RPC service meta info------------------");
+        System.out.println(rpcServiceMetaInfo.getTypesIDL());
+        System.out.println(rpcServiceMetaInfo.getRpcsIDL());
     }
     
 }

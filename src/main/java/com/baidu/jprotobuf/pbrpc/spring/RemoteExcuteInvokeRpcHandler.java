@@ -119,4 +119,28 @@ public class RemoteExcuteInvokeRpcHandler implements RpcHandler, RpcMetaAware {
         return delegator.getOutputMetaProto();
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getInputClass()
+     */
+    @Override
+    public Class<?> getInputClass() {
+        return delegator.getInputClass();
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getOutputClass()
+     */
+    @Override
+    public Class<?> getOutputClass() {
+        return delegator.getOutputClass();
+    }
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getDescription()
+     */
+    @Override
+    public String getDescription() {
+        return delegator.getDescription();
+    }
+
 }

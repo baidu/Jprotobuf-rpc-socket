@@ -18,25 +18,38 @@ package com.baidu.jprotobuf.pbrpc.meta;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
-
+import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
  * {@link RpcServiceMetaServiceProvider} service
- *
+ * 
  * @author xiemalin
  * @since 2.1
  */
 public class RpcServiceMetaServiceProvider {
-    
-    
+
+    /**
+     * 
+     */
+    private static final String LINE_BREAK = "\n";
+
     public static final String RPC_META_SERVICENAME = "__rpc_meta_watch_service__";
-    
+
     private RpcServiceRegistry rpcServiceRegistry;
+
+    private RpcServiceMetaList rpcServiceMetaList;
 
     /**
      * @param rpcServiceRegistry
@@ -48,28 +61,90 @@ public class RpcServiceMetaServiceProvider {
 
     @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
     public RpcServiceMetaList getRpcServiceMetaInfo() {
-        
+
+        // just cache once
+        if (rpcServiceMetaList != null) {
+            return rpcServiceMetaList;
+        }
+
+        StringBuilder typesIDL = new StringBuilder();
+        StringBuilder rpcsIDL = new StringBuilder();
+
+        Map<String, StringBuilder> rpcIDLMap = new HashMap<String, StringBuilder>();
+
+        final Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
+        final Set<Class<?>> cachedEnumTypes = new HashSet<Class<?>>();
+
         Collection<RpcHandler> services = rpcServiceRegistry.getServices();
         List<RpcServiceMeta> list = new ArrayList<RpcServiceMeta>(services.size());
         for (RpcHandler rpcHandler : services) {
             if (rpcHandler instanceof RpcMetaAware) {
                 RpcMetaAware meta = (RpcMetaAware) rpcHandler;
-                
+                String serviceName = rpcHandler.getServiceName();
+                if (RPC_META_SERVICENAME.equals(serviceName)) {
+                    continue;
+                }
                 RpcServiceMeta rpcServiceMeta = new RpcServiceMeta();
-                rpcServiceMeta.setServiceName(rpcHandler.getServiceName());
+                rpcServiceMeta.setServiceName(serviceName);
                 rpcServiceMeta.setMethodName(rpcHandler.getMethodName());
-                
+                if (rpcHandler.getInputClass() != null) {
+                    rpcServiceMeta.setInputObjName(rpcHandler.getInputClass().getSimpleName());
+
+                    String idl =
+                            ProtobufIDLGenerator.getIDL(rpcHandler.getInputClass(), cachedTypes, cachedEnumTypes, true);
+                    if (idl != null) {
+                        typesIDL.append(idl).append(LINE_BREAK);
+                    }
+                }
                 rpcServiceMeta.setInputProto(meta.getInputMetaProto());
+                if (rpcHandler.getOutputClass() != null) {
+                    rpcServiceMeta.setOutputObjName(rpcHandler.getOutputClass().getSimpleName());
+
+                    String idl =
+                            ProtobufIDLGenerator
+                                    .getIDL(rpcHandler.getOutputClass(), cachedTypes, cachedEnumTypes, true);
+                    if (idl != null) {
+                        typesIDL.append(idl).append(LINE_BREAK);
+                    }
+                }
                 rpcServiceMeta.setOutputProto(meta.getOutputMetaProto());
                 list.add(rpcServiceMeta);
+
+                StringBuilder rpc = rpcIDLMap.get(serviceName);
+                if (rpc == null) {
+                    rpc = new StringBuilder();
+                    rpcIDLMap.put(serviceName, rpc);
+                }
+                rpc.append("rpc ").append(rpcHandler.getMethodName()).append("(");
+                if (rpcHandler.getInputClass() != null) {
+                    rpc.append(rpcHandler.getInputClass().getSimpleName()).append(") ");
+                }
+                if (rpcHandler.getOutputClass() != null) {
+                    rpc.append("returns (").append(rpcHandler.getOutputClass().getSimpleName()).append(");");
+                }
+                if (!StringUtils.isBlank(rpcHandler.getDescription())) {
+                    rpc.append(" //").append(rpcHandler.getDescription());
+                }
+                
+                rpc.append(LINE_BREAK);
             }
         }
-        
-        RpcServiceMetaList ret = new RpcServiceMetaList();
-        ret.setRpcServiceMetas(list);
-        return ret;
+
+        Iterator<Entry<String, StringBuilder>> iter = rpcIDLMap.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<String, StringBuilder> entry = iter.next();
+            rpcsIDL.append("service ").append(entry.getKey()).append(" {").append(LINE_BREAK);
+            rpcsIDL.append(entry.getValue());
+            rpcsIDL.append("}").append(LINE_BREAK);
+        }
+
+        rpcServiceMetaList = new RpcServiceMetaList();
+        rpcServiceMetaList.setRpcServiceMetas(list);
+        rpcServiceMetaList.setTypesIDL(typesIDL.toString());
+        rpcServiceMetaList.setRpcsIDL(rpcsIDL.toString());
+        return rpcServiceMetaList;
     }
-    
+
     @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
     public void ping() {
         // here just to test service is available
