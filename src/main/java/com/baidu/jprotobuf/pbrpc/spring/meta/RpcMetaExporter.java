@@ -143,6 +143,9 @@ public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, I
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+            // here need do close here to free resource
+            pbrpcProxy.close();
+            rpcClient.stop();
         }
         
     }

@@ -21,10 +21,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
+import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -35,6 +39,11 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 1.0
  */
 public class RpcServiceRegistry {
+
+    /**
+     * log this class
+     */
+    protected static final Log LOGGER = LogFactory.getLog(RpcServiceExporter.class);
 
     /**
      * registered service map. the key if unique represent service name
@@ -51,12 +60,12 @@ public class RpcServiceRegistry {
      */
     public RpcServiceRegistry() {
     }
-    
+
     public void doRegisterMetaService() {
         RpcServiceMetaServiceProvider metaService = new RpcServiceMetaServiceProvider(this);
         registerService(metaService);
     }
-    
+
     public void unRegisterAll() {
         serviceMap.clear();
     }
@@ -108,7 +117,7 @@ public class RpcServiceRegistry {
     private void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         String methodSignature = getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName());
-        
+
         if (serviceMap.containsKey(methodSignature)) {
             if (dummyOverride) {
                 serviceMap.put(methodSignature, rpcHandler);
@@ -118,6 +127,12 @@ public class RpcServiceRegistry {
             }
         } else {
             serviceMap.put(methodSignature, rpcHandler);
+        }
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("RPC service register log: serviceName[" + rpcHandler.getServiceName() + "] methodName["
+                    + rpcHandler.getMethodName() + "] from " + method.getDeclaringClass().getName() + "."
+                    + method.getName());
         }
 
     }
