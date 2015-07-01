@@ -30,7 +30,7 @@ import com.google.protobuf.GeneratedMessage;
  * @since 1.2
  */
 @SuppressWarnings({"unchecked"})
-public class MessageGeneratedRpcHandler extends AbstractRpcHandler {
+public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
 
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 

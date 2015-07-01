@@ -28,8 +28,8 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
  * @author xiemalin
  * @since 1.0
  */
-@SuppressWarnings({"unchecked","rawtypes"})
-public class AnnotationRpcHandler extends AbstractRpcHandler {
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
 
     private Codec inputCodec;
     private Codec outputCodec;
@@ -57,7 +57,7 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
     protected RpcData doRealHandle(RpcData data) throws Exception {
         Object input = null;
         Object[] param;
-        Object ret;
+        Object ret = null;
         if (data.getData() != null && inputCodec != null) {
             input = inputCodec.decode(data.getData());
             param = new Object[] { input };
@@ -68,13 +68,13 @@ public class AnnotationRpcHandler extends AbstractRpcHandler {
         RpcData retData = new RpcData();
         // process attachment
         if (getAttachmentHandler() != null) {
-            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(),
-                    getServiceName(), getMethodName(), param);
+            byte[] responseAttachment =
+                    getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(), getMethodName(),
+                            param);
             retData.setAttachment(responseAttachment);
         }
 
         ret = getMethod().invoke(getService(), param);
-
         if (ret == null) {
             return retData;
         }

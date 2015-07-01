@@ -37,4 +37,19 @@ public interface IDLServiceInvoker {
      *             in case of any exception
      */
     void invoke(IDLProxyObject input, IDLProxyObject output) throws Exception;
+    
+    
+    /**
+     * get input {@link IDLProxyObject} as for input parameter object. or null if no input parameter
+     * 
+     * @return
+     */
+    IDLProxyObject getInput();
+    
+    /**
+     * get output {@link IDLProxyObject} as for return result. or null if no return result.
+     * 
+     * @return
+     */
+    IDLProxyObject getOutput();
 }

@@ -22,7 +22,7 @@ import org.springframework.remoting.support.RemoteInvocationExecutor;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
-import com.baidu.jprotobuf.pbrpc.server.AbstractRpcHandler;
+import com.baidu.jprotobuf.pbrpc.server.AbstractAnnotationRpcHandler;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 
 /**
@@ -68,7 +68,7 @@ public class RpcServiceRegistryBean extends RpcServiceRegistry {
             Object service, ProtobufRPCService protobufPRCService) {
         
         RpcHandler handler = super.doCreateRpcHandler(method, service, protobufPRCService);
-        RemoteExcuteInvokeRpcHandler wrap = new RemoteExcuteInvokeRpcHandler((AbstractRpcHandler) handler);
+        RemoteExcuteInvokeRpcHandler wrap = new RemoteExcuteInvokeRpcHandler((AbstractAnnotationRpcHandler) handler);
         wrap.setRemoteInvocationExecutor(remoteInvocationExecutor);
         return wrap;
     }

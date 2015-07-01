@@ -68,4 +68,9 @@ public class EchoServiceImpl {
         return doEcho(info);
     }
     
+    
+    @ProtobufRPCService(serviceName = "echoService", methodName = "businessExceptionCall")
+    public EchoInfo businessExceptionCall(EchoInfo info) {
+        throw new RuntimeException("Throw business exception.");
+    }
 }

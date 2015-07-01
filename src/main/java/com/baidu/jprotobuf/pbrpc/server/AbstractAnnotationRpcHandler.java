@@ -36,7 +36,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @see RpcServiceRegistry
  */
 @SuppressWarnings({"rawtypes"})
-public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
+public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMetaAware {
 
     private String serviceName;
     private String methodName;
@@ -88,7 +88,7 @@ public abstract class AbstractRpcHandler implements RpcHandler, RpcMetaAware {
      * @param service
      * @param protobufPRCService
      */
-    public AbstractRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
+    public AbstractAnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super();
         this.method = method;
         this.service = service;

@@ -23,7 +23,7 @@ import org.springframework.util.SerializationUtils;
 
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
-import com.baidu.jprotobuf.pbrpc.server.AbstractRpcHandler;
+import com.baidu.jprotobuf.pbrpc.server.AbstractAnnotationRpcHandler;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 
 
@@ -35,7 +35,7 @@ import com.baidu.jprotobuf.pbrpc.server.RpcData;
 public class RemoteExcuteInvokeRpcHandler implements RpcHandler, RpcMetaAware {
     
     private RemoteInvocationExecutor remoteInvocationExecutor = new DefaultRemoteInvocationExecutor();
-    private final AbstractRpcHandler delegator;
+    private final AbstractAnnotationRpcHandler delegator;
 
     /**
      * Set the RemoteInvocationExecutor to use for this exporter.
@@ -57,7 +57,7 @@ public class RemoteExcuteInvokeRpcHandler implements RpcHandler, RpcMetaAware {
     /**
      * default constructor with {@link RpcHandler}
      */
-    public RemoteExcuteInvokeRpcHandler(AbstractRpcHandler rpcHandler) {
+    public RemoteExcuteInvokeRpcHandler(AbstractAnnotationRpcHandler rpcHandler) {
         this.delegator = rpcHandler;
     }
 

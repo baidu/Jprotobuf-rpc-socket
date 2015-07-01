@@ -102,7 +102,7 @@ public class RpcServiceRegistry {
 
     protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
-        AbstractRpcHandler rpcHandler;
+        AbstractAnnotationRpcHandler rpcHandler;
         if (!messageType) {
             rpcHandler = new AnnotationRpcHandler(method, service, protobufPRCService);
         } else {
