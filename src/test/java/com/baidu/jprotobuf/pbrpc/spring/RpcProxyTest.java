@@ -116,7 +116,7 @@ public class RpcProxyTest {
         RpcServiceMetaList rpcServiceMetaInfo = rpcServiceMetaService.getRpcServiceMetaInfo();
 
         List<RpcServiceMeta> rpcServiceMetas = rpcServiceMetaInfo.getRpcServiceMetas();
-        Assert.assertEquals(4, rpcServiceMetas.size());
+        Assert.assertEquals(5, rpcServiceMetas.size());
 
         
     }
