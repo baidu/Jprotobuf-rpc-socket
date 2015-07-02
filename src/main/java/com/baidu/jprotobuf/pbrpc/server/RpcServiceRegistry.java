@@ -28,7 +28,6 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
-import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -43,7 +42,7 @@ public class RpcServiceRegistry {
     /**
      * log this class
      */
-    protected static final Log LOGGER = LogFactory.getLog(RpcServiceExporter.class);
+    protected static final Log LOGGER = LogFactory.getLog(RpcServiceRegistry.class);
 
     /**
      * registered service map. the key if unique represent service name
