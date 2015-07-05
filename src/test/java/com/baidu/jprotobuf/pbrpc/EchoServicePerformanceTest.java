@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -40,6 +41,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 1.0
  */
+@Ignore
 public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     RpcServer rpcServer;
