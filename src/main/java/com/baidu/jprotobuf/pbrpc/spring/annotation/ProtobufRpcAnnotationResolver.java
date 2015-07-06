@@ -86,6 +86,8 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         String port = parsePlaceholder(rpcExporter.port());
         // convert to integer and throw exception on error
         int intPort = Integer.valueOf(port);
+        
+        String host = parsePlaceholder(rpcExporter.host());
 
         RpcServiceExporter rpcServiceExporter = portMappingExpoters.get(intPort);
         if (rpcServiceExporter == null) {
@@ -104,6 +106,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
 
             rpcServiceExporter = new RpcServiceExporter();
             rpcServiceExporter.setServicePort(intPort);
+            rpcServiceExporter.setHost(host);
             rpcServiceExporter.copyFrom(rpcServerOptions);
 
             portMappingExpoters.put(intPort, rpcServiceExporter);
@@ -221,11 +224,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         String port = parsePlaceholder(rpcProxy.port());
         // convert to integer and throw exception on error
         int intPort = Integer.valueOf(port);
+        
+        String host = parsePlaceholder(rpcProxy.host());
 
         RpcProxyFactoryBean rpcProxyFactoryBean = new RpcProxyFactoryBean();
         rpcProxyFactoryBean.copyFrom(rpcClientOptions);
         rpcProxyFactoryBean.setServiceInterface(rpcProxy.serviceInterface());
         rpcProxyFactoryBean.setPort(intPort);
+        rpcProxyFactoryBean.setHost(host);
         rpcProxyFactoryBean.setLookupStubOnStartup(rpcProxy.lookupStubOnStartup());
         rpcProxyFactoryBean.afterPropertiesSet();
 

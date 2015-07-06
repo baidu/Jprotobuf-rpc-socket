@@ -40,6 +40,8 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     
     private int servicePort;
     
+    private String host;
+    
     private List<Object> registerServices;
     
     private RpcServiceRegistryBean rpcServiceRegistryBean;
@@ -103,6 +105,22 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
         this.servicePort = servicePort;
     }
 
+    /**
+     * get the host
+     * @return the host
+     */
+    protected String getHost() {
+        return host;
+    }
+
+    /**
+     * set host value to host
+     * @param host the host to set
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     /* (non-Javadoc)
      * @see org.springframework.beans.factory.DisposableBean#destroy()
      */
@@ -136,8 +154,11 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
             prRpcServer.registerService(service);
         }
         
-        
-        prRpcServer.bind(new InetSocketAddress(servicePort));
+        if (host == null) {
+            prRpcServer.bind(new InetSocketAddress(servicePort));
+        } else {
+            prRpcServer.bind(new InetSocketAddress(host, servicePort));
+        }
     }
 
 }

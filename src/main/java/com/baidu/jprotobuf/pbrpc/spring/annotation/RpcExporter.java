@@ -42,6 +42,8 @@ public @interface RpcExporter {
      */
     String port();
     
+    String host() default "127.0.0.1";
+    
     /**
      * bean name of RPC server options bean type must be {@link RpcServerOptions}
      */
