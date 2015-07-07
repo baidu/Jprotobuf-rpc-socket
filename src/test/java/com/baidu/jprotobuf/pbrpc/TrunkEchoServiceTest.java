@@ -33,6 +33,7 @@ public class TrunkEchoServiceTest extends EchoServiceTest {
     protected RpcClientOptions getRpcClientOptions() {
         RpcClientOptions rpcClientOptions = new RpcClientOptions();
         rpcClientOptions.setChunkSize(5);
+        rpcClientOptions.setShareThreadPoolUnderEachProxy(true);
         return rpcClientOptions;
     }
     

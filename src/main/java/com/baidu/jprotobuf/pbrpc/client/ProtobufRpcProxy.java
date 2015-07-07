@@ -47,6 +47,12 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class ProtobufRpcProxy<T> implements InvocationHandler {
 
+    /**
+     * key name for share thread pool
+     * @see RpcChannel
+     */
+    private static final String SHARE_KEY = "___share_key";
+
     private Map<String, RpcMethodInfo> cachedRpcMethods = new HashMap<String, RpcMethodInfo>();
     
     private static Logger LOG = Logger.getLogger(ProtobufRpcProxy.class.getName());
@@ -206,12 +212,22 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     eHost = address.getHostName();
                     port = address.getPort();
                 }
-                RpcChannel rpcChannel = new RpcChannel(rpcClient, eHost, ePort);
-                if (lookupStubOnStartup) {
-                    rpcChannel.testChannlConnect();
+                
+                String channelKey = methodSignature;
+                
+                if (rpcClient.getRpcClientOptions().isShareThreadPoolUnderEachProxy()) {
+                    channelKey = SHARE_KEY;
                 }
                 
-                rpcChannelMap.put(methodSignature, rpcChannel);
+                if (!rpcChannelMap.containsKey(channelKey)) {
+                    RpcChannel rpcChannel = new RpcChannel(rpcClient, eHost, ePort);
+                    if (lookupStubOnStartup) {
+                        rpcChannel.testChannlConnect();
+                    }
+                    
+                    rpcChannelMap.put(channelKey, rpcChannel);
+                }
+                
             }
         }
         
@@ -279,9 +295,15 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         // set correlationId
         rpcDataPackage.getRpcMeta().setCorrelationId(rpcClient.getNextCorrelationId());
         
-        RpcChannel rpcChannel = rpcChannelMap.get(methodSignature);
+        
+        String channelKey = methodSignature;
+        if (rpcClient.getRpcClientOptions().isShareThreadPoolUnderEachProxy()) {
+            channelKey = SHARE_KEY;
+        }
+        
+        RpcChannel rpcChannel = rpcChannelMap.get(channelKey);
         if (rpcChannel == null) {
-            throw new RuntimeException("No rpcChannel bind with serviceSignature '" + methodSignature + "'");
+            throw new RuntimeException("No rpcChannel bind with serviceSignature '" + channelKey + "'");
         }
         
         rpcChannel.doTransport(rpcDataPackage, callback, onceTalkTimeout);

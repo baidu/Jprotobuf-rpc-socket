@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
+import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
  * PBRPC exporter for standard PROTOBUF RPC implementation from jprotobuf-rpc-socket.
@@ -154,7 +155,7 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
             prRpcServer.registerService(service);
         }
         
-        if (host == null) {
+        if (StringUtils.isBlank(host)) {
             prRpcServer.bind(new InetSocketAddress(servicePort));
         } else {
             prRpcServer.bind(new InetSocketAddress(host, servicePort));

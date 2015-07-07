@@ -82,6 +82,9 @@ public class RpcServerOptions {
      */
     private int chunkPackageTimeout = 300 * 1000;
     
+    private int acceptorThreads = 0; // acceptor threads. default use Netty default value
+    private int workThreads = 0; // work threads. default use Netty default value
+    
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
     
@@ -98,6 +101,8 @@ public class RpcServerOptions {
         this.soLinger = options.soLinger;
         this.byteOrder = options.byteOrder;
         this.keepAlive = options.keepAlive;
+        this.acceptorThreads = options.acceptorThreads;
+        this.workThreads = options.workThreads;
     }
     
 
@@ -257,5 +262,42 @@ public class RpcServerOptions {
     public void setChunkPackageTimeout(int chunkPackageTimeout) {
         this.chunkPackageTimeout = chunkPackageTimeout;
     }
+
+
+    /**
+     * get the acceptorThreads
+     * @return the acceptorThreads
+     */
+    public int getAcceptorThreads() {
+        return acceptorThreads;
+    }
+
+
+    /**
+     * set acceptorThreads value to acceptorThreads
+     * @param acceptorThreads the acceptorThreads to set
+     */
+    public void setAcceptorThreads(int acceptorThreads) {
+        this.acceptorThreads = acceptorThreads;
+    }
+
+
+    /**
+     * get the workThreads
+     * @return the workThreads
+     */
+    public int getWorkThreads() {
+        return workThreads;
+    }
+
+
+    /**
+     * set workThreads value to workThreads
+     * @param workThreads the workThreads to set
+     */
+    public void setWorkThreads(int workThreads) {
+        this.workThreads = workThreads;
+    }
+    
     
 }

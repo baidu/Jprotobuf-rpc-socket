@@ -40,6 +40,8 @@ public class RpcClientOptions {
     private int minIdleSize = 2;
     private long minEvictableIdleTime = 1000L * 60L * 2;
     private long maxWait = 2000L; // max wait time in milliseconds for pool available
+    
+    private boolean shareThreadPoolUnderEachProxy = false; // share a thread pool under each rpc proxy
 
     private boolean testOnBorrow = true;
     private boolean testOnReturn = false;
@@ -71,6 +73,7 @@ public class RpcClientOptions {
         this.chunkSize = options.chunkSize;
         this.testOnBorrow = options.testOnBorrow;
         this.testOnReturn = options.testOnReturn;
+        this.shareThreadPoolUnderEachProxy = options.shareThreadPoolUnderEachProxy;
     }
 
     /**
@@ -338,4 +341,21 @@ public class RpcClientOptions {
         this.testOnReturn = testOnReturn;
     }
 
+    /**
+     * get the shareThreadPoolUnderEachProxy
+     * @return the shareThreadPoolUnderEachProxy
+     */
+    public boolean isShareThreadPoolUnderEachProxy() {
+        return shareThreadPoolUnderEachProxy;
+    }
+
+    /**
+     * set shareThreadPoolUnderEachProxy value to shareThreadPoolUnderEachProxy
+     * @param shareThreadPoolUnderEachProxy the shareThreadPoolUnderEachProxy to set
+     */
+    public void setShareThreadPoolUnderEachProxy(boolean shareThreadPoolUnderEachProxy) {
+        this.shareThreadPoolUnderEachProxy = shareThreadPoolUnderEachProxy;
+    }
+
+    
 }

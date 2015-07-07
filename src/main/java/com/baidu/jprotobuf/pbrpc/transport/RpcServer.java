@@ -81,8 +81,12 @@ public class RpcServer extends ServerBootstrap {
             throw new RuntimeException("protperty 'rpcServiceRegistry ' is null.");
         }
         
-        this.bossGroup = new NioEventLoopGroup();
-        this.workerGroup = new NioEventLoopGroup();
+        if (serverOptions == null) {
+            serverOptions = new RpcServerOptions();
+        }
+        
+        this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
+        this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
         this.group(this.bossGroup, this.workerGroup);
         this.channel(serverChannelClass);
 
