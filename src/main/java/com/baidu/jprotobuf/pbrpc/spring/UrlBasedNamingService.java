@@ -15,7 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.spring;
 
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +26,7 @@ import java.util.Set;
 import org.springframework.util.NumberUtils;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 
 /**
  * {@link URL} based naming service provider.<br>
@@ -45,7 +45,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
  */
 public class UrlBasedNamingService implements NamingService {
 
-    private List<InetSocketAddress> list;
+    private List<RegisterInfo> list;
 
     /**
      * url pattern with host:port and split by comma.<br>
@@ -59,12 +59,15 @@ public class UrlBasedNamingService implements NamingService {
             return;
         }
 
-        list = new ArrayList<InetSocketAddress>();
+        list = new ArrayList<RegisterInfo>();
         String[] array = url.split(";");
         for (String uri : array) {
             String[] uris = uri.split(":");
             if (uris != null && uris.length == 2) {
-                list.add(new InetSocketAddress(uris[0], NumberUtils.parseNumber(uris[1], Integer.class)));
+                RegisterInfo registerInfo = new RegisterInfo();
+                registerInfo.setHost(uris[0]);
+                registerInfo.setPort(NumberUtils.parseNumber(uris[1], Integer.class));
+                list.add(registerInfo);
             }
 
         }
@@ -77,8 +80,8 @@ public class UrlBasedNamingService implements NamingService {
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list()
      */
     @Override
-    public Map<String, List<InetSocketAddress>> list(Set<String> services) throws Exception {
-        Map<String, List<InetSocketAddress>> ret = new HashMap<String, List<InetSocketAddress>>();
+    public Map<String, List<RegisterInfo>> list(Set<String> services) throws Exception {
+        Map<String, List<RegisterInfo>> ret = new HashMap<String, List<RegisterInfo>>();
         
         if (services == null || services.isEmpty()) {
             return ret;

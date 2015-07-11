@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 
 /**
@@ -56,34 +57,49 @@ public class HaEchoServiceTestBase {
 
     private List<RpcServer> servers;
     
-    protected List<InetSocketAddress> list;
+    protected List<RegisterInfo> list;
 
     /**
      * 
      */
     public HaEchoServiceTestBase() {
 
-        list = new ArrayList<InetSocketAddress>();
+        list = new ArrayList<RegisterInfo>();
 
         // server1
         InetSocketAddress address = new InetSocketAddress(1031);
-        list.add(address);
+        RegisterInfo registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
+        list.add(registerInfo);
 
         // server2
         address = new InetSocketAddress(1032);
-        list.add(address);
+        registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
+        list.add(registerInfo);
 
         // server3
         address = new InetSocketAddress(1033);
-        list.add(address);
+        registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
+        list.add(registerInfo);
 
         // server4
         address = new InetSocketAddress(1034);
-        list.add(address);
+        registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
+        list.add(registerInfo);
 
         // server4
         address = new InetSocketAddress(1035);
-        list.add(address);
+        registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
+        list.add(registerInfo);
 
         namingService = new DummyNamingService(list);
     }
@@ -105,15 +121,15 @@ public class HaEchoServiceTestBase {
     
     public void startServers() throws Exception {
         
-        List<InetSocketAddress> list = namingService.list(defaultServices).get("");
+        List<RegisterInfo> list = namingService.list(defaultServices).get("");
         
         servers = new ArrayList<RpcServer>(list.size());
         int order = 1;
-        for (InetSocketAddress inetSocketAddress : list) {
+        for (RegisterInfo inetSocketAddress : list) {
             RpcServer rpcServer = new RpcServer();
             EchoServiceImpl echoServiceImpl = new EchoServiceImpl(order++);
             rpcServer.registerService(echoServiceImpl);
-            rpcServer.start(inetSocketAddress);
+            rpcServer.start(new InetSocketAddress(inetSocketAddress.getHost(), inetSocketAddress.getPort()));
             servers.add(rpcServer);
         }
         

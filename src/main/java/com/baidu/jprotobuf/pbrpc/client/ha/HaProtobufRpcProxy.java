@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -41,6 +40,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
@@ -120,7 +120,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             ProtobufRpcProxy<T> protobufRpcProxy = onBuildProtobufRpcProxy(rpcClient, interfaceClass);
 
             // get server list from NamingService
-            Map<String, List<InetSocketAddress>> servers = namingService.list(protobufRpcProxy.getServiceSignatures());
+            Map<String, List<RegisterInfo>> servers = namingService.list(protobufRpcProxy.getServiceSignatures());
             // start update naming service task
             startUpdateNamingServiceTask(servers);
 
@@ -130,11 +130,11 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         return proxyInstance;
     }
 
-    private void createServiceProxy(Map<String, List<InetSocketAddress>> servers) throws Exception {
+    private void createServiceProxy(Map<String, List<RegisterInfo>> servers) throws Exception {
 
-        Iterator<Entry<String, List<InetSocketAddress>>> iter = servers.entrySet().iterator();
+        Iterator<Entry<String, List<RegisterInfo>>> iter = servers.entrySet().iterator();
         while (iter.hasNext()) {
-            Entry<String, List<InetSocketAddress>> next = iter.next();
+            Entry<String, List<RegisterInfo>> next = iter.next();
             doProxy(next.getKey(), next.getValue());
         }
     }
@@ -144,10 +144,10 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
      * @return
      * @throws Exception
      */
-    private void doProxy(String service, List<InetSocketAddress> serversList) throws Exception {
-        List<InetSocketAddress> servers = serversList;
+    private void doProxy(String service, List<RegisterInfo> serversList) throws Exception {
+        List<RegisterInfo> servers = serversList;
         if (CollectionUtils.isEmpty(servers)) {
-            servers = new ArrayList<InetSocketAddress>();
+            servers = new ArrayList<RegisterInfo>();
         }
 
         LoadBalanceProxyFactoryBean lbProxyBean = new LoadBalanceProxyFactoryBean();
@@ -155,12 +155,12 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         List<ProtobufRpcProxy<T>> protobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>();
         Map<String, String> serverUrls = new HashMap<String, String>(servers.size());
         Map<String, Object> targetBeans = new HashMap<String, Object>();
-        for (InetSocketAddress address : servers) {
-            String serviceUrl = address.getHostName() + ":" + address.getPort();
+        for (RegisterInfo address : servers) {
+            String serviceUrl = address.getHost() + ":" + address.getPort();
             serverUrls.put(serviceUrl, serviceUrl);
 
             ProtobufRpcProxy<T> protobufRpcProxy = onBuildProtobufRpcProxy(rpcClient, interfaceClass);
-            protobufRpcProxy.setHost(address.getHostName());
+            protobufRpcProxy.setHost(address.getHost());
             protobufRpcProxy.setPort(address.getPort());
             protobufRpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
 
@@ -244,7 +244,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingServiceChangeListener#reInit(java.util.List)
      */
     @Override
-    protected void reInit(final String service, final List<InetSocketAddress> list) throws Exception {
+    protected void reInit(final String service, final List<RegisterInfo> list) throws Exception {
         // store old
         LoadBalanceProxyFactoryBean oldLbProxyBean = lbMap.get(service);
         List<ProtobufRpcProxy<T>> oldProtobufRpcProxyList =

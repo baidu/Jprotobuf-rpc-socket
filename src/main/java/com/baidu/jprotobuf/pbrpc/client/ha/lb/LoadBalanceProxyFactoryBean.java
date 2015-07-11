@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -243,8 +244,8 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         } else {
             // valid balance strategy targets
             Set<String> targets = loadBalanceStrategy.getTargets();
-            if (targets == null || targets.isEmpty()) {
-                throw new IllegalArgumentException("the targets of loadBalanceStrategy can not be empty");
+            if (targets == null) {
+                targets = new HashSet<String>();
             }
             for (String key : targets) {
                 if (!targetBeans.containsKey(key)) {

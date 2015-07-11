@@ -143,4 +143,12 @@ public class RemoteExcuteInvokeRpcHandler implements RpcHandler, RpcMetaAware {
         return delegator.getDescription();
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodSignature(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getMethodSignature() {
+        return delegator.getMethodSignature();
+    }
+
 }

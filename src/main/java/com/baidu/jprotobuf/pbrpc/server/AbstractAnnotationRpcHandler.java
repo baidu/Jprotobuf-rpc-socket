@@ -139,6 +139,10 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             }
         }
     }
+    
+    public String getMethodSignature() {
+        return serviceName + "!" + methodName;
+    }
 
     /**
      * get the inputClass

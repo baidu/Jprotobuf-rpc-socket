@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.jprotobuf.pbrpc.client.ha;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
+package com.baidu.jprotobuf.pbrpc.utils;
 
 /**
- * Naming service interface.
- * 
+ * Constant class.
+ *
  * @author xiemalin
- * @since 2.15
+ * @since 2.27
  */
-public interface NamingService {
+public class Constants {
 
     /**
-     * get server list from naming service.
-     * 
-     * @param serviceSignatures service signatures
-     * @return server list mapped by service signature.
-     * @throws Exception in case of any exception
+     * pbrpc scheme
      */
-    Map<String, List<RegisterInfo>> list(Set<String> serviceSignatures) throws Exception;
-
+    public static final String PBRPC_SCHEME = "pbrpc";
+    
+    public static final String SERVICE_KEY_PREIFX = "baidu-rpc:";
 }

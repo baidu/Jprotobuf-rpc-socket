@@ -16,6 +16,8 @@
 package com.baidu.jprotobuf.pbrpc.spring;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.DisposableBean;
@@ -25,8 +27,13 @@ import org.springframework.remoting.support.RemoteInvocationExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import com.baidu.jprotobuf.pbrpc.RpcHandler;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
+import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
+import com.baidu.jprotobuf.pbrpc.utils.Constants;
+import com.baidu.jprotobuf.pbrpc.utils.NetUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -48,6 +55,19 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     private RpcServiceRegistryBean rpcServiceRegistryBean;
     
     private RemoteInvocationExecutor remoteInvocationExecutor = new DefaultRemoteInvocationExecutor();
+    
+    private RegistryCenterService registryCenterService;
+    
+    private List<RegisterInfo> cachedRisterInfoList;
+    
+
+    /**
+     * set registryCenterService value to registryCenterService
+     * @param registryCenterService the registryCenterService to set
+     */
+    public void setRegistryCenterService(RegistryCenterService registryCenterService) {
+        this.registryCenterService = registryCenterService;
+    }
 
     /**
      * Set the RemoteInvocationExecutor to use for this exporter.
@@ -131,6 +151,12 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
             prRpcServer.shutdown();
         }
         
+        if (registryCenterService != null && cachedRisterInfoList != null) {
+            for (RegisterInfo registerInfo : cachedRisterInfoList) {
+                registryCenterService.unregister(registerInfo);
+            }
+        }
+        
         if (rpcServiceRegistryBean != null) {
             rpcServiceRegistryBean.unRegisterAll();
         }
@@ -155,10 +181,29 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
             prRpcServer.registerService(service);
         }
         
+        String registerHost;
         if (StringUtils.isBlank(host)) {
             prRpcServer.bind(new InetSocketAddress(servicePort));
+            registerHost = NetUtils.getLocalAddress().getHostAddress();
         } else {
             prRpcServer.bind(new InetSocketAddress(host, servicePort));
+            registerHost = host;
+        }
+        
+        if (registryCenterService != null) {
+            cachedRisterInfoList = new ArrayList<RegisterInfo>();
+            Collection<RpcHandler> services = rpcServiceRegistryBean.getServices();
+            List<RpcHandler> list = new ArrayList<RpcHandler>(services);
+            for (RpcHandler rpcHandler : list) {
+                RegisterInfo registerInfo = new RegisterInfo();
+                registerInfo.setHost(registerHost);
+                registerInfo.setPort(servicePort);
+                registerInfo.setProtocol(Constants.PBRPC_SCHEME);
+                registerInfo.setService(rpcHandler.getMethodSignature());
+                registryCenterService.register(registerInfo);
+                
+                cachedRisterInfoList.add(registerInfo);
+            }
         }
     }
 

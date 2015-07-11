@@ -67,5 +67,6 @@ public interface RpcHandler {
      */
     String getDescription();
     
+    String  getMethodSignature();
 
 }

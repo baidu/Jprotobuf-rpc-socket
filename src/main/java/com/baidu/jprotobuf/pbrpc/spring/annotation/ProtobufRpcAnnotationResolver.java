@@ -32,6 +32,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
@@ -62,6 +63,17 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
      * status to control start only once
      */
     private AtomicBoolean started = new AtomicBoolean(false);
+    
+    private RegistryCenterService registryCenterService;
+    
+
+    /**
+     * set registryCenterService value to registryCenterService
+     * @param registryCenterService the registryCenterService to set
+     */
+    public void setRegistryCenterService(RegistryCenterService registryCenterService) {
+        this.registryCenterService = registryCenterService;
+    }
 
     /*
      * (non-Javadoc)
@@ -108,6 +120,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             rpcServiceExporter.setServicePort(intPort);
             rpcServiceExporter.setHost(host);
             rpcServiceExporter.copyFrom(rpcServerOptions);
+            rpcServiceExporter.setRegistryCenterService(registryCenterService);
 
             portMappingExpoters.put(intPort, rpcServiceExporter);
         }
@@ -317,6 +330,17 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             for (HaRpcProxyFactoryBean bean : haRpcClients) {
                 try {
                     bean.destroy();
+                } catch (Exception e) {
+                    LOGGER.fatal(e.getMessage(), e.getCause());
+                }
+            }
+        }
+        
+        if (portMappingExpoters != null) {
+            Collection<RpcServiceExporter> exporters = portMappingExpoters.values();
+            for (RpcServiceExporter rpcServiceExporter : exporters) {
+                try {
+                    rpcServiceExporter.destroy();
                 } catch (Exception e) {
                     LOGGER.fatal(e.getMessage(), e.getCause());
                 }

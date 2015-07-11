@@ -29,6 +29,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
+
 /**
  * A listenr for {@link NamingService} changed call back.
  * 
@@ -72,9 +74,9 @@ public abstract class NamingServiceChangeListener {
         this.period = period;
     }
 
-    protected abstract void reInit(String service, List<InetSocketAddress> list) throws Exception;
+    protected abstract void reInit(String service, List<RegisterInfo> list) throws Exception;
 
-    protected void startUpdateNamingServiceTask(Map<String, List<InetSocketAddress>> serviceMap) {
+    protected void startUpdateNamingServiceTask(Map<String, List<RegisterInfo>> serviceMap) {
         if (getNamingService() == null) {
             return;
         }
@@ -92,18 +94,24 @@ public abstract class NamingServiceChangeListener {
 
     private final class UpdateNamingServiceTask extends TimerTask {
         NamingServiceChangeListener loadBalancer;
-        private Map<String, List<InetSocketAddress>> serviceMap;
+        private Map<String, List<RegisterInfo>> serviceMap;
 
         public UpdateNamingServiceTask(NamingServiceChangeListener loadBalancer,
-                Map<String, List<InetSocketAddress>> serviceMap) {
+                Map<String, List<RegisterInfo>> serviceMap) {
             this.loadBalancer = loadBalancer;
-            this.serviceMap = new HashMap<String, List<InetSocketAddress>>();
+            this.serviceMap = new HashMap<String, List<RegisterInfo>>();
 
             // copy map
-            Iterator<Entry<String, List<InetSocketAddress>>> iter = serviceMap.entrySet().iterator();
+            Iterator<Entry<String, List<RegisterInfo>>> iter = serviceMap.entrySet().iterator();
             while (iter.hasNext()) {
-                Entry<String, List<InetSocketAddress>> entry = iter.next();
-                this.serviceMap.put(entry.getKey(), new ArrayList<InetSocketAddress>(entry.getValue()));
+                Entry<String, List<RegisterInfo>> entry = iter.next();
+                
+                List<RegisterInfo> list = entry.getValue();
+                if (list == null) {
+                    list = new ArrayList<RegisterInfo>();
+                }
+                
+                this.serviceMap.put(entry.getKey(), new ArrayList<RegisterInfo>(list));
             }
 
         }
@@ -114,20 +122,20 @@ public abstract class NamingServiceChangeListener {
 
                 Set<String> serviceNames = serviceMap.keySet();
 
-                Map<String, List<InetSocketAddress>> eServcieMap = loadBalancer.getNamingService().list(serviceNames);
+                Map<String, List<RegisterInfo>> eServcieMap = loadBalancer.getNamingService().list(serviceNames);
                 if (eServcieMap == null) {
                     eServcieMap = Collections.emptyMap();
                 }
 
-                Iterator<Entry<String, List<InetSocketAddress>>> iter = serviceMap.entrySet().iterator();
+                Iterator<Entry<String, List<RegisterInfo>>> iter = serviceMap.entrySet().iterator();
                 while (iter.hasNext()) {
-                    Entry<String, List<InetSocketAddress>> next = iter.next();
+                    Entry<String, List<RegisterInfo>> next = iter.next();
                     String service = next.getKey();
-                    List<InetSocketAddress> oldList = next.getValue();
+                    List<RegisterInfo> oldList = next.getValue();
                     if (oldList == null) {
                         oldList = Collections.emptyList();
                     }
-                    List<InetSocketAddress> newList = eServcieMap.get(service);
+                    List<RegisterInfo> newList = eServcieMap.get(service);
                     if (newList == null) {
                         newList = Collections.emptyList();
                     }
@@ -138,7 +146,7 @@ public abstract class NamingServiceChangeListener {
 
                     LOG.log(Level.WARNING, "A new changed list geting from naming service name='" + service + "' "
                             + "value=" + newList);
-                    List<InetSocketAddress> list = new ArrayList<InetSocketAddress>(newList);
+                    List<RegisterInfo> list = new ArrayList<RegisterInfo>(newList);
                     next.setValue(list);
                     reInit(service, list);
                 }

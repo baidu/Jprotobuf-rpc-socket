@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.EchoService;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
@@ -169,8 +170,12 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         // first check all servers running OK
         testNoServerFail();
 
+        InetSocketAddress address = new InetSocketAddress(1036);
+        RegisterInfo registerInfo = new RegisterInfo();
+        registerInfo.setHost(address.getHostName());
+        registerInfo.setPort(address.getPort());
         // delete one from naming service
-        list.add(new InetSocketAddress(1036));
+        list.add(registerInfo);
         SleepUtils.dummySleep(6000);
         // to check naming service get size
         int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();

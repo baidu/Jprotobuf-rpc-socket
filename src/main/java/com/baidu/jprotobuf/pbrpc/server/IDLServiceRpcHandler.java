@@ -92,5 +92,13 @@ public class IDLServiceRpcHandler implements RpcHandler {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodSignature(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getMethodSignature() {
+        return null;
+    }
+
 
 }

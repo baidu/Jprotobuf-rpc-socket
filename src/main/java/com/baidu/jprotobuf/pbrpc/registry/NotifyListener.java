@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.jprotobuf.pbrpc.client.ha;
+package com.baidu.jprotobuf.pbrpc.registry;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 
 /**
- * Naming service interface.
+ * NotifyListener. (API, Prototype, ThreadSafe)
  * 
  * @author xiemalin
- * @since 2.15
+ * @since 2.27
  */
-public interface NamingService {
+public interface NotifyListener {
 
     /**
-     * get server list from naming service.
+     * 当收到服务变更通知时触发。
      * 
-     * @param serviceSignatures service signatures
-     * @return server list mapped by service signature.
-     * @throws Exception in case of any exception
+     * @param urls 已注册信息列表，总不为空，
      */
-    Map<String, List<RegisterInfo>> list(Set<String> serviceSignatures) throws Exception;
+    void notify(List<RegisterInfo> urls);
 
 }

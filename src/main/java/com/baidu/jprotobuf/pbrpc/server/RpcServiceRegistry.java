@@ -115,7 +115,7 @@ public class RpcServiceRegistry {
 
     private void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
-        String methodSignature = getMethodSignature(rpcHandler.getServiceName(), rpcHandler.getMethodName());
+        String methodSignature = rpcHandler.getMethodSignature();
 
         if (serviceMap.containsKey(methodSignature)) {
             if (dummyOverride) {

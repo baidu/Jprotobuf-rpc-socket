@@ -15,11 +15,12 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 
 /**
  * A dummy {@link NamingService} implements support default server list.
@@ -29,12 +30,12 @@ import java.util.Set;
  */
 public class DummyNamingService implements NamingService {
     
-    private List<InetSocketAddress> list;
+    private List<RegisterInfo> list;
     
     /**
      * @param list
      */
-    public DummyNamingService(List<InetSocketAddress> list) {
+    public DummyNamingService(List<RegisterInfo> list) {
         super();
         this.list = list;
     }
@@ -42,7 +43,7 @@ public class DummyNamingService implements NamingService {
     /* (non-Javadoc)
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list()
      */
-    public List<InetSocketAddress> list() throws Exception {
+    public List<RegisterInfo> list() throws Exception {
         return list;
     }
 
@@ -50,8 +51,8 @@ public class DummyNamingService implements NamingService {
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingService#list(java.util.Set)
      */
     @Override
-    public Map<String, List<InetSocketAddress>> list(Set<String> serviceSignatures) throws Exception {
-        Map<String, List<InetSocketAddress>> ret = new HashMap<String, List<InetSocketAddress>>();
+    public Map<String, List<RegisterInfo>> list(Set<String> serviceSignatures) throws Exception {
+        Map<String, List<RegisterInfo>> ret = new HashMap<String, List<RegisterInfo>>();
         
         if (serviceSignatures == null || serviceSignatures.isEmpty()) {
             return ret;

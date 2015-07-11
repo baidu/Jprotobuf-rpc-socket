@@ -15,7 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +28,7 @@ import java.util.Set;
 import org.springframework.util.CollectionUtils;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 
 /**
  * A weighted round robin strategy implementation for {@link LoadBalanceStrategy} interface
@@ -75,14 +75,14 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
 
         this.serviceSignature = serviceSignature;
         this.namingService = namingService;
-        doReInit(serviceSignature, namingService);
+        doReInit(this.serviceSignature, namingService);
     }
 
     public RoundRobinLoadBalanceStrategy(Map<String, Integer> lbFactors) {
         init(lbFactors);
     }
 
-    protected void init(List<InetSocketAddress> servers) {
+    protected void init(List<RegisterInfo> servers) {
         Map<String, Integer> lbFactors = parseLbFactors(servers);
         init(lbFactors);
     }
@@ -91,10 +91,14 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
      * @param servers
      * @return
      */
-    private Map<String, Integer> parseLbFactors(List<InetSocketAddress> servers) {
+    private Map<String, Integer> parseLbFactors(List<RegisterInfo> servers) {
         Map<String, Integer> lbFactors = new HashMap<String, Integer>();
-        for (InetSocketAddress address : servers) {
-            String serviceUrl = address.getHostName() + ":" + address.getPort();
+        if (servers == null) {
+            return lbFactors;
+        }
+        
+        for (RegisterInfo address : servers) {
+            String serviceUrl = address.getHost() + ":" + address.getPort();
             lbFactors.put(serviceUrl, DEFAULT_LOAD_FACTOR);
         }
         return lbFactors;
@@ -249,7 +253,7 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         Set<String> serviceSignatures = new HashSet<String>();
         serviceSignatures.add(serviceSignagure);
         
-        List<InetSocketAddress> servers;
+        List<RegisterInfo> servers;
         try {
             servers = namingService.list(serviceSignatures).get(serviceSignagure);
         } catch (Exception e) {
