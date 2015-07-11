@@ -19,9 +19,6 @@ import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-import redis.clients.jedis.exceptions.JedisConnectionException;
-import redis.clients.jedis.exceptions.JedisException;
-
 /**
  * Base pool class 
  * 
@@ -40,7 +37,7 @@ public abstract class Pool<T> {
         try {
             return (T) internalPool.borrowObject();
         } catch (Exception e) {
-            throw new JedisConnectionException("Could not get a resource from the pool", e);
+            throw new RuntimeException("Could not get a resource from the pool", e);
         }
     }
 
@@ -48,7 +45,7 @@ public abstract class Pool<T> {
         try {
             internalPool.returnObject(resource);
         } catch (Exception e) {
-            throw new JedisException("Could not return the resource to the pool", e);
+            throw new RuntimeException("Could not return the resource to the pool", e);
         }
     }
 
@@ -56,7 +53,7 @@ public abstract class Pool<T> {
         try {
             internalPool.invalidateObject(resource);
         } catch (Exception e) {
-            throw new JedisException("Could not return the resource to the pool", e);
+            throw new RuntimeException("Could not return the resource to the pool", e);
         }
     }
 
@@ -64,7 +61,7 @@ public abstract class Pool<T> {
         try {
             internalPool.close();
         } catch (Exception e) {
-            throw new JedisException("Could not destroy the pool", e);
+            throw new RuntimeException("Could not destroy the pool", e);
         }
     }
 }
