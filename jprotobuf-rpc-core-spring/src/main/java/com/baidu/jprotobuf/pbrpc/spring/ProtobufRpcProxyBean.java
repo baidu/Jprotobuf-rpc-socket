@@ -38,15 +38,16 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  * @since 2.17
  */
 public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements MethodInterceptor {
-    
+
     private static final ThreadLocal<MethodInvocation> CURRENT_PARAMS = new ThreadLocal<MethodInvocation>();
-    
+
     private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
-    
+
     private Object proxyBean;
 
     /**
      * set proxyBean value to proxyBean
+     * 
      * @param proxyBean the proxyBean to set
      */
     protected void setProxyBean(Object proxyBean) {
@@ -55,6 +56,7 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
 
     /**
      * get the remoteInvocationFactory
+     * 
      * @return the remoteInvocationFactory
      */
     public RemoteInvocationFactory getRemoteInvocationFactory() {
@@ -63,35 +65,37 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
 
     /**
      * set remoteInvocationFactory value to remoteInvocationFactory
+     * 
      * @param remoteInvocationFactory the remoteInvocationFactory to set
      */
     public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
-        this.remoteInvocationFactory = (remoteInvocationFactory != null ? remoteInvocationFactory
-                : new DefaultRemoteInvocationFactory());
+        this.remoteInvocationFactory =
+                (remoteInvocationFactory != null ? remoteInvocationFactory : new DefaultRemoteInvocationFactory());
     }
-    
-    /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy#buildRequestDataPackage(com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo, java.lang.Object[])
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy#buildRequestDataPackage(com.baidu.jprotobuf.pbrpc.client.
+     * RpcMethodInfo, java.lang.Object[])
      */
     @Override
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = super.buildRequestDataPackage(rpcMethodInfo, args);
-        
+
         MethodInvocation methodInvocation = CURRENT_PARAMS.get();
         if (methodInvocation != null) {
             RemoteInvocation ri = remoteInvocationFactory.createRemoteInvocation(methodInvocation);
             Map<String, Serializable> map = ri.getAttributes();
-            
+
             if (map != null) {
                 byte[] data = SerializationUtils.serialize(map);
                 rpcDataPackage.extraParams(data);
             }
         }
-        
+
         return rpcDataPackage;
     }
-    
-    
 
     /**
      * @param rpcClient
@@ -101,7 +105,9 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
         super(rpcClient, interfaceClass);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
      */
     @Override
@@ -111,9 +117,8 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
             if (proxyBean == null) {
                 proxyBean = proxy();
             }
-            
-            Object result = invoke(proxyBean,
-                    invocation.getMethod(), invocation.getArguments());
+
+            Object result = invoke(proxyBean, invocation.getMethod(), invocation.getArguments());
             return result;
         } finally {
             CURRENT_PARAMS.remove();

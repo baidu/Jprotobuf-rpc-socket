@@ -28,6 +28,7 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -136,7 +137,8 @@ public class RpcServiceRegistry {
     }
 
     private String getMethodSignature(String serviceName, String method) {
-        return serviceName + "!" + method;
+        String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, method);
+        return methodSignature;
     }
 
     public RpcHandler lookupService(String serviceName, String methodName) {

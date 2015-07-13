@@ -16,7 +16,6 @@
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceS
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -279,7 +279,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         if (StringUtils.isEmpty(methodName)) {
             methodName = method.getName();
         }
-        String methodSignature = serviceName + '!' + methodName;
+        String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         Object instance = instancesMap.get(methodSignature);
         if (instance == null) {
             throw new NullPointerException("target instance is null may be not initial correct.");

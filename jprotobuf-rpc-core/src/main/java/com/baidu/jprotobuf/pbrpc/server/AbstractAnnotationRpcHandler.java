@@ -26,6 +26,7 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -141,7 +142,8 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
     }
     
     public String getMethodSignature() {
-        return serviceName + "!" + methodName;
+        String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
+        return methodSignature;
     }
 
     /**

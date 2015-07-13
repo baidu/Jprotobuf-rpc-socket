@@ -36,6 +36,7 @@ import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -48,7 +49,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     /**
-     * key name for share thread pool
+     * key name for shared RPC channel
      * @see RpcChannel
      */
     private static final String SHARE_KEY = "___share_key";
@@ -121,7 +122,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     methodName = method.getName();
                 }
 
-                String methodSignature = serviceName + '!' + methodName;
+                String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
                 serviceSignatures.add(methodSignature);
             }
         }
@@ -177,7 +178,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     methodName = method.getName();
                 }
 
-                String methodSignature = serviceName + '!' + methodName;
+                String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
                 if (cachedRpcMethods.containsKey(methodSignature)) {
                     throw new IllegalArgumentException(
                             "Method with annotation ProtobufPRC already defined service name [" + serviceName
@@ -277,7 +278,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         if (StringUtils.isEmpty(methodName)) {
             methodName = method.getName();
         }
-        String methodSignature = serviceName + '!' + methodName;
+        String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         RpcMethodInfo rpcMethodInfo = cachedRpcMethods.get(methodSignature);
         if (rpcMethodInfo == null) {
             throw new IllegalAccessError("Can not invoke method '" + method.getName() 
