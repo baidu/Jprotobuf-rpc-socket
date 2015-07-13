@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -11,19 +12,32 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>2.28-SNAPSHOT</version>
+	<version>2.3.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-	<name>Jprotobuf-rpc-socket</name>
-	<description>A RPC implemention based on TCP protocol for Google protobuf</description>
-	<url>https://github.com/Baidu-ecom/Jprotobuf-rpc-socket</url>
+	<name>jprotobuf-rpc-socket</name>
+	<description>RPC implements </description>
+	<url>https://github.com/jhunters/jprotobuf/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<java.version>1.6</java.version>
 		<junit.version>4.10</junit.version>
-		<github.global.server>github</github.global.server>
+		
+		<!-- Common libs -->
+		<jprotobuf.version>1.7.4</jprotobuf.version>
+		<jprotobuf-rpc-common.version>1.5</jprotobuf-rpc-common.version>
+		<commons-pool2.version>2.3</commons-pool2.version>
+		<netty-all.version>4.0.27.Final</netty-all.version>
+		<snappy-java.version>1.1.1.6</snappy-java.version>
+		<spring-web.version>3.2.11.RELEASE</spring-web.version>
+		<servlet-api.version>2.4</servlet-api.version>
+		<jedis.version>2.0.0</jedis.version>
+	
+		<!-- publish version -->
+		
 	</properties>
- 
 
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -49,6 +63,14 @@
 		<url>http://baidu.com</url>
 	</organization>
 
+	<modules>
+		<module>jprotobuf-rpc-core-test</module>
+		<module>jprotobuf-rpc-core</module>
+ 		<module>jprotobuf-rpc-core-spring</module>
+		<module>jprotobuf-rpc-registry-redis</module>
+	</modules>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -57,54 +79,49 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.protobuf</groupId>
-			<artifactId>protobuf-java</artifactId>
-			<version>2.5.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf</artifactId>
-			<version>1.7.3</version>
+			<version>${jprotobuf.version}</version>
 			<scope>compile</scope>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf-rpc-common</artifactId>
-			<version>1.5</version>
+			<version>${jprotobuf-rpc-common.version}</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>	
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-pool2</artifactId>
-			<version>2.3</version>
+			<version>${commons-pool2.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.0.27.Final</version>
-			<scope>compile</scope> 
-		</dependency>
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.18.1-GA</version>
+			<version>${netty-all.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xerial.snappy</groupId>
 			<artifactId>snappy-java</artifactId>
-			<version>1.1.1.6</version>
+			<version>${snappy-java.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>3.2.11.RELEASE</version>
-		</dependency>			
+			<version>${spring-web.version}</version>
+		</dependency>		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -118,6 +135,7 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>
