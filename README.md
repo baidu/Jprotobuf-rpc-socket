@@ -25,14 +25,28 @@ Features:<br>
 环境要求：JDK 6+
 ```xml
 <dependency>
-  <groupId>com.baidu</groupId>
-  <artifactId>jprotobuf-rpc-socket</artifactId>
-  <version>2.26</version>
+	<groupId>com.baidu</groupId>
+	<artifactId>jprotobuf-rpc-core</artifactId>
+	<version>3.0.1</version>
 </dependency>
-```
-注：2.9及之后的版本对协议的解析有做调整，所以2.9及以后的版本无法与2.9之前的版本进行相互调用，请务必注意，谢谢！
 
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-rpc-socket/)
+<!-- 提供spring扩展 -->
+<dependency>
+	<groupId>com.baidu</groupId>
+	<artifactId>jprotobuf-rpc-core-spring</artifactId>
+	<version>3.0.1</version>
+</dependency>
+
+<!-- 基于redis实现服务注册，发现功能 -->
+<dependency>
+	<groupId>com.baidu</groupId>
+	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
+	<version>3.0.1</version>
+</dependency>
+
+```
+
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-rpc-core/)
 #### Qucik Start ####
 Jprotobuf-rpc-socket基于JProtobuf基础上开发，可帮助大家开发中省去编写Google Protobuf的IDL描述文件的过程。
 
