@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.server.BusinessServiceExecutor;
 import com.baidu.jprotobuf.pbrpc.server.IDLServiceExporter;
-import com.baidu.jprotobuf.pbrpc.server.ListenableBusinessServiceExecutor;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 
 /**
@@ -58,7 +57,7 @@ public class RpcServer extends ServerBootstrap {
 
 	private RpcServerPipelineInitializer rpcServerPipelineInitializer;
 
-	private BusinessServiceExecutor businessServiceExecutor = new ListenableBusinessServiceExecutor();
+	private BusinessServiceExecutor businessServiceExecutor = new BusinessServiceExecutor();
 
 	private EventLoopGroup bossGroup;
 	private EventLoopGroup workerGroup;
