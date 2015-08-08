@@ -2,6 +2,7 @@ package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.ReadTimeoutException;
@@ -9,6 +10,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Sharable
 public class RpcServerChannelIdleHandler extends ChannelDuplexHandler {
 
 	@Override

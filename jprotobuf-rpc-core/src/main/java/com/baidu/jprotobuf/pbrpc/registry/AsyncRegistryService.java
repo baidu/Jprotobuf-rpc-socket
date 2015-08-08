@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.pbrpc.register;
+package com.baidu.jprotobuf.pbrpc.registry;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +28,7 @@ import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
  * @author xiemalin
  * @since 2.27
  */
-public abstract class AsnycRegistryService implements RegistryCenterService {
+public abstract class AsyncRegistryService implements RegistryCenterService {
     
     private LinkedBlockingDeque<RegisterInfo> asyncQueue = new LinkedBlockingDeque<RegisterInfo>(100);
     
@@ -60,7 +60,7 @@ public abstract class AsnycRegistryService implements RegistryCenterService {
     /**
      * 
      */
-    public AsnycRegistryService() {
+    public AsyncRegistryService() {
         
         es.execute(new Runnable() {
             

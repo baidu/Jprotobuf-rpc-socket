@@ -17,6 +17,7 @@
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.compress.Compress;
 import com.baidu.jprotobuf.pbrpc.compress.GZipCompress;
+import com.baidu.jprotobuf.pbrpc.compress.SnappyCompress;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 
@@ -33,6 +35,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
  * @author xiemalin
  * @since 1.4
  */
+@Sharable
 public class RpcDataPackageUnCompressHandler extends
 		MessageToMessageDecoder<RpcDataPackage> {
 
@@ -49,6 +52,8 @@ public class RpcDataPackageUnCompressHandler extends
 			Compress compress = null;
 			if (compressType == RpcMeta.COMPERESS_GZIP) {
 				compress = new GZipCompress();
+			} else if (compressType == RpcMeta.COMPRESS_SNAPPY) {
+			    compress = new SnappyCompress();
 			}
 
 			if (compress != null) {

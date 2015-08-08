@@ -40,14 +40,14 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import redis.clients.jedis.Jedis;
-
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.registry.AsyncRegistryService;
 import com.baidu.jprotobuf.pbrpc.registry.NotifyListener;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
-import com.baidu.pbrpc.register.AsnycRegistryService;
+
+import redis.clients.jedis.Jedis;
 
 /**
  * Register service implements by Redis server.
@@ -55,7 +55,7 @@ import com.baidu.pbrpc.register.AsnycRegistryService;
  * @author xiemalin
  * @since 1.0
  */
-public class RedisRegistryService extends AsnycRegistryService implements NamingService, DisposableBean,
+public class RedisRegistryService extends AsyncRegistryService implements NamingService, DisposableBean,
         InitializingBean {
 
     private static final Logger logger = Logger.getLogger(RedisRegistryService.class.getName());
