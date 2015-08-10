@@ -24,9 +24,9 @@ import java.util.Set;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
-import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
+import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 import com.baidu.noah.naming.BNSClient;
 import com.baidu.noah.naming.BNSInstance;
 
@@ -175,7 +175,7 @@ public class BNSNamingService implements NamingService, InitializingBean {
                 String[] ports = mp.split(portSplit);
                 if (ports.length == 2 && !StringUtils.isEmpty(ports[0])) {
                     if (ports[0].equals(portName)) {
-                        return StringUtils.toInt(ports[1], result);
+                        return StringUtils.toInt(ports[1], result); 
                     }
                 }
             }
