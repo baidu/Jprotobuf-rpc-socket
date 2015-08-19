@@ -27,21 +27,21 @@ Features:<br>
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core</artifactId>
-	<version>3.0.1</version>
+	<version>3.0.7</version>
 </dependency>
 
 <!-- 提供spring扩展 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core-spring</artifactId>
-	<version>3.0.1</version>
+	<version>3.0.7</version>
 </dependency>
 
 <!-- 基于redis实现服务注册，发现功能 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
-	<version>3.0.1</version>
+	<version>3.0.7</version>
 </dependency>
 
 ```
