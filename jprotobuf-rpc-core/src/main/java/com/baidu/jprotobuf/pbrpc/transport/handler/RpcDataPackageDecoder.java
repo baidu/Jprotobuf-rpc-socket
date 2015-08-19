@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +56,8 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
     
     private static final Map<Long, RpcDataPackage> tempTrunkPackages = new ConcurrentHashMap<Long, RpcDataPackage>();
     
+    private static final AtomicBoolean startChunkPackageCleanUp = new AtomicBoolean(false);
+    
     private ExecutorService es;;
     private boolean stopChunkPackageTimeoutClean = false;
     
@@ -67,41 +70,45 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
             return;
         }
         
-        es = Executors.newSingleThreadExecutor();
-        es.execute(new Runnable() {
-            
-            public void run() {
-                while (!stopChunkPackageTimeoutClean) {
-                    
-                    if (!tempTrunkPackages.isEmpty()) {
+        // only start once OK
+        if (startChunkPackageCleanUp.compareAndSet(false, true)) {
+            es = Executors.newSingleThreadExecutor();
+            es.execute(new Runnable() {
+                
+                public void run() {
+                    while (!stopChunkPackageTimeoutClean) {
                         
-                        Map<Long, RpcDataPackage> currentCheckPackage;
-                        currentCheckPackage = new HashMap<Long, RpcDataPackage>(tempTrunkPackages);
-                        
-                        Iterator<Entry<Long, RpcDataPackage>> iter = currentCheckPackage.entrySet().iterator();
-                        while (iter.hasNext()) {
-                            Entry<Long, RpcDataPackage> entry = iter.next();
+                        if (!tempTrunkPackages.isEmpty()) {
                             
-                            if (entry.getValue().getTimeStamp() + chunkPackageTimeout > System.currentTimeMillis()) {
-                                // get time out chunk package, do clean action
-                                tempTrunkPackages.remove(entry.getValue());
-                                LOG.log(Level.SEVERE, "Found chunk package time out long than " + chunkPackageTimeout
-                                        + "(ms) will clean up correlationId:"
-                                        + entry.getValue().getRpcMeta().getCorrelationId());
+                            Map<Long, RpcDataPackage> currentCheckPackage;
+                            currentCheckPackage = new HashMap<Long, RpcDataPackage>(tempTrunkPackages);
+                            
+                            Iterator<Entry<Long, RpcDataPackage>> iter = currentCheckPackage.entrySet().iterator();
+                            while (iter.hasNext()) {
+                                Entry<Long, RpcDataPackage> entry = iter.next();
+                                
+                                if (entry.getValue().getTimeStamp() + chunkPackageTimeout > System.currentTimeMillis()) {
+                                    // get time out chunk package, do clean action
+                                    tempTrunkPackages.remove(entry.getValue());
+                                    LOG.log(Level.SEVERE, "Found chunk package time out long than " + chunkPackageTimeout
+                                            + "(ms) will clean up correlationId:"
+                                            + entry.getValue().getRpcMeta().getCorrelationId());
+                                }
                             }
                         }
-                    }
-                    
-                    try {
-                        Thread.sleep(DEFAULT_CLEANUP_INTERVAL);
-                    } catch (Exception e) {
-                        LOG.log(Level.SEVERE, e.getMessage(), e);
+                        
+                        try {
+                            Thread.sleep(DEFAULT_CLEANUP_INTERVAL);
+                        } catch (Exception e) {
+                            LOG.log(Level.SEVERE, e.getMessage(), e);
+                        }
+                        
                     }
                     
                 }
-                
-            }
-        });
+            });
+        }
+        
     }
     
 	@Override
