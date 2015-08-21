@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.server.BusinessServiceExecutor;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageCompressHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageDecoder;
@@ -65,11 +66,14 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 	private final RpcServerOptions rpcServerOptions;
 
 	private List<RpcDataPackageDecoder> rpcDataPackageDecoderList = new ArrayList<RpcDataPackageDecoder>();
+	
+	private BusinessServiceExecutor businessServiceExecutor;
 
-	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry,
-			RpcServerOptions rpcServerOptions) {
+	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions,
+			BusinessServiceExecutor businessServiceExecutor) {
 		this.rpcServiceRegistry = rpcServiceRegistry;
 		this.rpcServerOptions = rpcServerOptions;
+		this.businessServiceExecutor = businessServiceExecutor;
 	}
 
 	@Override
@@ -95,7 +99,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		// to process RPC service handler of request object RpcDataPackage and
 		// return new RpcDataPackage
 		channelPipe.addLast(RPC_SERVER_HANDLER, new RpcServiceHandler(
-				this.rpcServiceRegistry));
+				this.rpcServiceRegistry,businessServiceExecutor));
 
 		// response back
 		// check if need to compress for data and attachment

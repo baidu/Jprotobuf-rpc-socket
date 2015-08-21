@@ -20,6 +20,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,8 +29,12 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
+import com.baidu.jprotobuf.pbrpc.server.BusinessServiceExecutor;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * RPC service handler on request data arrived.
@@ -39,109 +44,124 @@ import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
  */
 public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackage> {
 
-    /**
-     * log this class
-     */
-    private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
+	/**
+	 * log this class
+	 */
+	private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
 
-    /**
-     * {@link RpcServiceRegistry}
-     */
-    private final RpcServiceRegistry rpcServiceRegistry;
+	/**
+	 * {@link RpcServiceRegistry}
+	 */
+	private final RpcServiceRegistry rpcServiceRegistry;
 
-    /**
-     * @param rpcServiceRegistry
-     */
-    public RpcServiceHandler(RpcServiceRegistry rpcServiceRegistry) {
-        this.rpcServiceRegistry = rpcServiceRegistry;
-    }
+	private final BusinessServiceExecutor businessServiceExecutor;
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
-        try {
-            RpcMeta rpcMeta = dataPackage.getRpcMeta();
-            String serviceName = rpcMeta.getRequest().getSerivceName();
-            String methodName = rpcMeta.getRequest().getMethodName();
+	/**
+	 * @param rpcServiceRegistry
+	 */
+	public RpcServiceHandler(RpcServiceRegistry rpcServiceRegistry, BusinessServiceExecutor businessServiceExecutor) {
+		this.rpcServiceRegistry = rpcServiceRegistry;
+		this.businessServiceExecutor = businessServiceExecutor;
+	}
 
-            RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
-            if (handler == null) {
-                dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
-                dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
-            } else {
+	@Override
+	protected void channelRead0(final ChannelHandlerContext ctx, final RpcDataPackage dataPackage) throws Exception {
+		try {
+			RpcMeta rpcMeta = dataPackage.getRpcMeta();
+			String serviceName = rpcMeta.getRequest().getSerivceName();
+			String methodName = rpcMeta.getRequest().getMethodName();
 
-                byte[] data = dataPackage.getData();
-                RpcData request = new RpcData();
-                request.setLogId(dataPackage.getRpcMeta().getRequest().getLogId());
-                request.setData(data);
-                request.setAttachment(dataPackage.getAttachment());
-                if (dataPackage.getRpcMeta() != null) {
-                    request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
-                }
-                request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
-                try {
-                    RpcData response = handler.doHandle(request);
-                    dataPackage.data(response.getData());
-                    dataPackage.attachment(response.getAttachment());
-                    dataPackage.authenticationData(response.getAuthenticationData());
+			final RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
+			if (handler == null) {
+				dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
+				dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
+				ctx.writeAndFlush(dataPackage);
+			} else {
 
-                    dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
-                    dataPackage.errorText(null);
+				byte[] data = dataPackage.getData();
+				final RpcData request = new RpcData();
+				request.setLogId(dataPackage.getRpcMeta().getRequest().getLogId());
+				request.setData(data);
+				request.setAttachment(dataPackage.getAttachment());
+				if (dataPackage.getRpcMeta() != null) {
+					request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
+				}
+				request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
 
-                } catch (InvocationTargetException e) {
-                    Throwable targetException = e.getTargetException();
-                    if (targetException == null) {
-                        targetException = e;
-                    }
-                    
-                    LOG.log(Level.SEVERE, targetException.getMessage(), targetException);
-                    // catch business exception
-                    dataPackage.errorCode(ErrorCodes.ST_ERROR);
-                    dataPackage.errorText(targetException.getMessage());
-                } catch (Exception e) {
-                    LOG.log(Level.SEVERE, e.getMessage(), e.getCause());
-                    // catch business exception
-                    dataPackage.errorCode(ErrorCodes.ST_ERROR);
-                    dataPackage.errorText(e.getMessage());
-                }
-            }
+				ListenableFuture<RpcData> future = this.businessServiceExecutor.submit(new Callable<RpcData>() {
 
-            // We do not need to write a ChannelBuffer here.
-            // We know the encoder inserted at TelnetPipelineFactory will do the
-            // conversion.
-            ctx.writeAndFlush(dataPackage);
-        } catch (Exception t) {
-            ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
-            exception.setErrorCode(ErrorCodes.ST_ERROR);
-            exception.setRpcDataPackage(dataPackage);
-            throw exception;
-        }
-    }
+					@Override
+					public RpcData call() throws Exception {
+						return handler.doHandle(request);
+					}
+				});
+				Futures.addCallback(future, new FutureCallback<RpcData>() {
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
+					@Override
+					public void onSuccess(RpcData response) {
+						dataPackage.data(response.getData());
+						dataPackage.attachment(response.getAttachment());
+						dataPackage.authenticationData(response.getAuthenticationData());
 
-        RpcDataPackage data = null;
+						dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
+						dataPackage.errorText(null);
+						ctx.writeAndFlush(dataPackage);
+					}
 
-        if (cause instanceof ErrorDataException) {
-            ErrorDataException error = (ErrorDataException) cause;
-            RpcDataPackage dataPackage = error.getRpcDataPackage();
-            if (dataPackage != null) {
-                int errorCode = ErrorCodes.ST_ERROR;
-                if (error.getErrorCode() > 0) {
-                    errorCode = error.getErrorCode();
-                }
-                data = dataPackage.getErrorResponseRpcDataPackage(errorCode, cause.getCause().getMessage());
-            }
-        }
+					@Override
+					public void onFailure(Throwable t) {
+						if (t instanceof InvocationTargetException) {
+							Throwable targetException = ((InvocationTargetException) t).getTargetException();
+							if (targetException == null) {
+								targetException = t;
+							}
 
-        if (data == null) {
-            data = new RpcDataPackage();
-            data =
-                    data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
-                            cause.getCause().getMessage());
-        }
-        ctx.fireChannelRead(data);
-    }
+							LOG.log(Level.SEVERE, targetException.getMessage(), targetException);
+							// catch business exception
+							dataPackage.errorText(targetException.getMessage());
+						} else {
+							LOG.log(Level.SEVERE, t.getMessage(), t.getCause());
+							// catch business exception
+							dataPackage.errorText(t.getMessage());
+						}
+						dataPackage.errorCode(ErrorCodes.ST_ERROR);
+						ctx.writeAndFlush(dataPackage);
+					}
+				});
+			}
+
+		} catch (Exception t) {
+			ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
+			exception.setErrorCode(ErrorCodes.ST_ERROR);
+			exception.setRpcDataPackage(dataPackage);
+			throw exception;
+		}
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
+
+		RpcDataPackage data = null;
+
+		if (cause instanceof ErrorDataException) {
+			ErrorDataException error = (ErrorDataException) cause;
+			RpcDataPackage dataPackage = error.getRpcDataPackage();
+			if (dataPackage != null) {
+				int errorCode = ErrorCodes.ST_ERROR;
+				if (error.getErrorCode() > 0) {
+					errorCode = error.getErrorCode();
+				}
+				data = dataPackage.getErrorResponseRpcDataPackage(errorCode, cause.getCause().getMessage());
+			}
+		}
+
+		if (data == null) {
+			data = new RpcDataPackage();
+			data = data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
+					cause.getCause().getMessage());
+		}
+		ctx.fireChannelRead(data);
+	}
 
 }
