@@ -165,7 +165,7 @@ public class StringUtils {
             return Integer.parseInt(str);
         } catch (NumberFormatException nfe) {
             return defaultValue;
-        }
+        } 
     }
 
     /**

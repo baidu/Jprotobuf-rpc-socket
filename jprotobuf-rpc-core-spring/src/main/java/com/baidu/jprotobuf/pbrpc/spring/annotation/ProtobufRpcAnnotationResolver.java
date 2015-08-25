@@ -87,11 +87,13 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             ConfigurableListableBeanFactory beanFactory) throws BeansException {
         if (t instanceof RpcExporter) {
             LOGGER.info("Annotation 'RpcExporter' for target '" + beanName + "' created");
-            parseRpcExporterAnnotation((RpcExporter) t, beanFactory, bean);
+            
+            // to fix AOP effective of target bean so instead of using beanFactory.getBean(beanName)
+            parseRpcExporterAnnotation((RpcExporter) t, beanFactory, beanFactory.getBean(beanName));
         }
         return bean;
     }
-
+    
     private void parseRpcExporterAnnotation(RpcExporter rpcExporter, ConfigurableListableBeanFactory beanFactory,
             Object bean) {
 
@@ -123,6 +125,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             rpcServiceExporter.setRegistryCenterService(registryCenterService);
 
             portMappingExpoters.put(intPort, rpcServiceExporter);
+            
         }
 
         // do register service
@@ -132,6 +135,9 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         }
         registerServices.add(bean);
         rpcServiceExporter.setRegisterServices(registerServices);
+        
+        
+        
     }
 
     /*
