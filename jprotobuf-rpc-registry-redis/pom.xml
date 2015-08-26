@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>3.0.10</version>
+		<version>3.0.11-SNAPSHOT</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
 	<packaging>jar</packaging>
