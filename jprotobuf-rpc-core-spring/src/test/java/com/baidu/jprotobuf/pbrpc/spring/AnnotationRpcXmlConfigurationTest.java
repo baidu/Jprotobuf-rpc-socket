@@ -15,6 +15,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.spring;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -23,6 +24,7 @@ import org.junit.Test;
  * @author xiemalin
  * @since 2.17
  */
+@Ignore
 public class AnnotationRpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
 
     protected String getConfigurationPath() {
@@ -31,6 +33,9 @@ public class AnnotationRpcXmlConfigurationTest extends RpcXmlConfigurationTestBa
 
     @Test
     public void testCommonRpcRequest() {
+        
+        SimpleAopClass bean = context.getBean("simpleAOP", SimpleAopClass.class);
+        bean.doHello();
 
         AnnotationEchoServiceClient annotationEchoServiceClient =
                 context.getBean("echoServiceClient", AnnotationEchoServiceClient.class);

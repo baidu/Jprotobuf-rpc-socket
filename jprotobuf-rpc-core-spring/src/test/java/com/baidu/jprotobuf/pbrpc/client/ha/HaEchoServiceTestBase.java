@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 
 import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
@@ -38,6 +39,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 2.15
  */
+@Ignore
 public class HaEchoServiceTestBase {
     
     private static final Logger LOG = Logger.getLogger(HaEchoServiceTestBase.class.getName());

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -36,6 +37,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
  * @author xiemalin
  * @since 2.23
  */
+@Ignore
 public class BusinessExceptionTest extends BaseTest {
     
     private static final Logger LOG = Logger.getLogger(BusinessExceptionTest.class.getName());

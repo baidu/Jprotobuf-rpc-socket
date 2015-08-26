@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.baidu.jprotobuf.pbrpc.spring;
 
-import org.springframework.stereotype.Component;
-
-import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
-import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 /**
- * Echo service for annotation exporter 
- * 
+ *
  * @author xiemalin
- * @since 2.17
+ *
  */
-@Component
-@RpcExporter(port = "1033" , rpcServerOptionsBeanName = "rpcServerOptions")
-public class AnnotationEchoServiceImpl3 extends EchoServiceImpl { 
-    
- 
-    
+public class MyInterceptor implements MethodInterceptor {
+
+    /* (non-Javadoc)
+     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+     */
+    @Override
+    public Object invoke(MethodInvocation arg0) throws Throwable {
+
+        System.out.println(arg0.getMethod().getName());
+        return arg0.proceed();
+    }
+
 }

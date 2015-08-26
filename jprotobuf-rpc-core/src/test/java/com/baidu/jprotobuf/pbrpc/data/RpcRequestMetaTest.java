@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc.data;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -27,6 +28,7 @@ import org.junit.Test;
  * @author xiemalin
  * @since 1.0
  */
+@Ignore
 public class RpcRequestMetaTest {
 
     @Test

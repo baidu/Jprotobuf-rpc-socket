@@ -20,6 +20,7 @@ package com.baidu.jprotobuf.pbrpc;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -34,6 +35,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  * @author xiemalin
  * @since 2.1
  */
+@Ignore
 public class RpcServiceMetaServiceTest extends BaseEchoServiceTest {
 
     @Test

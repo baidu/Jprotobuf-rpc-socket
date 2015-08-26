@@ -24,6 +24,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.remoting.support.DefaultRemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -44,6 +45,7 @@ import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaService;
  * @author xiemalin
  * @since 2.1.0.0
  */
+@Ignore
 public class RpcProxyTest {
     
     private int servicePort = 1031;

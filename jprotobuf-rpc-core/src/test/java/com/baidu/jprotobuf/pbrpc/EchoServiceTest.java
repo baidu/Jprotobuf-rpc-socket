@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -29,6 +30,7 @@ import org.junit.Test;
  * @see EchoService
  * 
  */
+@Ignore
 public class EchoServiceTest extends BaseEchoServiceTest {
     
     /**

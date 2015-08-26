@@ -10,8 +10,6 @@
             http://www.springframework.org/schema/util 
             http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-
-
 	<context:component-scan base-package="com.baidu.jprotobuf.pbrpc.spring">
 	</context:component-scan>
 
@@ -29,6 +27,11 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="rpcServerOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions">
+		<property name="acceptorThreads" value="1"></property>
+		<property name="workThreads" value="20"></property>
+	</bean>
+
 	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">
 		<property name="threadPoolSize" value="20"></property>
 		<property name="maxIdleSize" value="10"></property>
@@ -41,9 +44,26 @@
 		</constructor-arg>
 	</bean>
 
-<!-- 	<bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter">
-		<property name="servicePort" value="1031"></property>
-		<property name="path" value="D://my.proto"></property>
-	</bean> -->
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcRequestMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.ChunkInfo"></bean>
 
+	<!-- <bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter"> 
+		<property name="servicePort" value="1031"></property> <property name="path" 
+		value="D://my.proto"></property> </bean> -->
+
+	<bean
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*AOP</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>myInterceptor</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="myInterceptor" class="com.baidu.jprotobuf.pbrpc.spring.MyInterceptor"></bean>
 </beans>

@@ -16,7 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.spring;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
 import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
  * @author xiemalin
  * @since 2.17
  */
-@Component
+@Service("echoServiceAOP")
 @RpcExporter(port = "1031")
 public class AnnotationEchoServiceImpl extends EchoServiceImpl {
     

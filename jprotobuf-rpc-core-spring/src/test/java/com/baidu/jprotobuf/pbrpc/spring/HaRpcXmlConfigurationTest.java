@@ -17,6 +17,7 @@ package com.baidu.jprotobuf.pbrpc.spring;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.EchoService;
@@ -28,6 +29,7 @@ import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
  * @author xiemalin
  * @since 2.17
  */
+@Ignore
 public class HaRpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
 
     private RpcServiceExporter rpcServiceExporter1;

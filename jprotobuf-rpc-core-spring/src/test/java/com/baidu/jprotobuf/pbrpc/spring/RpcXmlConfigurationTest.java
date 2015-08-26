@@ -15,6 +15,7 @@
  */
 package com.baidu.jprotobuf.pbrpc.spring;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.EchoService;
@@ -26,6 +27,7 @@ import com.baidu.jprotobuf.pbrpc.EchoService;
  * @author xiemalin
  * @since 2.17
  */
+@Ignore
 public class RpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
 
 
