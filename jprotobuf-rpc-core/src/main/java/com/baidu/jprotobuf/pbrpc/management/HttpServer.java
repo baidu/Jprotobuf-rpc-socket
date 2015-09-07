@@ -115,11 +115,4 @@ public class HttpServer {
         workerGroup.shutdownGracefully();
     }
 
-    public static void main(String[] args) throws Exception {
-        HttpServer server = new HttpServer(null);
-        server.start(8844);
-
-        System.out.println("ok");
-    }
-
 }

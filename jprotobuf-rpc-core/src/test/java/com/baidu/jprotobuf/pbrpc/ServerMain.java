@@ -33,7 +33,7 @@ public class ServerMain {
         RpcServer rpcServer = new RpcServer(rpcServerOptions);
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(Integer.valueOf(args[0]));
+        rpcServer.start(1031);
         
     }
 }

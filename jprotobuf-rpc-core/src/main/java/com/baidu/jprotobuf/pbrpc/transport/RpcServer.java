@@ -63,6 +63,8 @@ public class RpcServer extends ServerBootstrap {
     
     private InetSocketAddress inetSocketAddress;
     
+    private long startTime;
+    
     private HttpServer httpServer;
 
     /**
@@ -159,6 +161,8 @@ public class RpcServer extends ServerBootstrap {
                 });
         this.inetSocketAddress = sa;
         
+        startTime = System.currentTimeMillis();
+        
         // check if need start http server
         if (rpcServerOptions.getHttpServerPort() > 0) {
             httpServer = new HttpServer(this);
@@ -222,4 +226,11 @@ public class RpcServer extends ServerBootstrap {
         this.rpcServerOptions = rpcServerOptions;
     }
 
+    /**
+     * get the startTime
+     * @return the startTime
+     */
+    public long getStartTime() {
+        return startTime;
+    }
 }

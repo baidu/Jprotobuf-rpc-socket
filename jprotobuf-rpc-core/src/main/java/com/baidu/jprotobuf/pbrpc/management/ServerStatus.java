@@ -57,7 +57,7 @@ public class ServerStatus {
     public ServerStatus(RpcServer rpcServer) {
         super();
         this.rpcServer = rpcServer;
-        startTime = System.currentTimeMillis();
+        startTime = rpcServer.getStartTime();
 
         port = rpcServer.getInetSocketAddress().getPort();
         httpPort = rpcServer.getRpcServerOptions().getHttpServerPort();
