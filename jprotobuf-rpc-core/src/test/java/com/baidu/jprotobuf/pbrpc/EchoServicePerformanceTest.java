@@ -26,8 +26,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,7 +35,8 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
-import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
+
+import junit.framework.Assert;
 
 /**
  * Test class for {@link EchoService}
@@ -45,6 +44,7 @@ import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
  * @author xiemalin
  * @since 1.0
  */
+@Ignore
 public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     RpcServer rpcServer;
@@ -66,10 +66,10 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     };
 
     public void setUp(int threadSize, String requestData, String responseData) {
-  /*      rpcServer = new RpcServer();
+        rpcServer = new RpcServer();
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(PORT);*/
+        rpcServer.start(PORT);
 
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(threadSize);
