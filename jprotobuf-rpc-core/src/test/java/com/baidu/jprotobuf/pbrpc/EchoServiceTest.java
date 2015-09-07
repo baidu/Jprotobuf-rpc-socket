@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
@@ -31,6 +32,7 @@ import junit.framework.Assert;
  * @see EchoService
  * 
  */
+@Ignore
 public class EchoServiceTest extends BaseEchoServiceTest {
     
     /* (non-Javadoc)
