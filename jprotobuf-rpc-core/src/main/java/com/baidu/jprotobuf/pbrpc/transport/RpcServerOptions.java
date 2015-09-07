@@ -22,6 +22,50 @@ import java.nio.ByteOrder;
 
 public class RpcServerOptions {
     
+    /**
+     * 
+     */
+    private static final String LINE_BREAK = "\n";
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("keepAlive=");
+        builder.append(keepAlive).append(LINE_BREAK);
+        builder.append("byteOrder=");
+        builder.append(byteOrder).append(LINE_BREAK);
+        builder.append("soLinger=");
+        builder.append(soLinger).append(LINE_BREAK);
+        builder.append("backlog=");
+        builder.append(backlog).append(LINE_BREAK);
+        builder.append("receiveBufferSize=");
+        builder.append(receiveBufferSize).append(LINE_BREAK);
+        builder.append("sendBufferSize=");
+        builder.append(sendBufferSize).append(LINE_BREAK);
+        builder.append("readerIdleTime=");
+        builder.append(readerIdleTime).append(LINE_BREAK);
+        builder.append("writerIdleTime=");
+        builder.append(writerIdleTime).append(LINE_BREAK);
+        builder.append("connectTimeout=");
+        builder.append(connectTimeout).append(LINE_BREAK);
+        builder.append("keepAliveTime=");
+        builder.append(keepAliveTime).append(LINE_BREAK);
+        builder.append("chunkPackageTimeout=");
+        builder.append(chunkPackageTimeout).append(LINE_BREAK);
+        builder.append("acceptorThreads=");
+        builder.append(acceptorThreads).append(LINE_BREAK);
+        builder.append("workThreads=");
+        builder.append(workThreads).append(LINE_BREAK);
+        builder.append("chunkSize=");
+        builder.append(chunkSize).append(LINE_BREAK);
+        builder.append("httpServerPort=");
+        builder.append(httpServerPort).append(LINE_BREAK);
+        builder.append("tcpNoDelay=");
+        builder.append(tcpNoDelay).append(LINE_BREAK);
+        return builder.toString();
+    }
+
+
     public RpcServerOptions() {
         
         tcpNoDelay = true;
@@ -87,6 +131,11 @@ public class RpcServerOptions {
     
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
+    
+    /**
+     * if http server port > 0 will start http server
+     */
+    private int httpServerPort = -1;
     
     public void copyFrom(RpcServerOptions options) {
         this.chunkSize = options.chunkSize;
@@ -299,5 +348,19 @@ public class RpcServerOptions {
         this.workThreads = workThreads;
     }
     
+    /**
+     * get the httpServerPort
+     * @return the httpServerPort
+     */
+    public int getHttpServerPort() {
+        return httpServerPort;
+    }
     
+    /**
+     * set httpServerPort value to httpServerPort
+     * @param httpServerPort the httpServerPort to set
+     */
+    public void setHttpServerPort(int httpServerPort) {
+        this.httpServerPort = httpServerPort;
+    }
 }

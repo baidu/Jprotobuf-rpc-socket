@@ -22,6 +22,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
@@ -34,6 +37,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
  * Test class for {@link EchoService}
@@ -41,7 +45,6 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 1.0
  */
-@Ignore
 public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     RpcServer rpcServer;
@@ -52,7 +55,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 1000;
+    int totalRequestSize = 100000000;
 
     Runnable runnable = new Runnable() {
 
@@ -63,10 +66,10 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     };
 
     public void setUp(int threadSize, String requestData, String responseData) {
-        rpcServer = new RpcServer();
+  /*      rpcServer = new RpcServer();
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(PORT);
+        rpcServer.start(PORT);*/
 
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(threadSize);
@@ -235,17 +238,28 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
             throws InterruptedException, ExecutionException {
         setUp(multiSize, requestData, responseData);
 
-        ExecutorService pool = Executors.newFixedThreadPool(multiSize);
+        LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue<Runnable>();
+        
+        ExecutorService pool = new ThreadPoolExecutor(multiSize, multiSize,
+                0L, TimeUnit.MILLISECONDS,
+                linkedBlockingQueue);
 
         long time = System.currentTimeMillis();
         List<Future<?>> futures = new ArrayList<Future<?>>(multiSize);
-        for (int i = 0; i < totalRequestSize; i++) {
-            Future<?> submit = pool.submit(runnable);
-            futures.add(submit);
+        
+        int roopSize = totalRequestSize / multiSize;
+        
+        for (int j = 0; j < roopSize; j++) {
+            for (int i = 0; i < multiSize; i++) {
+                Future<?> submit = pool.submit(runnable);
+                futures.add(submit);
+            }
+            for (Future<?> future : futures) {
+                future.get();
+            }
+            futures.clear();
         }
-        for (Future<?> future : futures) {
-            future.get();
-        }
+        
 
         long timetook = System.currentTimeMillis() - time;
         pool.shutdown();

@@ -28,10 +28,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 
-import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
-import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaList;
-import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaService;
-import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.meta.MetaExportHelper;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -41,11 +38,6 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 2.21
  */
 public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, InitializingBean {
-
-    /**
-     * default output charset name
-     */
-    private static final String CHARSET_NAME = "utf-8";
 
     /**
      * log this class
@@ -111,28 +103,11 @@ public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, I
      * 
      */
     private void doExport() {
-        RpcClient rpcClient = new RpcClient();
-        
-        ProtobufRpcProxy<RpcServiceMetaService> pbrpcProxy = new ProtobufRpcProxy<RpcServiceMetaService>(rpcClient, RpcServiceMetaService.class);
-        pbrpcProxy.setPort(servicePort);
-        pbrpcProxy.setHost(serviceHost);
-        RpcServiceMetaService proxy = pbrpcProxy.proxy();
-        
-        RpcServiceMetaList rpcServiceMetaInfo = proxy.getRpcServiceMetaInfo();
-        
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(localFile);
-            
-            String typesIDL = rpcServiceMetaInfo.getTypesIDL();
-            if (!StringUtils.isBlank(typesIDL)) {
-                fos.write(typesIDL.getBytes(CHARSET_NAME));
-            }
-            String rpcsIDL = rpcServiceMetaInfo.getRpcsIDL();
-            if (!StringUtils.isBlank(rpcsIDL)) {
-                fos.write(rpcsIDL.getBytes(CHARSET_NAME));
-            }
-            
+            String idl = MetaExportHelper.exportIDL(serviceHost, servicePort);
+            fos.write(idl.getBytes(MetaExportHelper.CHARSET_NAME));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
@@ -143,9 +118,6 @@ public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, I
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            // here need do close here to free resource
-            pbrpcProxy.close();
-            rpcClient.stop();
         }
         
     }

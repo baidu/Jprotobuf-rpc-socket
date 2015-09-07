@@ -18,7 +18,9 @@ package com.baidu.jprotobuf.pbrpc.spring;
 
 import org.springframework.stereotype.Service;
 
+import com.baidu.jprotobuf.pbrpc.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
 
 /**
@@ -31,6 +33,11 @@ import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
 @RpcExporter(port = "1031")
 public class AnnotationEchoServiceImpl extends EchoServiceImpl {
     
- 
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo", description ="echo测试服务")
+    public EchoInfo doEcho(EchoInfo info) {
+        EchoInfo ret = new EchoInfo();
+        ret.setMessage("hello:" + info.getMessage());
+        return ret;
+    }
     
 }

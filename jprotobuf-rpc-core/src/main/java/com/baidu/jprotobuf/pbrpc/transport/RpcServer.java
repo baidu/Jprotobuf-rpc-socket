@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.management.HttpServer;
 import com.baidu.jprotobuf.pbrpc.server.IDLServiceExporter;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 
@@ -61,6 +62,8 @@ public class RpcServer extends ServerBootstrap {
     private Channel channel;
     
     private InetSocketAddress inetSocketAddress;
+    
+    private HttpServer httpServer;
 
     /**
      * get the inetSocketAddress
@@ -104,7 +107,7 @@ public class RpcServer extends ServerBootstrap {
         this.rpcServiceRegistry = rpcServiceRegistry;
         // do register meta service
         rpcServiceRegistry.doRegisterMetaService();
-        this.rpcServerOptions = new RpcServerOptions();
+        this.rpcServerOptions = serverOptions;
         this.rpcServerPipelineInitializer =
                 new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions);
         this.childHandler(rpcServerPipelineInitializer);
@@ -140,7 +143,7 @@ public class RpcServer extends ServerBootstrap {
     }
 
     public void start(InetSocketAddress sa) {
-        LOG.log(Level.FINE, "Starting on: " + sa);
+        LOG.log(Level.INFO, "RPC starting at: " + sa);
         this.bind(sa).addListener(
                 new ChannelFutureListener() {
 
@@ -155,6 +158,12 @@ public class RpcServer extends ServerBootstrap {
                     }
                 });
         this.inetSocketAddress = sa;
+        
+        // check if need start http server
+        if (rpcServerOptions.getHttpServerPort() > 0) {
+            httpServer = new HttpServer(this);
+            httpServer.start(rpcServerOptions.getHttpServerPort());
+        }
     }
 
     public void waitForStop() throws InterruptedException {
@@ -184,6 +193,10 @@ public class RpcServer extends ServerBootstrap {
 		
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
+		
+		if (httpServer != null) {
+		    httpServer.shutdownNow();
+		}
 		
 	}
 

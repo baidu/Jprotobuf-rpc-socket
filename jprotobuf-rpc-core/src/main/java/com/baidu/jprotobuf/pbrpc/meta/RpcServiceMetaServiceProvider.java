@@ -93,7 +93,7 @@ public class RpcServiceMetaServiceProvider {
                     String idl =
                             ProtobufIDLGenerator.getIDL(rpcHandler.getInputClass(), cachedTypes, cachedEnumTypes, true);
                     if (idl != null) {
-                        typesIDL.append(idl).append(LINE_BREAK);
+                        typesIDL.append(meta.getInputMetaProto()).append(LINE_BREAK);
                     }
                 }
                 rpcServiceMeta.setInputProto(meta.getInputMetaProto());
@@ -104,7 +104,7 @@ public class RpcServiceMetaServiceProvider {
                             ProtobufIDLGenerator
                                     .getIDL(rpcHandler.getOutputClass(), cachedTypes, cachedEnumTypes, true);
                     if (idl != null) {
-                        typesIDL.append(idl).append(LINE_BREAK);
+                        typesIDL.append(meta.getOutputMetaProto()).append(LINE_BREAK);
                     }
                 }
                 rpcServiceMeta.setOutputProto(meta.getOutputMetaProto());

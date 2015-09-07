@@ -16,10 +16,11 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
-import junit.framework.Assert;
-
-import org.junit.Ignore;
 import org.junit.Test;
+
+import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
+
+import junit.framework.Assert;
 
 /**
  * 
@@ -30,8 +31,19 @@ import org.junit.Test;
  * @see EchoService
  * 
  */
-@Ignore
 public class EchoServiceTest extends BaseEchoServiceTest {
+    
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
+     */
+    @Override
+    protected RpcServerOptions getRpcServerOptions() {
+
+        RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setHttpServerPort(8866);
+        
+        return rpcServerOptions;
+    }
     
     /**
      * test client auto recover connection from server.
