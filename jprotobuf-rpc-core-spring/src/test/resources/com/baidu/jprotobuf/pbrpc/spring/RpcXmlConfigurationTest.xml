@@ -21,6 +21,7 @@
 			</list>
 		</property>
 		<property name="connectTimeout" value="1000"></property>
+		<property name="httpServerPort" value="8866"></property>
 	</bean>
 
 

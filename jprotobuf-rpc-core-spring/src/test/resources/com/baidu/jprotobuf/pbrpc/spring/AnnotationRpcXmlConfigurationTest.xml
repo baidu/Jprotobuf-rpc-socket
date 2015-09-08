@@ -30,6 +30,7 @@
 	<bean id="rpcServerOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions">
 		<property name="acceptorThreads" value="1"></property>
 		<property name="workThreads" value="20"></property>
+		<property name="httpServerPort" value="8866"></property>
 	</bean>
 
 	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">

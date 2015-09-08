@@ -152,6 +152,7 @@ public class RpcServerOptions {
         this.keepAlive = options.keepAlive;
         this.acceptorThreads = options.acceptorThreads;
         this.workThreads = options.workThreads;
+        this.httpServerPort = options.httpServerPort;
     }
     
 

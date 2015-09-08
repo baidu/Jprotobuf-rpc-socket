@@ -183,10 +183,10 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
         
         String registerHost;
         if (StringUtils.isBlank(host)) {
-            prRpcServer.bind(new InetSocketAddress(servicePort));
+            prRpcServer.start(new InetSocketAddress(servicePort));
             registerHost = NetUtils.getLocalAddress().getHostAddress();
         } else {
-            prRpcServer.bind(new InetSocketAddress(host, servicePort));
+            prRpcServer.start(new InetSocketAddress(host, servicePort));
             registerHost = host;
         }
         
