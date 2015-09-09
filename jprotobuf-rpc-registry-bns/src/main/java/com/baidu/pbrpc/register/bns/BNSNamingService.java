@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -37,6 +39,11 @@ import com.baidu.noah.naming.BNSInstance;
  * @since 3.0.2
  */
 public class BNSNamingService implements NamingService, InitializingBean {
+    
+    /**
+     * log this class
+     */
+    protected static final Log LOGGER = LogFactory.getLog(BNSNamingService.class.getName());
 
     /**
      *  port split string
@@ -160,28 +167,37 @@ public class BNSNamingService implements NamingService, InitializingBean {
 
             RegisterInfo registerInfo = new RegisterInfo();
             registerInfo.setHost(ip);
-            registerInfo.setPort(buildRpcPort(portName, bnsInstance.getMultiPort()));
+            registerInfo.setPort(buildRpcPort(portName, bnsInstance.getMultiPort(), bnsInstance.getPort()));
             ret.add(registerInfo);
         }
 
         return ret;
     }
 
-    private int buildRpcPort(String portName, String multiPort) {
-        int result = -1;
+    /**
+     * get port value by port name, if port name not found, default port will return
+     * 
+     * @param portName name of port
+     * @param multiPort port string of name and port
+     * @param defaultProt default port if port name not found this port will return
+     * @return the port by port name
+     */
+    private int buildRpcPort(String portName, String multiPort, int defaultProt) {
         if (!StringUtils.isEmpty(portName) && !StringUtils.isEmpty(multiPort)) {
             String[] multiPorts = multiPort.split(multiPortsSplit);
             for (String mp : multiPorts) {
                 String[] ports = mp.split(portSplit);
                 if (ports.length == 2 && !StringUtils.isEmpty(ports[0])) {
                     if (ports[0].equals(portName)) {
-                        return StringUtils.toInt(ports[1], result); 
+                        return StringUtils.toInt(ports[1], defaultProt); 
                     }
+                } else {
+                    LOGGER.error("Detect invalid port setting, value is'" + mp + "'");
                 }
             }
         }
         
-        return result;
+        return defaultProt;
     }
 
 }
