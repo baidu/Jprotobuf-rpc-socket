@@ -61,4 +61,10 @@ public @interface HaRpcProxy {
      * try to connect to server on startup
      */
     boolean lookupStubOnStartup() default true;
+    
+    
+    /**
+     * open fail over feature
+     */
+    boolean enableFailOver() default true;
 }

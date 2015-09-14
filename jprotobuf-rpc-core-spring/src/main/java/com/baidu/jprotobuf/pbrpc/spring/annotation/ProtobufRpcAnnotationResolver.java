@@ -32,6 +32,7 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.DummySocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
@@ -219,6 +220,10 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         haRpcProxyFactoryBean.setNamingService(namingService);
         haRpcProxyFactoryBean.setServiceInterface(rpcProxy.serviceInterface());
         haRpcProxyFactoryBean.setLookupStubOnStartup(rpcProxy.lookupStubOnStartup());
+        if (!rpcProxy.enableFailOver()) {
+            haRpcProxyFactoryBean.setFailOverInterceptor(new DummySocketFailOverInterceptor());
+        }
+        
         haRpcProxyFactoryBean.afterPropertiesSet();
         
         haRpcClients.add(haRpcProxyFactoryBean);

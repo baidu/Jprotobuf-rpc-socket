@@ -22,6 +22,8 @@ import org.springframework.remoting.support.RemoteInvocationFactory;
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.HaProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 
 /**
@@ -53,9 +55,12 @@ public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> {
         this.remoteInvocationFactory =
                 (remoteInvocationFactory != null ? remoteInvocationFactory : new DefaultRemoteInvocationFactory());
     }
-    
-    /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.client.ha.HaProtobufRpcProxy#onBuildProtobufRpcProxy(com.baidu.jprotobuf.pbrpc.transport.RpcClient, java.lang.Class)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.HaProtobufRpcProxy#onBuildProtobufRpcProxy(com.baidu.jprotobuf.pbrpc.
+     * transport.RpcClient, java.lang.Class)
      */
     @Override
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
@@ -64,13 +69,18 @@ public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> {
         return protobufRpcProxyBean;
     }
 
-
     /**
      * @param rpcClient
      * @param interfaceClass
      */
     public HaProtobufRpcProxyBean(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService) {
         super(rpcClient, interfaceClass, namingService);
+    }
+    
+    public HaProtobufRpcProxyBean(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
+            NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory,
+            FailOverInterceptor failOverInterceptor) {
+        super(rpcClient, interfaceClass, namingService, loadBalanceStrategyFactory, failOverInterceptor);
     }
 
     /*

@@ -26,6 +26,8 @@ import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.util.Assert;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
@@ -36,8 +38,8 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
  * @author xiemalin
  * @since 2.17
  */
-public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBean<Object>, InitializingBean,
-        MethodInterceptor, DisposableBean {
+public class HaRpcProxyFactoryBean extends RpcClientOptions
+        implements FactoryBean<Object>, InitializingBean, MethodInterceptor, DisposableBean {
 
     private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
 
@@ -48,12 +50,15 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
     private RpcClient rpcClient;
 
     private NamingService namingService;
-    
-    
+
+    private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
+    private FailOverInterceptor failOverInterceptor;
+
     private boolean lookupStubOnStartup = true;
-    
+
     /**
      * get the lookupStubOnStartup
+     * 
      * @return the lookupStubOnStartup
      */
     public boolean isLookupStubOnStartup() {
@@ -62,13 +67,16 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
 
     /**
      * set lookupStubOnStartup value to lookupStubOnStartup
+     * 
      * @param lookupStubOnStartup the lookupStubOnStartup to set
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
+
     /**
      * set namingService value to namingService
+     * 
      * @param namingService the namingService to set
      */
     public void setNamingService(NamingService namingService) {
@@ -76,11 +84,11 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
     }
 
     /**
-     * Set the interface of the service to access. The interface must be
-     * suitable for the particular service and remoting strategy.
+     * Set the interface of the service to access. The interface must be suitable for the particular service and
+     * remoting strategy.
      * <p>
-     * Typically required to be able to create a suitable service proxy, but can
-     * also be optional if the lookup returns a typed proxy.
+     * Typically required to be able to create a suitable service proxy, but can also be optional if the lookup returns
+     * a typed proxy.
      */
     public void setServiceInterface(Class serviceInterface) {
         if (serviceInterface != null && !serviceInterface.isInterface()) {
@@ -123,23 +131,28 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(namingService, "property 'namingService' is null.");
-        
+
         rpcClient = new RpcClient(this);
         // 创建EchoService代理
-        pbrpcProxy = new HaProtobufRpcProxyBean<Object>(rpcClient, serviceInterface, namingService);
+        pbrpcProxy = new HaProtobufRpcProxyBean<Object>(rpcClient, serviceInterface, namingService,
+                namingServiceLoadBalanceStrategyFactory, failOverInterceptor);
         pbrpcProxy.setRemoteInvocationFactory(remoteInvocationFactory);
         pbrpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
         pbrpcProxy.proxy();
-        
+
         this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
      */
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -148,13 +161,16 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
 
     /**
      * set remoteInvocationFactory value to remoteInvocationFactory
+     * 
      * @param remoteInvocationFactory the remoteInvocationFactory to set
      */
     protected void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
         this.remoteInvocationFactory = remoteInvocationFactory;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.beans.factory.DisposableBean#destroy()
      */
     public void destroy() throws Exception {
@@ -165,6 +181,22 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions implements FactoryBe
             rpcClient.stop();
         }
     }
-
+    
+    /**
+     * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
+     * @param namingServiceLoadBalanceStrategyFactory the namingServiceLoadBalanceStrategyFactory to set
+     */
+    public void setNamingServiceLoadBalanceStrategyFactory(
+            NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory) {
+        this.namingServiceLoadBalanceStrategyFactory = namingServiceLoadBalanceStrategyFactory;
+    }
+    
+    /**
+     * set failOverInterceptor value to failOverInterceptor
+     * @param failOverInterceptor the failOverInterceptor to set
+     */
+    public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
+        this.failOverInterceptor = failOverInterceptor;
+    }
 
 }

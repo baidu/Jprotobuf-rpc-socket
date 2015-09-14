@@ -27,6 +27,8 @@ import io.netty.util.Timer;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,14 +42,14 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RpcClient extends Bootstrap {
 
     // 会话状态存储
-    private final Map<Long, RpcClientCallState> requestMap =
-            new ConcurrentHashMap<Long, RpcClientCallState>();
+    private final Map<Long, RpcClientCallState> requestMap = new ConcurrentHashMap<Long, RpcClientCallState>();
 
     private AtomicLong correlationId = new AtomicLong(1); // session标识
-    private Timer timer = new HashedWheelTimer(); // 初始化定时器
+    private static final Timer timer =
+            new HashedWheelTimer(Executors.defaultThreadFactory(), 100, TimeUnit.MILLISECONDS, 2048); // 初始化定时器
     private RpcClientOptions rpcClientOptions;
     private ChannelPool channelPool;
-    private NioEventLoopGroup workerGroup; 
+    private NioEventLoopGroup workerGroup;
 
     public RpcClient() {
         this(NioSocketChannel.class);
