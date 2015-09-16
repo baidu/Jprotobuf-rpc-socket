@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -41,15 +42,32 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RpcClient extends Bootstrap {
 
+    /**
+     * Tick count of each wheel instance for timer 
+     */
+    private static final int DEFAULT_TICKS_PER_WHEEL = 2048;
+
+    /**
+     * Tick duration for timer 
+     */
+    private static final int DEFAULT_TICK_DURATION = 100;
+
     // 会话状态存储
     private final Map<Long, RpcClientCallState> requestMap = new ConcurrentHashMap<Long, RpcClientCallState>();
 
     private AtomicLong correlationId = new AtomicLong(1); // session标识
-    private static final Timer timer =
-            new HashedWheelTimer(Executors.defaultThreadFactory(), 100, TimeUnit.MILLISECONDS, 2048); // 初始化定时器
+    private static Timer timer = createTimer(); // 初始化定时器
     private RpcClientOptions rpcClientOptions;
     private ChannelPool channelPool;
     private NioEventLoopGroup workerGroup;
+
+    private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger();
+
+    private static Timer createTimer() {
+        Timer timer = new HashedWheelTimer(Executors.defaultThreadFactory(), DEFAULT_TICK_DURATION,
+                TimeUnit.MILLISECONDS, DEFAULT_TICKS_PER_WHEEL);
+        return timer;
+    }
 
     public RpcClient() {
         this(NioSocketChannel.class);
@@ -77,6 +95,9 @@ public class RpcClient extends Bootstrap {
         this.option(ChannelOption.TCP_NODELAY, rpcClientOptions.getTcpNoDelay());
         this.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR,
                 new DefaultMessageSizeEstimator(rpcClientOptions.getReceiveBufferSize()));
+
+        // add count
+        INSTANCE_COUNT.incrementAndGet();
     }
 
     /**
@@ -158,8 +179,16 @@ public class RpcClient extends Bootstrap {
         if (channelPool != null) {
             channelPool.stop();
         }
-        if (timer != null) {
-            timer.stop();
+
+        // to check instance count
+        int count = INSTANCE_COUNT.decrementAndGet();
+        if (count == 0) { // no current instance count try to stop old
+            if (timer != null) {
+                timer.stop();
+
+                // reset timer
+                timer = createTimer(); // 初始化定时器
+            }
         }
     }
 
