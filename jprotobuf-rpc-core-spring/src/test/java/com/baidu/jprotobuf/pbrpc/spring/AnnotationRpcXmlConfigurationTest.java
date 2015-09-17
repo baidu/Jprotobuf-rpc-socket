@@ -15,8 +15,12 @@
  */
 package com.baidu.jprotobuf.pbrpc.spring;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.baidu.jprotobuf.pbrpc.EchoInfo;
+import com.baidu.jprotobuf.pbrpc.EchoService;
 
 /**
  * 
@@ -64,5 +68,27 @@ public class AnnotationRpcXmlConfigurationTest extends RpcXmlConfigurationTestBa
         
         // test ha client
         super.internalRpcRequestAndResponse(annotationEchoServiceClient.haEchoServiceOfPartialFailed);
+    }
+    
+    @Test
+    public void testHaRpcRequestWithTimeoutFailed() {
+
+        AnnotationEchoServiceClient annotationEchoServiceClient =
+                context.getBean("echoServiceClient", AnnotationEchoServiceClient.class);
+        
+        // test should throw exception and retry max times
+        try {
+            internalRpcRequestAndResponseTimeout(annotationEchoServiceClient.namingServiceOfTimeoutFailed);
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
+    }
+    
+    protected void internalRpcRequestAndResponseTimeout(EchoService echoService) {
+        EchoInfo echo = new EchoInfo();
+        echo.setMessage("world");
+
+        EchoInfo response = echoService.echoTimeout(echo);
+        Assert.assertEquals("hello:world", response.getMessage());
     }
 }

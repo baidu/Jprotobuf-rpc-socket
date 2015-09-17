@@ -41,7 +41,7 @@
 
 	<bean id="namingServiceOfPartialFailed" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
 		<constructor-arg>
-			<value>localhost:1030;localhost:1039;localhost:1033</value>
+			<value>localhost:1035;localhost:1029;localhost:1031</value>
 		</constructor-arg>
 	</bean>
 
@@ -67,4 +67,10 @@
 	</bean>
 
 	<bean id="myInterceptor" class="com.baidu.jprotobuf.pbrpc.spring.MyInterceptor"></bean>
+
+	<bean id="timeoutIngoredSocketFailOverInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.TimeoutIngoredSocketFailOverInterceptor">
+	</bean>
+
+
 </beans>

@@ -350,6 +350,12 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     // /---- MethodInterceptor implement
     public Object invoke(MethodInvocation invocation) throws Throwable {
+        int maxTry = loadBalanceStrategy.getTargets().size();
+        return invokeWithMaxTry(invocation, maxTry);
+
+    }
+    
+    public Object invokeWithMaxTry(MethodInvocation invocation, int maxTry) throws Throwable {
         String beanKey = elect(invocation);
         Object bean = targetBeans.get(beanKey);
         if (isFailOver()) { // support fail over
@@ -362,7 +368,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
             if (!isAvailable) {
                 failedTarget(bean, invocation, beanKey);
                 // using recursion to do fail over action
-                return invoke(invocation);
+                return invokeWithMaxTry(invocation, maxTry);
             }
         }
 
@@ -376,7 +382,11 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
                     LOGGER.log(Level.SEVERE,
                             "do failover action due to last access throws exception: " + t.getLocalizedMessage());
                     failedTarget(bean, invocation, beanKey);
-                    return invoke(invocation); // do fail over action
+                    maxTry--;
+                    if (maxTry < 1) { // reach the max try times
+                        throw t;
+                    }
+                    return invokeWithMaxTry(invocation, maxTry); // do fail over action
                 }
                 throw t;
             }

@@ -66,10 +66,10 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     };
 
     public void setUp(int threadSize, String requestData, String responseData) {
-        rpcServer = new RpcServer();
-        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
-        rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(PORT);
+//        rpcServer = new RpcServer();
+//        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
+//        rpcServer.registerService(echoServiceImpl);
+//        rpcServer.start(PORT);
 
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(threadSize);

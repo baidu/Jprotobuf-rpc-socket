@@ -17,6 +17,7 @@
 package com.baidu.jprotobuf.pbrpc;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
+import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
  * Echo service 
@@ -72,5 +73,13 @@ public class EchoServiceImpl {
     @ProtobufRPCService(serviceName = "echoService", methodName = "businessExceptionCall")
     public EchoInfo businessExceptionCall(EchoInfo info) {
         throw new RuntimeException("Throw business exception.");
+    }
+    
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echoTimeout", description ="echo测试服务")
+    public EchoInfo echoTimeout(EchoInfo info) {
+        SleepUtils.dummySleep(2000);
+        EchoInfo ret = new EchoInfo();
+        ret.setMessage("hello:" + info.getMessage());
+        return ret;
     }
 }

@@ -33,7 +33,7 @@ public class EchoServicePerformanceMain {
         System.out.println("-------------------jprotobuf-----------------------------");
         EchoServicePerformanceTest test =  new EchoServicePerformanceTest();
         
-        test.performanceOneTreadTest();
+/*        test.performanceOneTreadTest();
         test.tearDown();
         
         test.performanceOneTreadTest2();
@@ -52,7 +52,7 @@ public class EchoServicePerformanceMain {
         test.tearDown();
         
         test.performance20TreadsTestWithLongText();
-        test.tearDown();
+        test.tearDown();*/
         
         test.performance40TreadsTestWithLongText();
         test.tearDown();

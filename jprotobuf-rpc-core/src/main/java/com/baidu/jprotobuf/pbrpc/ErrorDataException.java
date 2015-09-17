@@ -81,6 +81,15 @@ public class ErrorDataException extends Exception {
     public ErrorDataException(String message, Throwable cause) {
         super(message, cause);
     }
+    
+    /**
+     * @param message
+     * @param cause
+     */
+    public ErrorDataException(String message, Throwable cause, int errorCode) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
 
     /**
      * @param message
@@ -90,10 +99,26 @@ public class ErrorDataException extends Exception {
     }
 
     /**
+     * @param message
+     */
+    public ErrorDataException(String message, int errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+    
+    /**
      * @param cause
      */
     public ErrorDataException(Throwable cause) {
         super(cause);
+    }
+    
+    /**
+     * @param cause
+     */
+    public ErrorDataException(Throwable cause, int errorCode) {
+        super(cause);
+        this.errorCode = errorCode;
     }
 
     

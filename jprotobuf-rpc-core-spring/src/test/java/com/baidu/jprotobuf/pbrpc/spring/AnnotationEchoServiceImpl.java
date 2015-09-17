@@ -31,4 +31,5 @@ import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
 @RpcExporter(port = "1031", rpcServerOptionsBeanName = "rpcServerOptions")
 public class AnnotationEchoServiceImpl extends EchoServiceImpl {
     
+
 }

@@ -19,11 +19,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
-
-
-
 
 /**
  * Socket fail over intercepter.
@@ -32,6 +31,11 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 2.16
  */
 public class SocketFailOverInterceptor implements FailOverInterceptor {
+
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(SocketFailOverInterceptor.class.getName());
 
     private Map<String, String> recoverServiceUrls;
 
@@ -47,9 +51,8 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baidu.rigel.service.lb.failover.FailOverInterceptor#isAvailable(java
-     * .lang.Object, java.lang.reflect.Method, java.lang.String)
+     * @see com.baidu.rigel.service.lb.failover.FailOverInterceptor#isAvailable(java .lang.Object,
+     * java.lang.reflect.Method, java.lang.String)
      */
     public boolean isAvailable(Object o, Method m, String beanKey) {
         return true;
@@ -58,9 +61,8 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baidu.rigel.service.lb.failover.FailOverInterceptor#isRecover(java
-     * .lang.Object, java.lang.reflect.Method, java.lang.String)
+     * @see com.baidu.rigel.service.lb.failover.FailOverInterceptor#isRecover(java .lang.Object,
+     * java.lang.reflect.Method, java.lang.String)
      */
     public boolean isRecover(Object o, Method m, String beanKey) {
         Host host = parseHost(beanKey);
@@ -72,6 +74,9 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
         try {
             socket = new Socket(host.host, host.port);
         } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Recover socket test for host '" + host.host + "' and port '" + host.port
+                    + "' failed. message:" + e.getMessage());
+
             return false;
         } finally {
             try {
@@ -79,6 +84,8 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
                     socket.close();
                 }
             } catch (IOException e) {
+                // need to care this exception
+                LOGGER.log(Level.FINEST, e.getMessage(), e.getCause());
             }
         }
 
@@ -88,9 +95,7 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baidu.rigel.service.lb.failover.FailOverInterceptor#isDoFailover(
-     * java.lang.Throwable, java.lang.String)
+     * @see com.baidu.rigel.service.lb.failover.FailOverInterceptor#isDoFailover( java.lang.Throwable, java.lang.String)
      */
     public boolean isDoFailover(Throwable t, String beanKey) {
         return true;

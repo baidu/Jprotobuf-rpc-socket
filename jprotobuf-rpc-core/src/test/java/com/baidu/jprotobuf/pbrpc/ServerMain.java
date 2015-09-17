@@ -29,6 +29,7 @@ public class ServerMain {
         
         RpcServerOptions rpcServerOptions = new RpcServerOptions();
         rpcServerOptions.setHttpServerPort(8866);
+        rpcServerOptions.setWorkThreads(50);
         
         RpcServer rpcServer = new RpcServer(rpcServerOptions);
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();

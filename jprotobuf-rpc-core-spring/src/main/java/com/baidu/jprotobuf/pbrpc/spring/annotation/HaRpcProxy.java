@@ -62,9 +62,9 @@ public @interface HaRpcProxy {
      */
     boolean lookupStubOnStartup() default true;
     
-    
+     
     /**
-     * open fail over feature
+     * failover interceptor bean name
      */
-    boolean enableFailOver() default true;
+    String failoverInteceptorBeanName() default "";
 }

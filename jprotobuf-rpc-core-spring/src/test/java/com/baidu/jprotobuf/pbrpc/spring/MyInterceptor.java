@@ -31,7 +31,7 @@ public class MyInterceptor implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation arg0) throws Throwable {
 
-        System.out.println(arg0.getMethod().getName());
+        System.out.println("inteceptor'" + MyInterceptor.class.getName() + "' =>" + arg0.getMethod().getName());
         return arg0.proceed();
     }
 

@@ -33,6 +33,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.DummySocketFailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
@@ -55,21 +56,21 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     protected static final Log LOGGER = LogFactory.getLog(ProtobufRpcAnnotationResolver.class);
 
     private List<RpcProxyFactoryBean> rpcClients = new ArrayList<RpcProxyFactoryBean>();
-    
+
     private List<HaRpcProxyFactoryBean> haRpcClients = new ArrayList<HaRpcProxyFactoryBean>();
 
     private Map<Integer, RpcServiceExporter> portMappingExpoters = new HashMap<Integer, RpcServiceExporter>();
-    
+
     /**
      * status to control start only once
      */
     private AtomicBoolean started = new AtomicBoolean(false);
-    
+
     private RegistryCenterService registryCenterService;
-    
 
     /**
      * set registryCenterService value to registryCenterService
+     * 
      * @param registryCenterService the registryCenterService to set
      */
     public void setRegistryCenterService(RegistryCenterService registryCenterService) {
@@ -79,29 +80,29 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtType(java.lang.annotation.Annotation
-     * , java.lang.Object, java.lang.String, org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtType(java.lang.annotation.
+     * Annotation , java.lang.Object, java.lang.String,
+     * org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
     @Override
     public Object annotationAtType(Annotation t, Object bean, String beanName,
             ConfigurableListableBeanFactory beanFactory) throws BeansException {
         if (t instanceof RpcExporter) {
             LOGGER.info("Annotation 'RpcExporter' for target '" + beanName + "' created");
-            
+
             // to fix AOP effective of target bean so instead of using beanFactory.getBean(beanName)
             parseRpcExporterAnnotation((RpcExporter) t, beanFactory, beanFactory.getBean(beanName));
         }
         return bean;
     }
-    
+
     private void parseRpcExporterAnnotation(RpcExporter rpcExporter, ConfigurableListableBeanFactory beanFactory,
             Object bean) {
 
         String port = parsePlaceholder(rpcExporter.port());
         // convert to integer and throw exception on error
         int intPort = Integer.valueOf(port);
-        
+
         String host = parsePlaceholder(rpcExporter.host());
 
         RpcServiceExporter rpcServiceExporter = portMappingExpoters.get(intPort);
@@ -126,7 +127,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             rpcServiceExporter.setRegistryCenterService(registryCenterService);
 
             portMappingExpoters.put(intPort, rpcServiceExporter);
-            
+
         }
 
         // do register service
@@ -136,9 +137,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         }
         registerServices.add(bean);
         rpcServiceExporter.setRegisterServices(registerServices);
-        
-        
-        
+
     }
 
     /*
@@ -184,7 +183,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         if (t instanceof HaRpcProxy) {
             try {
                 LOGGER.info("Annotation 'HaRpcProxy' on field '" + field.getName() + "' for target '" + beanName
@@ -200,10 +199,10 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
 
     private Object parseHaRpcProxyAnnotation(HaRpcProxy rpcProxy, ConfigurableListableBeanFactory beanFactory)
             throws Exception {
-        
+
         String namingServiceBeanName = parsePlaceholder(rpcProxy.namingServiceBeanName());
         NamingService namingService = beanFactory.getBean(namingServiceBeanName, NamingService.class);
-        
+
         // get RpcClientOptions
         String rpcClientOptionsBeanName = parsePlaceholder(rpcProxy.rpcClientOptionsBeanName());
 
@@ -214,20 +213,24 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             // if not exist throw exception
             rpcClientOptions = beanFactory.getBean(rpcClientOptionsBeanName, RpcClientOptions.class);
         }
-        
+
         HaRpcProxyFactoryBean haRpcProxyFactoryBean = new HaRpcProxyFactoryBean();
         haRpcProxyFactoryBean.copyFrom(rpcClientOptions);
         haRpcProxyFactoryBean.setNamingService(namingService);
         haRpcProxyFactoryBean.setServiceInterface(rpcProxy.serviceInterface());
         haRpcProxyFactoryBean.setLookupStubOnStartup(rpcProxy.lookupStubOnStartup());
-        if (!rpcProxy.enableFailOver()) {
-            haRpcProxyFactoryBean.setFailOverInterceptor(new DummySocketFailOverInterceptor());
+
+        String failoverInteceptorBeanName = parsePlaceholder(rpcProxy.failoverInteceptorBeanName());
+        if (!StringUtils.isBlank(failoverInteceptorBeanName)) {
+            FailOverInterceptor failOverInterceptor =
+                    beanFactory.getBean(failoverInteceptorBeanName, FailOverInterceptor.class);
+            haRpcProxyFactoryBean.setFailOverInterceptor(failOverInterceptor);
         }
-        
+
         haRpcProxyFactoryBean.afterPropertiesSet();
-        
+
         haRpcClients.add(haRpcProxyFactoryBean);
-        
+
         return haRpcProxyFactoryBean.getObject();
     }
 
@@ -248,7 +251,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         String port = parsePlaceholder(rpcProxy.port());
         // convert to integer and throw exception on error
         int intPort = Integer.valueOf(port);
-        
+
         String host = parsePlaceholder(rpcProxy.host());
 
         RpcProxyFactoryBean rpcProxyFactoryBean = new RpcProxyFactoryBean();
@@ -284,7 +287,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         if (t instanceof HaRpcProxy) {
             try {
                 LOGGER.info("Annotation 'HaRpcProxy' on method '" + method.getName() + "' for target '" + beanName
@@ -336,7 +339,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                 }
             }
         }
-        
+
         if (haRpcClients != null) {
             for (HaRpcProxyFactoryBean bean : haRpcClients) {
                 try {
@@ -346,7 +349,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                 }
             }
         }
-        
+
         if (portMappingExpoters != null) {
             Collection<RpcServiceExporter> exporters = portMappingExpoters.values();
             for (RpcServiceExporter rpcServiceExporter : exporters) {

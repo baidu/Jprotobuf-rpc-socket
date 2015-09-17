@@ -41,4 +41,9 @@ public class AnnotationEchoServiceClient {
     @HaRpcProxy(namingServiceBeanName = "namingServiceOfPartialFailed", serviceInterface = EchoService.class,
             lookupStubOnStartup = false)
     public EchoService haEchoServiceOfPartialFailed;
+    
+    
+    @HaRpcProxy(namingServiceBeanName = "namingService", serviceInterface = EchoService.class,
+            lookupStubOnStartup = false, failoverInteceptorBeanName = "timeoutIngoredSocketFailOverInterceptor")
+    public EchoService namingServiceOfTimeoutFailed;
 }
