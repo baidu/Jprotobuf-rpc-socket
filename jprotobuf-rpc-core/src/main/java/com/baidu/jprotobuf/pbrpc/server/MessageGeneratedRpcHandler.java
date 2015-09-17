@@ -19,6 +19,7 @@ package com.baidu.jprotobuf.pbrpc.server;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.google.protobuf.GeneratedMessage;
@@ -31,6 +32,16 @@ import com.google.protobuf.GeneratedMessage;
  */
 @SuppressWarnings({"unchecked"})
 public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(MessageGeneratedRpcHandler.class.getName());
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
@@ -82,7 +93,10 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
             retData.setAttachment(responseAttachment);
         }
 
+        long time = System.currentTimeMillis();
         ret = getMethod().invoke(getService(), param);
+        PERFORMANCE_LOGGER.info("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
+                + (System.currentTimeMillis() - time) + " ms");
 
         if (ret == null) {
             return retData;

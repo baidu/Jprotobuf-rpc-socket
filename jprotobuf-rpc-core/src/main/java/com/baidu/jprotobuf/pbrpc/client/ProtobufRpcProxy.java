@@ -50,6 +50,16 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(ProtobufRpcProxy.class.getName());
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
+
+    /**
      * key name for shared RPC channel
      * 
      * @see RpcChannel
@@ -57,8 +67,6 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private static final String SHARE_KEY = "___share_key";
 
     private Map<String, RpcMethodInfo> cachedRpcMethods = new HashMap<String, RpcMethodInfo>();
-
-    private static Logger LOG = Logger.getLogger(ProtobufRpcProxy.class.getName());
 
     /**
      * RPC client.
@@ -258,7 +266,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             try {
                 rpcChann.close();
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, e.getMessage(), e.getCause());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e.getCause());
             }
         }
 
@@ -270,6 +278,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+        long time = System.currentTimeMillis();
 
         ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
         if (protobufPRC == null) {
@@ -349,6 +359,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         if (data == null) {
             return null;
         }
+
+        PERFORMANCE_LOGGER.info("RPC client invoke method '" + method.getName() + "' time took:"
+                + (System.currentTimeMillis() - time) + " ms");
 
         return rpcMethodInfo.outputDecode(data);
     }

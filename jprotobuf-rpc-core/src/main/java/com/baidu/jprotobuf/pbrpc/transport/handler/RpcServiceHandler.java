@@ -58,11 +58,13 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
-        try {
-            RpcMeta rpcMeta = dataPackage.getRpcMeta();
-            String serviceName = rpcMeta.getRequest().getSerivceName();
-            String methodName = rpcMeta.getRequest().getMethodName();
+        long time = System.currentTimeMillis();
+        
+        RpcMeta rpcMeta = dataPackage.getRpcMeta();
+        String serviceName = rpcMeta.getRequest().getSerivceName();
+        String methodName = rpcMeta.getRequest().getMethodName();
 
+        try {
             RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
             if (handler == null) {
                 dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
@@ -92,7 +94,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                     if (targetException == null) {
                         targetException = e;
                     }
-                    
+
                     LOG.log(Level.SEVERE, targetException.getMessage(), targetException);
                     // catch business exception
                     dataPackage.errorCode(ErrorCodes.ST_ERROR);
@@ -114,6 +116,9 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
             exception.setErrorCode(ErrorCodes.ST_ERROR);
             exception.setRpcDataPackage(dataPackage);
             throw exception;
+        } finally {
+            LOG.info("RPC server invoke method '" + methodName + "' time took:"
+                    + (System.currentTimeMillis() - time) + " ms");
         }
     }
 
@@ -137,9 +142,8 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 
         if (data == null) {
             data = new RpcDataPackage();
-            data =
-                    data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
-                            cause.getCause().getMessage());
+            data = data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
+                    cause.getCause().getMessage());
         }
         ctx.fireChannelRead(data);
     }

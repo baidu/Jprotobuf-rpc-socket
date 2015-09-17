@@ -17,6 +17,7 @@
 package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
@@ -30,6 +31,15 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(AnnotationRpcHandler.class.getName());
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     private Codec inputCodec;
     private Codec outputCodec;
@@ -73,8 +83,12 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
                             param);
             retData.setAttachment(responseAttachment);
         }
-
+        
+        long time = System.currentTimeMillis();
         ret = getMethod().invoke(getService(), param);
+        PERFORMANCE_LOGGER.info("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
+                + (System.currentTimeMillis() - time) + " ms");
+        
         if (ret == null) {
             return retData;
         }
