@@ -33,6 +33,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
@@ -63,7 +64,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     
     private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
     
-    private FailOverInterceptor failOverInterceptor; 
+    private SocketFailOverInterceptor failOverInterceptor; 
 
     /**
      * status to control start only once
@@ -85,7 +86,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
      * set failOverInterceptor value to failOverInterceptor
      * @param failOverInterceptor the failOverInterceptor to set
      */
-    public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
+    public void setFailOverInterceptor(SocketFailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;
     }
 
@@ -243,8 +244,8 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
 
         String failoverInteceptorBeanName = parsePlaceholder(rpcProxy.failoverInteceptorBeanName());
         if (!StringUtils.isBlank(failoverInteceptorBeanName)) {
-            FailOverInterceptor failOverInterceptor =
-                    beanFactory.getBean(failoverInteceptorBeanName, FailOverInterceptor.class);
+            SocketFailOverInterceptor failOverInterceptor =
+                    beanFactory.getBean(failoverInteceptorBeanName, SocketFailOverInterceptor.class);
             haRpcProxyFactoryBean.setFailOverInterceptor(failOverInterceptor);
         } else {
             if (failOverInterceptor != null) {

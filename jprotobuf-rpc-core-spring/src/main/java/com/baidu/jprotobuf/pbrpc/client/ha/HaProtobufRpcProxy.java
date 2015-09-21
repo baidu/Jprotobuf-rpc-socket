@@ -35,7 +35,6 @@ import org.springframework.util.CollectionUtils;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
@@ -57,7 +56,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     private final Class<T> interfaceClass;
     private final NamingService namingService;
     private NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory;
-    private FailOverInterceptor failOverInterceptor;
+    private SocketFailOverInterceptor failOverInterceptor;
     private T proxyInstance;
 
     private boolean lookupStubOnStartup = true;
@@ -97,7 +96,8 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     }
 
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
-            NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory, FailOverInterceptor failOverInterceptor) {
+            NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory,
+            SocketFailOverInterceptor failOverInterceptor) {
         this.rpcClient = rpcClient;
         this.interfaceClass = interfaceClass;
         this.namingService = namingService;
@@ -180,10 +180,11 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             SocketFailOverInterceptor socketFailOverInterceptor = new SocketFailOverInterceptor();
             socketFailOverInterceptor.setRecoverServiceUrls(serverUrls);
             lbProxyBean.setFailOverInterceptor(socketFailOverInterceptor);
-        } else  {
+        } else {
+            failOverInterceptor.setRecoverServiceUrls(serverUrls);
             lbProxyBean.setFailOverInterceptor(failOverInterceptor);
         }
-        
+
         lbProxyBean.setTargetBeans(targetBeans);
         lbProxyBean.afterPropertiesSet();
 
@@ -254,7 +255,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
         // create a new instance
         doProxy(service, list);
-        
+
         try {
             // try to close old
             doClose(oldLbProxyBean, oldProtobufRpcProxyList);

@@ -26,7 +26,7 @@ import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.util.Assert;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
@@ -52,7 +52,7 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     private NamingService namingService;
 
     private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
-    private FailOverInterceptor failOverInterceptor;
+    private SocketFailOverInterceptor failOverInterceptor;
 
     private boolean lookupStubOnStartup = true;
 
@@ -195,7 +195,7 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
      * set failOverInterceptor value to failOverInterceptor
      * @param failOverInterceptor the failOverInterceptor to set
      */
-    public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
+    public void setFailOverInterceptor(SocketFailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;
     }
 

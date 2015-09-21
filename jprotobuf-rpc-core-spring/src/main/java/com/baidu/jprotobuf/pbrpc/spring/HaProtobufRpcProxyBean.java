@@ -22,7 +22,7 @@ import org.springframework.remoting.support.RemoteInvocationFactory;
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.HaProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 
@@ -79,7 +79,7 @@ public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> {
     
     public HaProtobufRpcProxyBean(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
             NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory,
-            FailOverInterceptor failOverInterceptor) {
+            SocketFailOverInterceptor failOverInterceptor) {
         super(rpcClient, interfaceClass, namingService, loadBalanceStrategyFactory, failOverInterceptor);
     }
 
