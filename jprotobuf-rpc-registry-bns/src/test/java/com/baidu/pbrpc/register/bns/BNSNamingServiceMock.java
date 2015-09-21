@@ -67,4 +67,5 @@ public class BNSNamingServiceMock extends BNSNamingService {
                 | (addrBytes[0] & 0xff);
         return addr;
     }
+    
 }

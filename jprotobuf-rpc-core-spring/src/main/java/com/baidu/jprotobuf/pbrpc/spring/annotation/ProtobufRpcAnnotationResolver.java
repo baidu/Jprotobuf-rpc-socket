@@ -32,8 +32,8 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.DummySocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
@@ -60,6 +60,10 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private List<HaRpcProxyFactoryBean> haRpcClients = new ArrayList<HaRpcProxyFactoryBean>();
 
     private Map<Integer, RpcServiceExporter> portMappingExpoters = new HashMap<Integer, RpcServiceExporter>();
+    
+    private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
+    
+    private FailOverInterceptor failOverInterceptor; 
 
     /**
      * status to control start only once
@@ -67,6 +71,23 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private AtomicBoolean started = new AtomicBoolean(false);
 
     private RegistryCenterService registryCenterService;
+    
+    /**
+     * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
+     * @param namingServiceLoadBalanceStrategyFactory the namingServiceLoadBalanceStrategyFactory to set
+     */
+    public void setNamingServiceLoadBalanceStrategyFactory(
+            NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory) {
+        this.namingServiceLoadBalanceStrategyFactory = namingServiceLoadBalanceStrategyFactory;
+    }
+    
+    /**
+     * set failOverInterceptor value to failOverInterceptor
+     * @param failOverInterceptor the failOverInterceptor to set
+     */
+    public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
+        this.failOverInterceptor = failOverInterceptor;
+    }
 
     /**
      * set registryCenterService value to registryCenterService
@@ -225,6 +246,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             FailOverInterceptor failOverInterceptor =
                     beanFactory.getBean(failoverInteceptorBeanName, FailOverInterceptor.class);
             haRpcProxyFactoryBean.setFailOverInterceptor(failOverInterceptor);
+        } else {
+            if (failOverInterceptor != null) {
+                haRpcProxyFactoryBean.setFailOverInterceptor(failOverInterceptor);
+            }
+        }
+        
+        if (namingServiceLoadBalanceStrategyFactory != null) {
+            haRpcProxyFactoryBean.setNamingServiceLoadBalanceStrategyFactory(namingServiceLoadBalanceStrategyFactory);
         }
 
         haRpcProxyFactoryBean.afterPropertiesSet();

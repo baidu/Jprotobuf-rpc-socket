@@ -17,8 +17,14 @@
 		class="com.baidu.jprotobuf.pbrpc.spring.annotation.CommonAnnotationBeanPostProcessor">
 		<property name="callback">
 			<bean
-				class="com.baidu.jprotobuf.pbrpc.spring.annotation.ProtobufRpcAnnotationResolver"></bean>
+				class="com.baidu.jprotobuf.pbrpc.spring.annotation.ProtobufRpcAnnotationResolver">
+				<property name="failOverInterceptor" ref="timeoutIngoredSocketFailOverInterceptor"></property>
+			</bean>
 		</property>
+	</bean>
+
+	<bean id="timeoutIngoredSocketFailOverInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.TimeoutIngoredSocketFailOverInterceptor">
 	</bean>
 
 	<bean id="namingService" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
@@ -67,10 +73,6 @@
 	</bean>
 
 	<bean id="myInterceptor" class="com.baidu.jprotobuf.pbrpc.spring.MyInterceptor"></bean>
-
-	<bean id="timeoutIngoredSocketFailOverInterceptor"
-		class="com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.TimeoutIngoredSocketFailOverInterceptor">
-	</bean>
 
 
 </beans>
