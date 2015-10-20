@@ -15,45 +15,15 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha.lb.failover;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.baidu.jprotobuf.pbrpc.ErrorDataException;
-import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
-
 /**
  * Dummy all failover action of timeout exception.
- *
+ * 
+ * 
+ * @deprecated Due to error spell pls using {@link TimeoutIgnoredSocketFailOverInterceptor} instead
  * @author xiemalin
  * @since 3.1.5
  */
-public class TimeoutIngoredSocketFailOverInterceptor extends SocketFailOverInterceptor {
+@Deprecated
+public class TimeoutIngoredSocketFailOverInterceptor extends TimeoutIgnoredSocketFailOverInterceptor {
     
-    /**
-     * log this class
-     */
-    protected static final Log LOGGER = LogFactory.getLog(TimeoutIngoredSocketFailOverInterceptor.class);
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor#isDoFailover(java.lang.Throwable,
-     * java.lang.String)
-     */
-    @Override
-    public boolean isDoFailover(Throwable t, String beanKey) {
-        if (t instanceof ErrorDataException) {
-            ErrorDataException errorDataException = (ErrorDataException) t;
-            int errorCode = errorDataException.getErrorCode();
-            // only not read time out error should do fail over action 
-            boolean doFailover = ErrorCodes.ST_READ_TIMEOUT != errorCode;
-            if (!doFailover && LOGGER.isInfoEnabled()) {
-                LOGGER.info("Found timeout exception of ErrorDataException in failoverinterceptor, "
-                        + "will not do failover now.");
-            }
-            return doFailover;
-        }
-        
-        return super.isDoFailover(t, beanKey);
-    }
 }

@@ -35,7 +35,7 @@ public class ClientMain {
         
         RpcClient rpcClient = new RpcClient(options);
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
-        pbrpcProxy.setPort(Integer.valueOf(args[0]));
+        pbrpcProxy.setPort(1031);
         pbrpcProxy.setHost("localhost");
         EchoService echoService = pbrpcProxy.proxy();
 

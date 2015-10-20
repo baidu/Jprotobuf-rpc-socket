@@ -32,7 +32,6 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
-import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
