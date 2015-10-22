@@ -12,6 +12,7 @@ Features:<br>
 - 支持多包拆分与合并功能
 - 支持多级超时设定，灵活控制请求超时时间
 - 支持RPC服务元数据动态生成，简单易用
+- 集成内置HTTP管理功能(3.1.1版本+)
 
 关联项目：
 [https://github.com/jhunters/jprotobuf](https://github.com/jhunters/jprotobuf "https://github.com/jhunters/jprotobuf")
@@ -27,21 +28,21 @@ Features:<br>
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core</artifactId>
-	<version>3.0.7</version>
+	<version>3.1.9</version>
 </dependency>
 
 <!-- 提供spring扩展 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core-spring</artifactId>
-	<version>3.0.7</version>
+	<version>3.1.9</version>
 </dependency>
 
 <!-- 基于redis实现服务注册，发现功能 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
-	<version>3.0.7</version>
+	<version>3.1.9</version>
 </dependency>
 
 ```
