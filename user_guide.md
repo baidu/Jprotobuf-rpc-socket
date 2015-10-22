@@ -398,4 +398,40 @@ public interface EchoService {
     EchoInfo echo(EchoInfo info);
 }
 ```
+#### HTTP查看支持 ####
+该功能在3.1.1版本之后支持配置方式如下：
+1.       代码方式
+```java 
+   RpcServerOptions rpcServerOptions = new RpcServerOptions();
+   rpcServerOptions.setHttpServerPort(8866);
+       
+    RpcServer rpcServer = new RpcServer(rpcServerOptions);
+ ```
+2.       Spring xml方式
+```xml 
+    <bean class="com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter">
+        <property name="servicePort" value="1031"></property>
+        <property name="registerServices">
+            <list>
+                <ref local="echoService" />
+            </list>
+        </property>
+        <property name="connectTimeout" value="1000"></property>
+        <property name="httpServerPort" value="8866"></property>
+    </bean>
+ ```
+ 
+3.       Spring注解方式
+```java
+@RpcExporter(port = "1033" , rpcServerOptionsBeanName = "rpcServerOptions")
+public class AnnotationEchoServiceImpl3 extends EchoServiceImpl {
+        
+             <bean id="rpcServerOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions">
+        <property name="acceptorThreads" value="1"></property>
+        <property name="workThreads" value="20"></property>
+        <property name="httpServerPort" value="8866"></property>
+        </bean>
+ ```java
+ 
+
 更多使用示例参见 单元测试com.baidu.jprotobuf.pbrpc.spring.AnnotationRpcXmlConfigurationTest
