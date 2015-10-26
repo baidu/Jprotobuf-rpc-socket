@@ -82,7 +82,7 @@ public class RpcClient extends Bootstrap {
     }
 
     public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
-        this.workerGroup = new NioEventLoopGroup();
+        this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getThreadPoolSize());
         this.group(workerGroup);
         this.channel(clientChannelClass);
         this.handler(new RpcClientPipelineinitializer(this));

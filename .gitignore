@@ -119,3 +119,9 @@ pom.xml.next
 release.properties
 
 
+/dependency/
+/log/
+
+.checkstyle
+*.classpath
+.project
