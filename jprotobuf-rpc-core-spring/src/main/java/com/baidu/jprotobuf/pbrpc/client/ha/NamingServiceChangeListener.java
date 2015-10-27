@@ -15,7 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

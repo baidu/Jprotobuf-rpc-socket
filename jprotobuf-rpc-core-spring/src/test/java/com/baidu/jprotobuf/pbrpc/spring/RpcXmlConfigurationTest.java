@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.EchoService;
  * @author xiemalin
  * @since 2.17
  */
-@Ignore
+
 public class RpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
 
 

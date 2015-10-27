@@ -22,7 +22,6 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.EchoInfo;
@@ -37,7 +36,7 @@ import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
  * @author xiemalin
  * @since 2.15
  */
-@Ignore
+
 public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
     /**

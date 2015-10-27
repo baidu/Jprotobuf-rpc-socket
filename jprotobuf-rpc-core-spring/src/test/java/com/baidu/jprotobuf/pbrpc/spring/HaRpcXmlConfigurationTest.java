@@ -29,7 +29,7 @@ import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
  * @author xiemalin
  * @since 2.17
  */
-@Ignore
+
 public class HaRpcXmlConfigurationTest extends RpcXmlConfigurationTestBase {
 
     private RpcServiceExporter rpcServiceExporter1;

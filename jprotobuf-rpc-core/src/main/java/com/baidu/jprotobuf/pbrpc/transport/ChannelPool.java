@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 /**
  * Adapter for netty channel. Used by Mcpack Netty Client {@link NettyClient}.
@@ -39,7 +40,10 @@ public class ChannelPool {
     public ChannelPool(RpcClient rpcClient, String host, int port) {
         this.clientConfig = rpcClient.getRpcClientOptions();
         objectFactory = new ChannelPoolObjectFactory(rpcClient, host, port);
-        pool = new GenericObjectPool<Connection>(objectFactory);
+        
+        GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+        config.setJmxEnabled(clientConfig.isJmxEnabled());
+        pool = new GenericObjectPool<Connection>(objectFactory, config);
         pool.setMaxIdle(clientConfig.getMaxIdleSize());
         pool.setMaxTotal(clientConfig.getThreadPoolSize());
         pool.setMaxWaitMillis(clientConfig.getMaxWait());

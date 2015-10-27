@@ -45,7 +45,7 @@ import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaService;
  * @author xiemalin
  * @since 2.1.0.0
  */
-@Ignore
+
 public class RpcProxyTest {
     
     private int servicePort = 1031;
@@ -118,7 +118,7 @@ public class RpcProxyTest {
         RpcServiceMetaList rpcServiceMetaInfo = rpcServiceMetaService.getRpcServiceMetaInfo();
 
         List<RpcServiceMeta> rpcServiceMetas = rpcServiceMetaInfo.getRpcServiceMetas();
-        Assert.assertEquals(5, rpcServiceMetas.size());
+        Assert.assertEquals(6, rpcServiceMetas.size());
 
         
     }

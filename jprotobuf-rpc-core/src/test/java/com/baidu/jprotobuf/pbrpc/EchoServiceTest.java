@@ -32,7 +32,7 @@ import junit.framework.Assert;
  * @see EchoService
  * 
  */
-@Ignore
+
 public class EchoServiceTest extends BaseEchoServiceTest {
     
     /* (non-Javadoc)

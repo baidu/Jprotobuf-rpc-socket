@@ -37,7 +37,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
  * @author xiemalin
  * @since 2.23
  */
-@Ignore
+
 public class BusinessExceptionTest extends BaseTest {
     
     private static final Logger LOG = Logger.getLogger(BusinessExceptionTest.class.getName());

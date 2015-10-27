@@ -39,7 +39,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 2.15
  */
-@Ignore
+
 public class HaEchoServiceTestBase {
     
     private static final Logger LOG = Logger.getLogger(HaEchoServiceTestBase.class.getName());

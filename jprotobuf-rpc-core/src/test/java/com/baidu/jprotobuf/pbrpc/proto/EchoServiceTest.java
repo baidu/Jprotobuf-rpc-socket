@@ -32,7 +32,7 @@ import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
  * @see EchoService
  * 
  */
-@Ignore
+
 public class EchoServiceTest extends BaseEchoServiceTest {
     
     /**

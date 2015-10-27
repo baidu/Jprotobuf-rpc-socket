@@ -28,7 +28,7 @@ import org.junit.Test;
  * @author xiemalin
  * @since 1.0
  */
-@Ignore
+
 public class RpcRequestMetaTest {
 
     @Test

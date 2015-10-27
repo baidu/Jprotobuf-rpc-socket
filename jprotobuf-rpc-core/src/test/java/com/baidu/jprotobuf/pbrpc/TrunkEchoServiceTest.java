@@ -26,7 +26,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
  * @author xiemalin
  * @since 2.10
  */
-@Ignore
+
 public class TrunkEchoServiceTest extends EchoServiceTest {
 
     /* (non-Javadoc)

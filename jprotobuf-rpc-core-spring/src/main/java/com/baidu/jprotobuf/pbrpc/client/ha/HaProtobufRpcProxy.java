@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -51,6 +52,8 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 2.16
  */
 public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implements MethodInterceptor {
+
+    private static final Logger LOG = Logger.getLogger(HaProtobufRpcProxy.class.getName());
 
     private final RpcClient rpcClient;
     private final Class<T> interfaceClass;
@@ -145,6 +148,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
      * @throws Exception
      */
     private void doProxy(String service, List<RegisterInfo> serversList) throws Exception {
+        long current = System.currentTimeMillis();
+        LOG.info("Begin: proxy service [" + service + "] for target servicesList of size:" + serversList.size());
+
         List<RegisterInfo> servers = serversList;
         if (CollectionUtils.isEmpty(servers)) {
             servers = new ArrayList<RegisterInfo>();
@@ -157,6 +163,10 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         Map<String, Object> targetBeans = new HashMap<String, Object>();
         for (RegisterInfo address : servers) {
             String serviceUrl = address.getHost() + ":" + address.getPort();
+            if (serverUrls.containsKey(serviceUrl)) {
+                continue;
+            }
+
             serverUrls.put(serviceUrl, serviceUrl);
 
             ProtobufRpcProxy<T> protobufRpcProxy = onBuildProtobufRpcProxy(rpcClient, interfaceClass);
@@ -169,6 +179,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             protobufRpcProxyList.add(protobufRpcProxy);
 
             targetBeans.put(serviceUrl, rpc);
+
         }
 
         if (loadBalanceStrategyFactory == null) {
@@ -191,6 +202,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         protobufRpcProxyListMap.put(service, protobufRpcProxyList);
         lbMap.put(service, lbProxyBean);
         instancesMap.put(service, (T) lbProxyBean.getObject());
+
+        LOG.info("Finished:proxy service [" + service + "] for target servicesList of size:" + serversList.size()
+                + " time took:" + (System.currentTimeMillis() - current) + " ms");
     }
 
     public void close() {
