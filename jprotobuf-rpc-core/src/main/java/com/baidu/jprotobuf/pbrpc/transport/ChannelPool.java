@@ -51,6 +51,7 @@ public class ChannelPool {
         pool.setMinEvictableIdleTimeMillis(clientConfig.getMinEvictableIdleTime());
         pool.setTestOnBorrow(clientConfig.isTestOnBorrow());
         pool.setTestOnReturn(clientConfig.isTestOnReturn());
+        pool.setLifo(clientConfig.isLifo());
     }
     
     public Connection getChannel() {

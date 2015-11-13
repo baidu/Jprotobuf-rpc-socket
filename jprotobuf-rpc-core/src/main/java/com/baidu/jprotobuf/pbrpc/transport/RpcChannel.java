@@ -60,7 +60,17 @@ public class RpcChannel {
         rpcClient.setChannelPool(channelPool);
     }
 
-    public void doTransport(RpcDataPackage rpcDataPackage, RpcCallback<RpcDataPackage> callback, long onceTalkTimeout) {
+    public Connection getConnection() {
+        Connection channel = channelPool.getChannel();
+        return channel;
+    }
+
+    public void releaseConnection(Connection connection) {
+        channelPool.returnChannel(connection);
+    }
+
+    public void doTransport(Connection connection, RpcDataPackage rpcDataPackage, RpcCallback<RpcDataPackage> callback,
+            long onceTalkTimeout) {
         if (rpcDataPackage == null) {
             throw new IllegalArgumentException("param 'rpcDataPackage' is null.");
         }
@@ -69,36 +79,33 @@ public class RpcChannel {
 
         // register timer
         Timeout timeout =
-                rpcClient.getTimer().newTimeout(
-                        new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient,
-                                onceTalkTimeout, TimeUnit.MILLISECONDS), onceTalkTimeout, TimeUnit.MILLISECONDS);
+                rpcClient.getTimer()
+                        .newTimeout(
+                                new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient,
+                                        onceTalkTimeout, TimeUnit.MILLISECONDS),
+                                onceTalkTimeout, TimeUnit.MILLISECONDS);
 
         RpcClientCallState state = new RpcClientCallState(callback, rpcDataPackage, timeout);
 
-        Connection channel = channelPool.getChannel();
-        try {
-            Long correlationId = state.getDataPackage().getRpcMeta().getCorrelationId();
-            rpcClient.registerPendingRequest(correlationId, state);
+        Long correlationId = state.getDataPackage().getRpcMeta().getCorrelationId();
+        rpcClient.registerPendingRequest(correlationId, state);
 
-            if (!channel.getFuture().isSuccess()) {
-                try {
-                    channel.produceRequest(state);
-                } catch (IllegalStateException e) {
-                    RpcClientCallState callState = rpcClient.removePendingRequest(correlationId);
-                    if (callState != null) {
-                        callState.handleFailure(e.getMessage());
-                        LOG.log(Level.FINE, "id:" + correlationId + " is put in the queue");
-                    }
+        if (!connection.getFuture().isSuccess()) {
+            try {
+                connection.produceRequest(state);
+            } catch (IllegalStateException e) {
+                RpcClientCallState callState = rpcClient.removePendingRequest(correlationId);
+                if (callState != null) {
+                    callState.handleFailure(e.getMessage());
+                    LOG.log(Level.FINE, "id:" + correlationId + " is put in the queue");
                 }
-            } else {
-                channel.getFuture().channel().writeAndFlush(state.getDataPackage());
             }
-
-            long callMethodEnd = System.currentTimeMillis();
-            LOG.log(Level.FINE, "profiling callMethod cost " + (callMethodEnd - callMethodStart) + "ms");
-        } finally {
-            channelPool.returnChannel(channel);
+        } else {
+            connection.getFuture().channel().writeAndFlush(state.getDataPackage());
         }
+
+        long callMethodEnd = System.currentTimeMillis();
+        LOG.log(Level.FINE, "profiling callMethod cost " + (callMethodEnd - callMethodStart) + "ms");
 
     }
 

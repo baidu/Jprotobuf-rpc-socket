@@ -41,7 +41,9 @@ public class RpcClientOptions {
     private long minEvictableIdleTime = 1000L * 60L * 2;
     private long maxWait = 2000L; // max wait time in milliseconds for pool available
     
-    private boolean shareThreadPoolUnderEachProxy = true; // share a thread pool under each rpc proxy
+    private boolean lifo = false;
+    
+    private boolean shareThreadPoolUnderEachProxy = false; // share a thread pool under each rpc proxy
 
     private boolean testOnBorrow = true;
     private boolean testOnReturn = false;
@@ -77,6 +79,7 @@ public class RpcClientOptions {
         this.testOnReturn = options.testOnReturn;
         this.shareThreadPoolUnderEachProxy = options.shareThreadPoolUnderEachProxy;
         this.jmxEnabled = options.jmxEnabled;
+        this.lifo = options.lifo;
     }
 
     /**
@@ -376,4 +379,19 @@ public class RpcClientOptions {
         this.jmxEnabled = jmxEnabled;
     }
     
+    /**
+     * set lifo value to lifo
+     * @param lifo the lifo to set
+     */
+    public void setLifo(boolean lifo) {
+        this.lifo = lifo;
+    }
+    
+    /**
+     * get the lifo
+     * @return the lifo
+     */
+    public boolean isLifo() {
+        return lifo;
+    }
 }
