@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.client.ServiceUrlAccessible;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
@@ -36,17 +37,6 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(SocketFailOverInterceptor.class.getName());
-
-    private Map<String, String> recoverServiceUrls;
-
-    /**
-     * format as: localhost:80
-     * 
-     * @param recoverServiceUrls
-     */
-    public void setRecoverServiceUrls(Map<String, String> recoverServiceUrls) {
-        this.recoverServiceUrls = recoverServiceUrls;
-    }
 
     /*
      * (non-Javadoc)
@@ -65,7 +55,15 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
      * java.lang.reflect.Method, java.lang.String)
      */
     public boolean isRecover(Object o, Method m, String beanKey) {
-        Host host = parseHost(beanKey);
+        if (!(o instanceof ServiceUrlAccessible)) {
+            LOGGER.log(Level.SEVERE, "Invalid target object to recover, should be implements '"
+                    + ServiceUrlAccessible.class.getName() + "'");
+            return false;
+        }
+        
+        String serviceUrl = ((ServiceUrlAccessible) o).getServiceUrl();
+
+        Host host = parseHost(serviceUrl);
         if (host == null) {
             return false;
         }
@@ -101,16 +99,12 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
         return true;
     }
 
-    protected Host parseHost(String beanKey) {
-        if (recoverServiceUrls == null) {
-            return null;
-        }
-        String string = recoverServiceUrls.get(beanKey);
-        if (StringUtils.isBlank(string)) {
+    protected Host parseHost(String serviceUrl) {
+        if (StringUtils.isBlank(serviceUrl)) {
             return null;
         }
 
-        String[] splits = string.split(":");
+        String[] splits = serviceUrl.split(":");
         if (splits == null || splits.length != 2) {
             return null;
         }

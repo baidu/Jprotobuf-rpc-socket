@@ -26,7 +26,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @since 1.0
  * @see EchoService
  */
-public class EchoInfo {
+public class EchoInfo { 
     
     @Protobuf(description = "Echo消息内容")
     private String message;

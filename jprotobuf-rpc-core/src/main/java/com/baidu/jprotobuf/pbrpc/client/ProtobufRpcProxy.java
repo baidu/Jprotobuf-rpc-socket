@@ -28,12 +28,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
+import com.baidu.jprotobuf.pbrpc.transport.Connection;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
@@ -67,7 +69,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private static final String SHARE_KEY = "___share_key";
 
     private Map<String, RpcMethodInfo> cachedRpcMethods = new HashMap<String, RpcMethodInfo>();
-
+    
     /**
      * RPC client.
      */
@@ -82,6 +84,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private T instance;
 
     private ServiceLocatorCallback serviceLocatorCallback;
+    
+    private String serviceUrl;
 
     /**
      * set serviceLocatorCallback value to serviceLocatorCallback
@@ -242,6 +246,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     rpcChannelMap.put(channelKey, rpcChannel);
                 }
 
+                serviceUrl = eHost + ":" + ePort;
             }
         }
 
@@ -251,7 +256,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     "This no protobufRpc method in interface class:" + interfaceClass.getName());
         }
 
-        instance = ProxyFactory.createProxy(interfaceClass, this);
+        Class[] clazz = { interfaceClass, ServiceUrlAccessible.class };
+        instance = ProxyFactory.createProxy(clazz, interfaceClass.getClassLoader(), this);
         return instance;
     }
 
@@ -278,6 +284,14 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        
+        String mName = method.getName();
+        if ("getServiceUrl".equals(mName)) {
+            
+            // return directly from local due to call ServiceUrlAccessible
+            return serviceUrl;
+        }
+        
 
         long time = System.currentTimeMillis();
 
@@ -290,7 +304,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         String serviceName = protobufPRC.serviceName();
         String methodName = protobufPRC.methodName();
         if (StringUtils.isEmpty(methodName)) {
-            methodName = method.getName();
+            methodName = mName;
         }
         String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         RpcMethodInfo rpcMethodInfo = cachedRpcMethods.get(methodSignature);
@@ -320,18 +334,24 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             throw new RuntimeException("No rpcChannel bind with serviceSignature '" + channelKey + "'");
         }
 
-        rpcChannel.doTransport(rpcDataPackage, callback, onceTalkTimeout);
-
-        if (!callback.isDone()) {
-            synchronized (callback) {
-                while (!callback.isDone()) {
-                    try {
-                        callback.wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+        Connection connection = rpcChannel.getConnection();
+        
+        try {
+            rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
+            
+            if (!callback.isDone()) {
+                synchronized (callback) {
+                    while (!callback.isDone()) {
+                        try {
+                            callback.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }
             }
+        } finally {
+            rpcChannel.releaseConnection(connection);
         }
 
         RpcDataPackage message = callback.getMessage();

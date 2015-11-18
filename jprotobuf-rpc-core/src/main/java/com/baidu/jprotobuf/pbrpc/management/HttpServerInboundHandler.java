@@ -58,10 +58,13 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
 
     private Map<String, Object> responseMapping;
 
+    private ServerStatus serverStatus;
+
     public HttpServerInboundHandler(RpcServer rpcServer) {
         super();
         responseMapping = new HashMap<String, Object>();
-        responseMapping.put(STATUS_URI, new ServerStatus(rpcServer));
+        serverStatus = new ServerStatus(rpcServer);
+        responseMapping.put(STATUS_URI, serverStatus);
     }
 
     /*
@@ -110,5 +113,15 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         ctx.close();
+    }
+
+    /**
+     * 
+     */
+    public void close() {
+        if (serverStatus != null) {
+            serverStatus.close();
+        }
+        
     }
 }

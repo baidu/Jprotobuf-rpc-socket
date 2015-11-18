@@ -23,7 +23,17 @@ import static com.baidu.jprotobuf.pbrpc.management.HttpConstants.LINE_BREAK;
 import static com.baidu.jprotobuf.pbrpc.management.HttpConstants.PRE_ENDS;
 import static com.baidu.jprotobuf.pbrpc.management.HttpConstants.PRE_STARTS;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.baidu.jprotobuf.pbrpc.meta.MetaExportHelper;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMeta;
@@ -53,6 +63,29 @@ public class ServerStatus {
     private long startTime;
 
     private RpcServer rpcServer;
+    
+    private transient boolean close = false;
+
+    public static final ConcurrentHashMap<String, AtomicLong> REQUEST_COUNTS =
+            new ConcurrentHashMap<String, AtomicLong>();
+    
+    public static final BlockingQueue<RequestInfo> ASYNC_REQUEST = new LinkedBlockingQueue<ServerStatus.RequestInfo>();
+    
+    private static ExecutorService es;
+
+    public static void incr(String serviceSignature, long timetook) {
+        
+        ASYNC_REQUEST.add(new RequestInfo(timetook, serviceSignature));
+    }
+    
+    private static void doIncr(RequestInfo requestInfo) {
+        AtomicLong newOne = new AtomicLong();
+        AtomicLong oldOne = REQUEST_COUNTS.putIfAbsent(requestInfo.signature, newOne);
+        if (oldOne != null) {
+            newOne = oldOne;
+        }
+        newOne.incrementAndGet();
+    }
 
     public ServerStatus(RpcServer rpcServer) {
         super();
@@ -62,6 +95,23 @@ public class ServerStatus {
         port = rpcServer.getInetSocketAddress().getPort();
         httpPort = rpcServer.getRpcServerOptions().getHttpServerPort();
 
+        es = Executors.newSingleThreadExecutor();
+        
+        es.execute(new Runnable() {
+            
+            @Override
+            public void run() {
+                while (!close) {
+                    
+                    try {
+                        RequestInfo requestInfo = ASYNC_REQUEST.take();
+                        doIncr(requestInfo);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                
+            }
+        });
     }
 
     /*
@@ -87,7 +137,7 @@ public class ServerStatus {
         ret.append(rpcServer.getRpcServerOptions());
 
         ret.append(LINE_BREAK).append(LINE_BREAK);
-        
+
         RpcServiceMetaList exportRPCMeta = MetaExportHelper.exportRPCMeta(port);
 
         List<RpcServiceMeta> metaList = exportRPCMeta.getRpcServiceMetas();
@@ -118,6 +168,18 @@ public class ServerStatus {
         ret.append(PRE_ENDS);
         ret.append(HTML_TAIL);
 
+        ret.append("--------------Request Info ----------------").append(LINE_BREAK);
+        Map<String, AtomicLong> copy = new HashMap<String, AtomicLong>(REQUEST_COUNTS);
+        Iterator<Entry<String, AtomicLong>> iterator = copy.entrySet().iterator();
+        ret.append("<table><tr><td>service</td><td>request count</td></tr>");
+        while (iterator.hasNext()) {
+            Entry<String, AtomicLong> next = iterator.next();
+            ret.append("<tr>");
+            ret.append("<td>").append(next.getKey()).append("</td>");
+            ret.append("<td>").append(next.getValue()).append("</td>");
+            ret.append("</tr>");
+        }
+        ret.append("</table>");
         return ret.toString();
     }
 
@@ -132,5 +194,29 @@ public class ServerStatus {
         ret.append(days).append(" days ").append(hours).append(" hours ").append(seconds).append(" seconds");
 
         return ret.toString();
+    }
+    
+    private static class RequestInfo {
+        private long took;
+        private String signature;
+        public RequestInfo(long took, String signature) {
+            super();
+            this.took = took;
+            this.signature = signature;
+        }
+        
+        
+    }
+
+    /**
+     * 
+     */
+    public void close() {
+        close = true;
+        
+        if (es != null) {
+            es.shutdown();
+        }
+        
     }
 }

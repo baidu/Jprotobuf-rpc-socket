@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
+import com.baidu.jprotobuf.pbrpc.management.ServerStatus;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 
 /**
  * RPC handler for Jprotobuf annotation.
@@ -43,6 +45,8 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
 
     private Codec inputCodec;
     private Codec outputCodec;
+    
+    private String serviceSignature;
 
     /**
      * @param method
@@ -56,6 +60,8 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
         if (getOutputClass() != null) {
             outputCodec = ProtobufProxy.create(getOutputClass());
         }
+        
+        serviceSignature = ServiceSignatureUtils.makeSignature(getServiceName(), getMethodName());
 
     }
 
@@ -86,8 +92,11 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
         
         long time = System.currentTimeMillis();
         ret = getMethod().invoke(getService(), param);
+        long took =  (System.currentTimeMillis() - time);
         PERFORMANCE_LOGGER.info("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
-                + (System.currentTimeMillis() - time) + " ms");
+                + took + " ms");
+        
+        ServerStatus.incr(serviceSignature, took);
         
         if (ret == null) {
             return retData;

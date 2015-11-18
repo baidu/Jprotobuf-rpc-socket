@@ -55,6 +55,8 @@ public class HttpServer {
     private AtomicBoolean stop = new AtomicBoolean(false);
 
     private RpcServer rpcServer;
+    
+    private HttpServerInboundHandler handler;
 
     /**
      * 
@@ -63,6 +65,8 @@ public class HttpServer {
         this.rpcServer = rpcServer;
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
+        
+        handler = new HttpServerInboundHandler(rpcServer);
     }
 
     public void start(int port) {
@@ -76,7 +80,7 @@ public class HttpServer {
                         ch.pipeline().addLast(new HttpResponseEncoder());
                         // server端接收到的是httpRequest，所以要使用HttpRequestDecoder进行解码
                         ch.pipeline().addLast(new HttpRequestDecoder());
-                        ch.pipeline().addLast(new HttpServerInboundHandler(rpcServer));
+                        ch.pipeline().addLast(handler);
                     }
                 }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
@@ -113,6 +117,10 @@ public class HttpServer {
 
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
+        
+        if (handler != null) {
+            handler.close();
+        }
     }
 
 }

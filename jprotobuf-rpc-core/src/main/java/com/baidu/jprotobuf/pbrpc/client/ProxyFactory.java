@@ -36,8 +36,7 @@ public class ProxyFactory {
      * @param handler invocation handler
      * @return proxied object.
      */
-    public static <T> T createProxy(Class<T> type, InvocationHandler handler) {
-        Class[] clazz = { type };
-        return (T) Proxy.newProxyInstance(type.getClassLoader(), clazz, handler);
+    public static <T> T createProxy(Class[] clazz, ClassLoader classLoader, InvocationHandler handler) {
+        return (T) Proxy.newProxyInstance(classLoader, clazz, handler);
     }
 }

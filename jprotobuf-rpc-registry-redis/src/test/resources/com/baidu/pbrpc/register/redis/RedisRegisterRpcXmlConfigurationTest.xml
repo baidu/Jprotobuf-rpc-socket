@@ -10,12 +10,25 @@
             http://www.springframework.org/schema/util 
             http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-
-
-	<context:component-scan base-package="com.baidu.jprotobuf.pbrpc.spring">
+	<context:component-scan base-package="com.baidu.jprotobuf.pbrpc.spring.server">
 	</context:component-scan>
-	
-	<alias name="namingService" alias="namingServiceOfPartialFailed"/>
+
+
+	<bean id="namingServiceOfPartialFailed" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
+		<constructor-arg>
+			<value>localhost:1035;localhost:1029;localhost:1031</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="rpcServerOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions">
+		<property name="acceptorThreads" value="1"></property>
+		<property name="workThreads" value="20"></property>
+		<property name="httpServerPort" value="8866"></property>
+	</bean>
+
+	<bean id="timeoutIngoredSocketFailOverInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.TimeoutIngoredSocketFailOverInterceptor">
+	</bean>
 
 	<bean id="namingService" class="com.baidu.pbrpc.register.redis.RedisRegistryService">
 		<constructor-arg>
@@ -31,15 +44,27 @@
 		<property name="expirePeriod" value="3000"></property>
 	</bean>
 
+	<bean id="redisClient" class="com.baidu.pbrpc.register.redis.RedisClient">
+		<property name="redisServer" value="localhost"></property>
+		<property name="port" value="6379"></property>
+		<property name="testOnBorrow" value="true"></property>
+		<property name="maxWait" value="2000"></property>
+	</bean>
+
 	<bean
 		class="com.baidu.jprotobuf.pbrpc.spring.annotation.CommonAnnotationBeanPostProcessor">
 		<property name="callback">
 			<bean
 				class="com.baidu.jprotobuf.pbrpc.spring.annotation.ProtobufRpcAnnotationResolver">
 				<property name="registryCenterService" ref="namingService"></property>
+				<property name="compiler" ref="redisCacheableJdkCompiler"></property>
 			</bean>
-
 		</property>
+	</bean>
+
+	<bean id="redisCacheableJdkCompiler" class="com.baidu.pbrpc.utils.RedisCacheableJdkCompiler">
+		<property name="redisClient" ref="redisClient"></property>
+		<property name="expireTime" value="300"></property>
 	</bean>
 
 	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">

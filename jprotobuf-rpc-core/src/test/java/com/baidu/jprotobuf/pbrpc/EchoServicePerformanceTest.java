@@ -35,6 +35,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 import junit.framework.Assert;
 
@@ -55,7 +56,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 100000000;
+    int totalRequestSize = 10000;
 
     Runnable runnable = new Runnable() {
 
@@ -66,15 +67,18 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     };
 
     public void setUp(int threadSize, String requestData, String responseData) {
-//        rpcServer = new RpcServer();
-//        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
-//        rpcServer.registerService(echoServiceImpl);
-//        rpcServer.start(PORT);
+        RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setHttpServerPort(8866);
+        rpcServer = new RpcServer(rpcServerOptions);
+        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
+        rpcServer.registerService(echoServiceImpl);
+        rpcServer.start(PORT);
 
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(threadSize);
         options.setMaxIdleSize(threadSize);
         options.setMaxWait(1000);
+        options.setMaxIdleSize(threadSize);
 
         rpcClient = new RpcClient(options);
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);

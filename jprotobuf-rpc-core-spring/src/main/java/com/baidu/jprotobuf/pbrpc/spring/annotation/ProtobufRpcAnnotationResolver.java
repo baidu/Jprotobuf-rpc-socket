@@ -29,8 +29,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
+import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
@@ -41,6 +43,7 @@ import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 
 /**
  * Supports annotation resolver for {@link RpcProxy} and {@link RpcExporter}
@@ -48,7 +51,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @author xiemalin
  * @since 2.17
  */
-public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallback {
+public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallback implements InitializingBean {
 
     /**
      * log this class
@@ -60,10 +63,12 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private List<HaRpcProxyFactoryBean> haRpcClients = new ArrayList<HaRpcProxyFactoryBean>();
 
     private Map<Integer, RpcServiceExporter> portMappingExpoters = new HashMap<Integer, RpcServiceExporter>();
-    
+
     private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
-    
-    private SocketFailOverInterceptor failOverInterceptor; 
+
+    private SocketFailOverInterceptor failOverInterceptor;
+
+    private Compiler compiler;
 
     /**
      * status to control start only once
@@ -71,18 +76,20 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private AtomicBoolean started = new AtomicBoolean(false);
 
     private RegistryCenterService registryCenterService;
-    
+
     /**
      * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
+     * 
      * @param namingServiceLoadBalanceStrategyFactory the namingServiceLoadBalanceStrategyFactory to set
      */
     public void setNamingServiceLoadBalanceStrategyFactory(
             NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory) {
         this.namingServiceLoadBalanceStrategyFactory = namingServiceLoadBalanceStrategyFactory;
     }
-    
+
     /**
      * set failOverInterceptor value to failOverInterceptor
+     * 
      * @param failOverInterceptor the failOverInterceptor to set
      */
     public void setFailOverInterceptor(SocketFailOverInterceptor failOverInterceptor) {
@@ -101,7 +108,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtType(java.lang.annotation.
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback# annotationAtType(java.lang.annotation.
      * Annotation , java.lang.Object, java.lang.String,
      * org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
@@ -111,7 +118,8 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         if (t instanceof RpcExporter) {
             LOGGER.info("Annotation 'RpcExporter' for target '" + beanName + "' created");
 
-            // to fix AOP effective of target bean so instead of using beanFactory.getBean(beanName)
+            // to fix AOP effective of target bean so instead of using
+            // beanFactory.getBean(beanName)
             parseRpcExporterAnnotation((RpcExporter) t, beanFactory, beanFactory.getBean(beanName));
         }
         return bean;
@@ -164,8 +172,8 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtTypeAfterStarted(java.lang.
-     * annotation.Annotation, java.lang.Object, java.lang.String,
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#
+     * annotationAtTypeAfterStarted(java.lang. annotation.Annotation, java.lang.Object, java.lang.String,
      * org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
     @Override
@@ -188,8 +196,9 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtField(java.lang.annotation.
-     * Annotation, java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues,
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#
+     * annotationAtField(java.lang.annotation. Annotation, java.lang.Object, java.lang.String,
+     * org.springframework.beans.PropertyValues,
      * org.springframework.beans.factory.config.ConfigurableListableBeanFactory, java.lang.reflect.Field)
      */
     @Override
@@ -251,7 +260,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                 haRpcProxyFactoryBean.setFailOverInterceptor(failOverInterceptor);
             }
         }
-        
+
         if (namingServiceLoadBalanceStrategyFactory != null) {
             haRpcProxyFactoryBean.setNamingServiceLoadBalanceStrategyFactory(namingServiceLoadBalanceStrategyFactory);
         }
@@ -299,9 +308,9 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#annotationAtMethod(java.lang.annotation.
-     * Annotation, java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues,
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#
+     * annotationAtMethod(java.lang.annotation. Annotation, java.lang.Object, java.lang.String,
+     * org.springframework.beans.PropertyValues,
      * org.springframework.beans.factory.config.ConfigurableListableBeanFactory, java.lang.reflect.Method)
      */
     @Override
@@ -332,7 +341,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#getTypeAnnotation()
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback# getTypeAnnotation()
      */
     @Override
     public Class<? extends Annotation> getTypeAnnotation() {
@@ -342,7 +351,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#getMethodFieldAnnotation()
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback# getMethodFieldAnnotation()
      */
     @Override
     public List<Class<? extends Annotation>> getMethodFieldAnnotation() {
@@ -355,7 +364,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     /*
      * (non-Javadoc)
      * 
-     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#destroy()
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback# destroy()
      */
     @Override
     public void destroy() throws Exception {
@@ -388,6 +397,28 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                     LOGGER.fatal(e.getMessage(), e.getCause());
                 }
             }
+        }
+
+    }
+
+    /**
+     * set compiler value to compiler
+     * 
+     * @param compiler the compiler to set
+     */
+    public void setCompiler(Compiler compiler) {
+        this.compiler = compiler;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (compiler != null) {
+            JDKCompilerHelper.setCompiler(compiler);
         }
 
     }

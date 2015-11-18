@@ -189,10 +189,8 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
         if (failOverInterceptor == null) {
             SocketFailOverInterceptor socketFailOverInterceptor = new SocketFailOverInterceptor();
-            socketFailOverInterceptor.setRecoverServiceUrls(serverUrls);
             lbProxyBean.setFailOverInterceptor(socketFailOverInterceptor);
         } else {
-            failOverInterceptor.setRecoverServiceUrls(serverUrls);
             lbProxyBean.setFailOverInterceptor(failOverInterceptor);
         }
 
