@@ -149,12 +149,11 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
      */
     private void doProxy(String service, List<RegisterInfo> serversList) throws Exception {
         long current = System.currentTimeMillis();
-        LOG.info("Begin: proxy service [" + service + "] for target servicesList of size:" + serversList.size());
-
         List<RegisterInfo> servers = serversList;
         if (CollectionUtils.isEmpty(servers)) {
             servers = new ArrayList<RegisterInfo>();
         }
+        LOG.info("Begin: proxy service [" + service + "] for target servicesList of size:" + servers.size());
 
         LoadBalanceProxyFactoryBean lbProxyBean = new LoadBalanceProxyFactoryBean();
         lbProxyBean.setServiceInterface(interfaceClass);
