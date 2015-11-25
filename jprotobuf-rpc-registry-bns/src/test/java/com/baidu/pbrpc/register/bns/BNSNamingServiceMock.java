@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.baidu.noah.naming.BNSInstance;
+import com.baidu.driver4j.bns.Instance;
 
 /**
  * Mock class for {@link BNSNamingService}
@@ -36,15 +36,15 @@ public class BNSNamingServiceMock extends BNSNamingService {
      * @see com.baidu.pbrpc.register.bns.BNSNamingService#doGetInstanceList()
      */
     @Override
-    protected List<BNSInstance> doGetInstanceList() {
+    protected List<Instance> doGetInstanceList() {
 
-        List<BNSInstance> ret = new ArrayList<BNSInstance>();
+        List<Instance> ret = new ArrayList<Instance>();
 
-        BNSInstance instance = new BNSInstance();
+        Instance instance = new Instance();
 
-        instance.setMultiPort("rpc=1031");
+        instance.setPort("{rpc=1031}");
         try {
-            instance.setPort(lookupHost(InetAddress.getLocalHost().getHostName()));
+            instance.setIp(lookupHost(InetAddress.getLocalHost().getHostName()));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

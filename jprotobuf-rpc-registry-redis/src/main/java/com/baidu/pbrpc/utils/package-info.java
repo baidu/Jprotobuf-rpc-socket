@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.jprotobuf.pbrpc.client;
-
 /**
- * Service URL accessible interface.
- * 
+ * Utility for redis usage.
  *
  * @author xiemalin
- * @since 3.2.5
+ * @since 3.2.3
  */
-public interface ServiceUrlAccessible {
-
-    /**
-     * get service URL with pattern of host:port
-     * @return serivce URL
-     */
-    String getServiceUrl();
-}
+package com.baidu.pbrpc.utils;
