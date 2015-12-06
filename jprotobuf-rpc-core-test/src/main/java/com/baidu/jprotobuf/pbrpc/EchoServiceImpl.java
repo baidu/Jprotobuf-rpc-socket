@@ -16,7 +16,6 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
-import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**

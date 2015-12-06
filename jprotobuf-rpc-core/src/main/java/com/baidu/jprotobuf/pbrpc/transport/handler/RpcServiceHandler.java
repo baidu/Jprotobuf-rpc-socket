@@ -30,6 +30,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
+import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
 /**
  * RPC service handler on request data arrived.
@@ -63,7 +64,10 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
         RpcMeta rpcMeta = dataPackage.getRpcMeta();
         String serviceName = rpcMeta.getRequest().getSerivceName();
         String methodName = rpcMeta.getRequest().getMethodName();
-
+        
+        Long logId = rpcMeta.getRequest().getLogId();
+        // set log id to holder
+        LogIdThreadLocalHolder.setLogId(logId);
         try {
             RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
             if (handler == null) {

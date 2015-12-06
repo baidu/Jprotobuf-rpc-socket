@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>3.2.6</version>
+		<version>3.2.8</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-registry-bns</artifactId>
 	<packaging>jar</packaging>
@@ -27,6 +27,16 @@
 			<groupId>com.baidu</groupId>
 			<artifactId>bns-client</artifactId>
 			<version>1.1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.protobuf</groupId>
+					<artifactId>protobuf-java</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>

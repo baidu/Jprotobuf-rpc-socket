@@ -42,7 +42,7 @@ public class ClientMain {
         EchoInfo echoInfo = new EchoInfo();
         echoInfo.setMessage("hello");
         
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 1000000000000000L; i++) {
             echoService.echo(echoInfo);
         }
         

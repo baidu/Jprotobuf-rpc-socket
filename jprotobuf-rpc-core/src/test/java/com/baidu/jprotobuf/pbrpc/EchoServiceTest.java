@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
+import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
 import junit.framework.Assert;
 
@@ -89,6 +90,7 @@ public class EchoServiceTest extends BaseEchoServiceTest {
     
     @Test
     public void testAttachment() {
+        
         EchoInfo echoInfo = getEchoInfo();
         
         EchoServiceImpl ecohImpl = new EchoServiceImpl();

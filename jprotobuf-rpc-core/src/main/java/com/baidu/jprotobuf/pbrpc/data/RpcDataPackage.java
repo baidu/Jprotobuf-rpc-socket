@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.utils.ArrayUtils;
+import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
 /**
  * 
@@ -37,6 +39,8 @@ import com.baidu.jprotobuf.pbrpc.utils.ArrayUtils;
  * @since 1.0
  */
 public class RpcDataPackage implements Readable, Writerable {
+    
+    private static Logger LOG = Logger.getLogger(RpcDataPackage.class.getName());
 
     private RpcHeadMeta head;
     private RpcMeta rpcMeta;
@@ -512,12 +516,20 @@ public class RpcDataPackage implements Readable, Writerable {
                 dataPackage.data(data);
             }
         }
-
+        
         // set logid
-        LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
-        if (logIDGenerator != null) {
-            long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
-            dataPackage.logId(logId);
+        // if logid exsit under thread local holder
+        Long elogId = LogIdThreadLocalHolder.getLogId();
+        if (elogId != null) {
+            // will always use this log id
+            LOG.info("Detected LogIdThreadLocalHolder contains a logId, will always use this log id.");
+            dataPackage.logId(elogId);
+        } else {
+            LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
+            if (logIDGenerator != null) {
+                long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
+                dataPackage.logId(logId);
+            }
         }
 
         // set attachment
