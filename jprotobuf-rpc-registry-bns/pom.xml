@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>3.2.8</version>
+		<version>3.2.9</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-registry-bns</artifactId>
 	<packaging>jar</packaging>
@@ -17,7 +17,11 @@
 			<artifactId>jprotobuf-rpc-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.baidu.noah.naming</groupId>
+			<artifactId>naming-sdk-java</artifactId>
+			<version>1.0.7.2</version>
+		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf-rpc-core-spring</artifactId>
@@ -26,7 +30,7 @@
 		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>bns-client</artifactId>
-			<version>1.1.0</version>
+			<version>1.2.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>

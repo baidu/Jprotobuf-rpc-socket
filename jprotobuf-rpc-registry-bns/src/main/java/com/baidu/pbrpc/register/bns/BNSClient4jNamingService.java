@@ -26,11 +26,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import com.baidu.driver4j.bns.BNSQueryAgentProxy;
+import com.baidu.driver4j.bns.Instance;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
-import com.baidu.noah.naming.BNSClient;
-import com.baidu.noah.naming.BNSInstance;
 
 /**
  * Registry service support by BNS.
@@ -38,36 +38,27 @@ import com.baidu.noah.naming.BNSInstance;
  * @author xiemalin
  * @since 3.0.2
  */
-public class BNSNamingService implements NamingService, InitializingBean {
-    
+public class BNSClient4jNamingService implements NamingService, InitializingBean {
+
     /**
      * log this class
      */
-    protected static final Log LOGGER = LogFactory.getLog(BNSNamingService.class.getName());
-
-    /**
-     *  port split string
-     */
-    private String portSplit = "=";
-
-    /**
-     * multiple ports split string
-     */
-    private String multiPortsSplit = ",";
+    protected static final Log LOGGER = LogFactory.getLog(BNSClient4jNamingService.class.getName());
 
     /**
      * this BNSClient constructor method is doing nothing.
      */
-    private BNSClient bnsClient = new BNSClient();
+    private BNSQueryAgentProxy proxy = BNSQueryAgentProxy.proxy();
 
     private int timeout = 3000;
 
     private String bnsName;
-    
+
     private String portName = "rpc";
-    
+
     /**
      * set portName value to portName
+     * 
      * @param portName the portName to set
      */
     public void setPortName(String portName) {
@@ -91,21 +82,25 @@ public class BNSNamingService implements NamingService, InitializingBean {
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
-    
+
     /**
      * set multiPortsSplit value to multiPortsSplit
+     * 
      * @param multiPortsSplit the multiPortsSplit to set
      */
+    @Deprecated
     public void setMultiPortsSplit(String multiPortsSplit) {
-        this.multiPortsSplit = multiPortsSplit;
+        // no longer use will remove later
     }
-    
+
     /**
      * set portSplit value to portSplit
+     * 
      * @param portSplit the portSplit to set
      */
+    @Deprecated
     public void setPortSplit(String portSplit) {
-        this.portSplit = portSplit;
+        // no longer use will remove later
     }
 
     /*
@@ -134,7 +129,7 @@ public class BNSNamingService implements NamingService, InitializingBean {
         }
 
         // get bns name
-        List<BNSInstance> instanceList = doGetInstanceList();
+        List<Instance> instanceList = doGetInstanceList();
 
         List<RegisterInfo> registerInfos = wrapRegisterInfos(instanceList);
 
@@ -144,11 +139,10 @@ public class BNSNamingService implements NamingService, InitializingBean {
 
         return ret;
     }
-    
-    
-    protected List<BNSInstance> doGetInstanceList() {
+
+    protected List<Instance> doGetInstanceList() {
         // get bns name
-        List<BNSInstance> instanceList = bnsClient.getInstanceByService(bnsName, timeout);
+        List<Instance> instanceList = proxy.getInstanceByService(bnsName, timeout);
         return instanceList;
     }
 
@@ -156,18 +150,18 @@ public class BNSNamingService implements NamingService, InitializingBean {
      * @param instanceList
      * @return
      */
-    protected List<RegisterInfo> wrapRegisterInfos(List<BNSInstance> instanceList) {
+    protected List<RegisterInfo> wrapRegisterInfos(List<Instance> instanceList) {
         if (instanceList == null || instanceList.isEmpty()) {
             return null;
         }
 
         List<RegisterInfo> ret = new ArrayList<RegisterInfo>();
-        for (BNSInstance bnsInstance : instanceList) {
+        for (Instance bnsInstance : instanceList) {
             String ip = bnsInstance.getDottedIP();
 
             RegisterInfo registerInfo = new RegisterInfo();
             registerInfo.setHost(ip);
-            registerInfo.setPort(buildRpcPort(portName, bnsInstance.getMultiPort(), bnsInstance.getPort()));
+            registerInfo.setPort(buildRpcPort(portName, bnsInstance.getPorts(), bnsInstance.getPort()));
             ret.add(registerInfo);
         }
 
@@ -182,22 +176,18 @@ public class BNSNamingService implements NamingService, InitializingBean {
      * @param defaultProt default port if port name not found this port will return
      * @return the port by port name
      */
-    private int buildRpcPort(String portName, String multiPort, int defaultProt) {
-        if (!StringUtils.isEmpty(portName) && !StringUtils.isEmpty(multiPort)) {
-            String[] multiPorts = multiPort.split(multiPortsSplit);
-            for (String mp : multiPorts) {
-                String[] ports = mp.split(portSplit);
-                if (ports.length == 2 && !StringUtils.isEmpty(ports[0])) {
-                    if (ports[0].equals(portName)) {
-                        return StringUtils.toInt(ports[1], defaultProt); 
-                    }
-                } else {
-                    LOGGER.error("Detect invalid port setting, value is'" + mp + "'");
-                }
-            }
+    private int buildRpcPort(String portName, Map<String, String> ports, int defaultProt) {
+        if (ports == null || ports.isEmpty()) {
+            return defaultProt;
         }
-        
-        return defaultProt;
+
+        String sPort = ports.get(portName);
+        if (sPort == null) {
+            return defaultProt;
+        }
+
+        return StringUtils.toInt(sPort);
+
     }
 
 }
