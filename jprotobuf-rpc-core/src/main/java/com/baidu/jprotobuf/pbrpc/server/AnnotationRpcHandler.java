@@ -36,11 +36,6 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(AnnotationRpcHandler.class.getName());
-    
-    /**
-     * Logger for this class
-     */
     private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     private Codec inputCodec;
@@ -93,7 +88,7 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
         long time = System.currentTimeMillis();
         ret = getMethod().invoke(getService(), param);
         long took =  (System.currentTimeMillis() - time);
-        PERFORMANCE_LOGGER.info("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
+        PERFORMANCE_LOGGER.fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
                 + took + " ms");
         
         ServerStatus.incr(serviceSignature, took);

@@ -16,10 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +30,9 @@ import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+
 /**
  * RPC service handler on request data arrived.
  * 
@@ -40,116 +41,159 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  */
 public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackage> {
 
-    /**
-     * log this class
-     */
-    private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
+	/**
+	 * log this class
+	 */
+	private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
+	
+	private ExecutorService es;
+	
+	/**
+	 * set es value to es
+	 * @param es the es to set
+	 */
+	public void setEs(ExecutorService es) {
+		this.es = es;
+	}
+	
+	/**
+	 * {@link RpcServiceRegistry}
+	 */
+	private final RpcServiceRegistry rpcServiceRegistry;
 
-    /**
-     * {@link RpcServiceRegistry}
-     */
-    private final RpcServiceRegistry rpcServiceRegistry;
+	/**
+	 * @param rpcServiceRegistry
+	 */
+	public RpcServiceHandler(RpcServiceRegistry rpcServiceRegistry) {
+		this.rpcServiceRegistry = rpcServiceRegistry;
+	}
 
-    /**
-     * @param rpcServiceRegistry
-     */
-    public RpcServiceHandler(RpcServiceRegistry rpcServiceRegistry) {
-        this.rpcServiceRegistry = rpcServiceRegistry;
-    }
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
+		BackgroundTask task = new BackgroundTask(ctx, dataPackage, rpcServiceRegistry);
+		// run by async way
+		es.submit(task);
+	}
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
-        long time = System.currentTimeMillis();
-        
-        RpcMeta rpcMeta = dataPackage.getRpcMeta();
-        String serviceName = rpcMeta.getRequest().getSerivceName();
-        String methodName = rpcMeta.getRequest().getMethodName();
-        
-        Long logId = rpcMeta.getRequest().getLogId();
-        // set log id to holder
-        LogIdThreadLocalHolder.setLogId(logId);
-        try {
-            RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
-            if (handler == null) {
-                dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
-                dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
-            } else {
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
 
-                byte[] data = dataPackage.getData();
-                RpcData request = new RpcData();
-                request.setLogId(dataPackage.getRpcMeta().getRequest().getLogId());
-                request.setData(data);
-                request.setAttachment(dataPackage.getAttachment());
-                if (dataPackage.getRpcMeta() != null) {
-                    request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
-                }
-                request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
-                try {
-                    RpcData response = handler.doHandle(request);
-                    dataPackage.data(response.getData());
-                    dataPackage.attachment(response.getAttachment());
-                    dataPackage.authenticationData(response.getAuthenticationData());
+		RpcDataPackage data = null;
 
-                    dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
-                    dataPackage.errorText(null);
+		if (cause instanceof ErrorDataException) {
+			ErrorDataException error = (ErrorDataException) cause;
+			RpcDataPackage dataPackage = error.getRpcDataPackage();
+			if (dataPackage != null) {
+				int errorCode = ErrorCodes.ST_ERROR;
+				if (error.getErrorCode() > 0) {
+					errorCode = error.getErrorCode();
+				}
+				data = dataPackage.getErrorResponseRpcDataPackage(errorCode, cause.getCause().getMessage());
+			}
+		}
 
-                } catch (InvocationTargetException e) {
-                    Throwable targetException = e.getTargetException();
-                    if (targetException == null) {
-                        targetException = e;
-                    }
+		if (data == null) {
+			data = new RpcDataPackage();
+			data = data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
+					cause.getCause().getMessage());
+		}
+		ctx.fireChannelRead(data);
+	}
 
-                    LOG.log(Level.SEVERE, targetException.getMessage(), targetException);
-                    // catch business exception
-                    dataPackage.errorCode(ErrorCodes.ST_ERROR);
-                    dataPackage.errorText(targetException.getMessage());
-                } catch (Exception e) {
-                    LOG.log(Level.SEVERE, e.getMessage(), e.getCause());
-                    // catch business exception
-                    dataPackage.errorCode(ErrorCodes.ST_ERROR);
-                    dataPackage.errorText(e.getMessage());
-                }
-            }
+	private static class BackgroundTask implements Runnable {
 
-            // We do not need to write a ChannelBuffer here.
-            // We know the encoder inserted at TelnetPipelineFactory will do the
-            // conversion.
-            ctx.writeAndFlush(dataPackage);
-        } catch (Exception t) {
-            ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
-            exception.setErrorCode(ErrorCodes.ST_ERROR);
-            exception.setRpcDataPackage(dataPackage);
-            throw exception;
-        } finally {
-            LOG.info("RPC server invoke method '" + methodName + "' time took:"
-                    + (System.currentTimeMillis() - time) + " ms");
-        }
-    }
+		private ChannelHandlerContext ctx;
+		private RpcDataPackage dataPackage;
+		private RpcServiceRegistry rpcServiceRegistry;
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
+		/**
+		 * @param ctx
+		 * @param dataPackage
+		 */
+		public BackgroundTask(ChannelHandlerContext ctx, RpcDataPackage dataPackage,
+				RpcServiceRegistry rpcServiceRegistry) {
+			super();
+			this.ctx = ctx;
+			this.dataPackage = dataPackage;
+			this.rpcServiceRegistry = rpcServiceRegistry;
+		}
 
-        RpcDataPackage data = null;
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			long time = System.currentTimeMillis();
 
-        if (cause instanceof ErrorDataException) {
-            ErrorDataException error = (ErrorDataException) cause;
-            RpcDataPackage dataPackage = error.getRpcDataPackage();
-            if (dataPackage != null) {
-                int errorCode = ErrorCodes.ST_ERROR;
-                if (error.getErrorCode() > 0) {
-                    errorCode = error.getErrorCode();
-                }
-                data = dataPackage.getErrorResponseRpcDataPackage(errorCode, cause.getCause().getMessage());
-            }
-        }
+			RpcMeta rpcMeta = dataPackage.getRpcMeta();
+			String serviceName = rpcMeta.getRequest().getSerivceName();
+			String methodName = rpcMeta.getRequest().getMethodName();
 
-        if (data == null) {
-            data = new RpcDataPackage();
-            data = data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
-                    cause.getCause().getMessage());
-        }
-        ctx.fireChannelRead(data);
-    }
+			Long logId = rpcMeta.getRequest().getLogId();
+			// set log id to holder
+			LogIdThreadLocalHolder.setLogId(logId);
+			try {
+				RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
+				if (handler == null) {
+					dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
+					dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
+				} else {
+
+					byte[] data = dataPackage.getData();
+					RpcData request = new RpcData();
+					request.setLogId(dataPackage.getRpcMeta().getRequest().getLogId());
+					request.setData(data);
+					request.setAttachment(dataPackage.getAttachment());
+					if (dataPackage.getRpcMeta() != null) {
+						request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
+					}
+					request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
+					try {
+						RpcData response = handler.doHandle(request);
+						dataPackage.data(response.getData());
+						dataPackage.attachment(response.getAttachment());
+						dataPackage.authenticationData(response.getAuthenticationData());
+
+						dataPackage.errorCode(ErrorCodes.ST_SUCCESS);
+						dataPackage.errorText(null);
+
+					} catch (InvocationTargetException e) {
+						Throwable targetException = e.getTargetException();
+						if (targetException == null) {
+							targetException = e;
+						}
+
+						LOG.log(Level.SEVERE, targetException.getMessage(), targetException);
+						// catch business exception
+						dataPackage.errorCode(ErrorCodes.ST_ERROR);
+						dataPackage.errorText(targetException.getMessage());
+					} catch (Exception e) {
+						LOG.log(Level.SEVERE, e.getMessage(), e.getCause());
+						// catch business exception
+						dataPackage.errorCode(ErrorCodes.ST_ERROR);
+						dataPackage.errorText(e.getMessage());
+					}
+				}
+
+				// We do not need to write a ChannelBuffer here.
+				// We know the encoder inserted at TelnetPipelineFactory will do
+				// the
+				// conversion.
+				ctx.writeAndFlush(dataPackage);
+			} catch (Exception t) {
+				ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
+				exception.setErrorCode(ErrorCodes.ST_ERROR);
+				exception.setRpcDataPackage(dataPackage);
+				throw new RuntimeException(exception.getMessage(), exception);
+			} finally {
+				LOG.fine("RPC server invoke method '" + methodName + "' time took:"
+						+ (System.currentTimeMillis() - time) + " ms");
+			}
+		}
+
+	}
 
 }

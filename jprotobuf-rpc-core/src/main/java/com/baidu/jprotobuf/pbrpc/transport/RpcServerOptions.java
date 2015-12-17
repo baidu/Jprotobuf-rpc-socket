@@ -21,49 +21,50 @@ import io.netty.handler.timeout.IdleStateEvent;
 import java.nio.ByteOrder;
 
 public class RpcServerOptions {
-    
-    /**
-     * 
-     */
-    private static final String LINE_BREAK = "\n";
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("keepAlive=");
-        builder.append(keepAlive).append(LINE_BREAK);
-        builder.append("byteOrder=");
-        builder.append(byteOrder).append(LINE_BREAK);
-        builder.append("soLinger=");
-        builder.append(soLinger).append(LINE_BREAK);
-        builder.append("backlog=");
-        builder.append(backlog).append(LINE_BREAK);
-        builder.append("receiveBufferSize=");
-        builder.append(receiveBufferSize).append(LINE_BREAK);
-        builder.append("sendBufferSize=");
-        builder.append(sendBufferSize).append(LINE_BREAK);
-        builder.append("readerIdleTime=");
-        builder.append(readerIdleTime).append(LINE_BREAK);
-        builder.append("writerIdleTime=");
-        builder.append(writerIdleTime).append(LINE_BREAK);
-        builder.append("connectTimeout=");
-        builder.append(connectTimeout).append(LINE_BREAK);
-        builder.append("keepAliveTime=");
-        builder.append(keepAliveTime).append(LINE_BREAK);
-        builder.append("chunkPackageTimeout=");
-        builder.append(chunkPackageTimeout).append(LINE_BREAK);
-        builder.append("acceptorThreads=");
-        builder.append(acceptorThreads).append(LINE_BREAK);
-        builder.append("workThreads=");
-        builder.append(workThreads).append(LINE_BREAK);
-        builder.append("chunkSize=");
-        builder.append(chunkSize).append(LINE_BREAK);
-        builder.append("httpServerPort=");
-        builder.append(httpServerPort).append(LINE_BREAK);
-        builder.append("tcpNoDelay=");
-        builder.append(tcpNoDelay).append(LINE_BREAK);
-        return builder.toString();
-    }
+    /* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RpcServerOptions [keepAlive=");
+		builder.append(keepAlive);
+		builder.append(", byteOrder=");
+		builder.append(byteOrder);
+		builder.append(", soLinger=");
+		builder.append(soLinger);
+		builder.append(", backlog=");
+		builder.append(backlog);
+		builder.append(", receiveBufferSize=");
+		builder.append(receiveBufferSize);
+		builder.append(", sendBufferSize=");
+		builder.append(sendBufferSize);
+		builder.append(", readerIdleTime=");
+		builder.append(readerIdleTime);
+		builder.append(", writerIdleTime=");
+		builder.append(writerIdleTime);
+		builder.append(", connectTimeout=");
+		builder.append(connectTimeout);
+		builder.append(", keepAliveTime=");
+		builder.append(keepAliveTime);
+		builder.append(", chunkPackageTimeout=");
+		builder.append(chunkPackageTimeout);
+		builder.append(", acceptorThreads=");
+		builder.append(acceptorThreads);
+		builder.append(", workThreads=");
+		builder.append(workThreads);
+		builder.append(", taskTheads=");
+		builder.append(taskTheads);
+		builder.append(", chunkSize=");
+		builder.append(chunkSize);
+		builder.append(", httpServerPort=");
+		builder.append(httpServerPort);
+		builder.append(", tcpNoDelay=");
+		builder.append(tcpNoDelay);
+		builder.append("]");
+		return builder.toString();
+	}
 
 
     public RpcServerOptions() {
@@ -128,6 +129,7 @@ public class RpcServerOptions {
     
     private int acceptorThreads = 0; // acceptor threads. default use Netty default value
     private int workThreads = 0; // work threads. default use Netty default value
+    private int taskTheads = 20; // real execute task threads
     
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
@@ -152,6 +154,7 @@ public class RpcServerOptions {
         this.keepAlive = options.keepAlive;
         this.acceptorThreads = options.acceptorThreads;
         this.workThreads = options.workThreads;
+        this.taskTheads = options.taskTheads;
         this.httpServerPort = options.httpServerPort;
     }
     
@@ -364,4 +367,24 @@ public class RpcServerOptions {
     public void setHttpServerPort(int httpServerPort) {
         this.httpServerPort = httpServerPort;
     }
+
+
+	/**
+	 * get the taskTheads
+	 * @return the taskTheads
+	 */
+	public int getTaskTheads() {
+		return taskTheads;
+	}
+
+
+	/**
+	 * set taskTheads value to taskTheads
+	 * @param taskTheads the taskTheads to set
+	 */
+	public void setTaskTheads(int taskTheads) {
+		this.taskTheads = taskTheads;
+	}
+    
+    
 }

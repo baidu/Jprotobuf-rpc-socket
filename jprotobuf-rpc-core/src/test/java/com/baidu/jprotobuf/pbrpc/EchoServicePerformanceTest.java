@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -45,7 +44,6 @@ import junit.framework.Assert;
  * @author xiemalin
  * @since 1.0
  */
-@Ignore
 public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     RpcServer rpcServer;
@@ -56,12 +54,13 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 10000;
+    int totalRequestSize = 1000;
 
     Runnable runnable = new Runnable() {
 
         public void run() {
-            echoService.echo(echoInfo);
+            EchoInfo echo = echoService.echo(echoInfo);
+            Assert.assertEquals(echo.getMessage(), "hello:" + echoInfo.getMessage());
 
         }
     };
@@ -69,6 +68,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     public void setUp(int threadSize, String requestData, String responseData) {
         RpcServerOptions rpcServerOptions = new RpcServerOptions();
         rpcServerOptions.setHttpServerPort(8866);
+        rpcServerOptions.setTaskTheads(threadSize);
         rpcServer = new RpcServer(rpcServerOptions);
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
@@ -186,7 +186,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
         String requestString = "";
         String responseString = "";
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             requestString += "world world";
             responseString += "hello world";
         }

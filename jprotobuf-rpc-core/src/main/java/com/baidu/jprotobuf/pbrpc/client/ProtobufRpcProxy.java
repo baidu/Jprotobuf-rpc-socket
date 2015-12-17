@@ -380,7 +380,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             return null;
         }
 
-        PERFORMANCE_LOGGER.info("RPC client invoke method '" + method.getName() + "' time took:"
+        PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
                 + (System.currentTimeMillis() - time) + " ms");
 
         return rpcMethodInfo.outputDecode(data);

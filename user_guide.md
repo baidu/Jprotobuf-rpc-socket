@@ -398,6 +398,57 @@ public interface EchoService {
     EchoInfo echo(EchoInfo info);
 }
 ```
+
+#### Redis注册服务使用 ####
+jprotobuf-rpc支持使用Redis来实现服务的注册与发现功能
+
+示例配置如下：
+```xml
+    <bean id="namingService" class="com.baidu.pbrpc.register.redis.RedisRegistryService">
+       <constructor-arg>
+           <bean class="com.baidu.pbrpc.register.redis.RedisClient">
+              <property name="redisServer" value="localhost"></property>
+              <property name="port" value="6379"></property>
+              <property name="testOnBorrow" value="true"></property>
+              <property name="maxWait" value="2000"></property>
+           </bean>
+       </constructor-arg>
+       <property name="administrator" value="true"></property>
+       <property name="group" value="default/"></property>
+<property name="expirePeriod" value="3000"></property>
+</bean>
+
+```
+RedisRegistryService属性：
+1.	expirePeriod 服务过期时间设置，当服务注册成功后，会写入最后的注册时间，然后会在定期更新服务存活时间(频率 expirePeriod/3)
+2.	administrator， 默认是false, 当设置为true时，会对redis上已经注册的服务已经过期的时间进行删除。 一般有一台服务进行清理即可，也可支持多台一起清理
+3.	group 表示分组，可以同一组名下的服务才有能力相互发现
+
+
+服务的发布时使用示例
+```xml
+  <bean class="com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter">
+        <property name="servicePort" value="1031"></property>
+        <property name="registerServices">
+            <list>
+                <ref local="echoService" />
+            </list>
+        </property>
+		<property name="registryCenterService" ref="namingService">
+        <property name="connectTimeout" value="1000"></property>
+    </bean>
+
+```
+
+客户端使用示例
+```xml
+<bean id="echoServiceProxy" class="com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean">
+        <property name="serviceInterface" value="com.baidu.jprotobuf.pbrpc.EchoService"></property>
+        <property name="namingService" ref="namingService"></property>
+    </bean>
+
+```
+
 #### HTTP查看支持 ####
 该功能在3.1.1版本之后支持配置方式如下：
 1.       代码方式

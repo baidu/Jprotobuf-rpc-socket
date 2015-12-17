@@ -22,6 +22,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,8 +52,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 
 	private static final String RPC_SERVER_HANDLER = "rpc_handler";
 
-	private static Logger LOG = Logger.getLogger(RpcServerPipelineInitializer.class
-			.getName());
+	private static Logger LOG = Logger.getLogger(RpcServerPipelineInitializer.class.getName());
 
 	private final RpcServiceRegistry rpcServiceRegistry;
 
@@ -66,10 +66,13 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 
 	private List<RpcDataPackageDecoder> rpcDataPackageDecoderList = new ArrayList<RpcDataPackageDecoder>();
 
-	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry,
-			RpcServerOptions rpcServerOptions) {
+	private ExecutorService es;
+
+	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions,
+			ExecutorService es) {
 		this.rpcServiceRegistry = rpcServiceRegistry;
 		this.rpcServerOptions = rpcServerOptions;
+		this.es = es;
 	}
 
 	@Override
@@ -78,12 +81,10 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		ChannelPipeline channelPipe = ch.pipeline();
 		// receive request data
 		channelPipe.addLast(RPC_CHANNEL_STATE_AWARE_HANDLER,
-				new IdleStateHandler(this.rpcServerOptions.getKeepAliveTime(),
-						this.rpcServerOptions.getKeepAliveTime(),
+				new IdleStateHandler(this.rpcServerOptions.getKeepAliveTime(), this.rpcServerOptions.getKeepAliveTime(),
 						this.rpcServerOptions.getKeepAliveTime()));
 
-		channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER,
-				new RpcServerChannelIdleHandler());
+		channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
 
 		RpcDataPackageDecoder rpcDataPackageDecoder = new RpcDataPackageDecoder(
 				this.rpcServerOptions.getChunkPackageTimeout());
@@ -94,8 +95,9 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
 		// to process RPC service handler of request object RpcDataPackage and
 		// return new RpcDataPackage
-		channelPipe.addLast(RPC_SERVER_HANDLER, new RpcServiceHandler(
-				this.rpcServiceRegistry));
+		RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(this.rpcServiceRegistry);
+		rpcServiceHandler.setEs(es);
+		channelPipe.addLast(RPC_SERVER_HANDLER, rpcServiceHandler);
 
 		// response back
 		// check if need to compress for data and attachment
@@ -109,8 +111,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		if (rpcDataPackageDecoderList.isEmpty()) {
 			return;
 		}
-		List<RpcDataPackageDecoder> list = new ArrayList<RpcDataPackageDecoder>(
-				rpcDataPackageDecoderList);
+		List<RpcDataPackageDecoder> list = new ArrayList<RpcDataPackageDecoder>(rpcDataPackageDecoderList);
 		for (RpcDataPackageDecoder rpcDataPackageDecoder : list) {
 			rpcDataPackageDecoder.close();
 		}

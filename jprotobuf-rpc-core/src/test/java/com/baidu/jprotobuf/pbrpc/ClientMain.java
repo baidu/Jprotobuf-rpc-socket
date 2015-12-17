@@ -40,10 +40,10 @@ public class ClientMain {
         EchoService echoService = pbrpcProxy.proxy();
 
         EchoInfo echoInfo = new EchoInfo();
-        echoInfo.setMessage("hello");
         
-        for (int i = 0; i < 1000000000000000L; i++) {
-            echoService.echo(echoInfo);
+        for (int i = 0; i < 10L; i++) {
+        	echoInfo.setMessage("hello" + i);
+            System.out.println(echoService.echo(echoInfo).getMessage());
         }
         
         pbrpcProxy.close();
