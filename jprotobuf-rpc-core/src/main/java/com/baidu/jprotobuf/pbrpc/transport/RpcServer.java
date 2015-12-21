@@ -91,7 +91,7 @@ public class RpcServer extends ServerBootstrap {
 	public ThreadPoolExecutor getEs() {
 		return es;
 	}
-
+	
 	/**
 	 * rpcServiceRegistry
 	 */

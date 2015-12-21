@@ -200,7 +200,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         lbMap.put(service, lbProxyBean);
         instancesMap.put(service, (T) lbProxyBean.getObject());
 
-        LOG.info("Finished:proxy service [" + service + "] for target servicesList of size:" + serversList.size()
+        LOG.info("Finished:proxy service [" + service + "] for target servicesList of size:" + servers.size()
                 + " time took:" + (System.currentTimeMillis() - current) + " ms");
     }
 

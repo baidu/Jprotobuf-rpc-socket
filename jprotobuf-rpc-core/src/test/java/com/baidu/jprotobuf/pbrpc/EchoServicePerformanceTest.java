@@ -54,7 +54,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 1000;
+    int totalRequestSize = 10000;
 
     Runnable runnable = new Runnable() {
 
@@ -201,7 +201,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     @Test
     public void multiExecuteValidTest() throws Exception {
 
-        setUp(100, "hello", "world");
+        setUp(10, "hello", "world");
         ExecutorService pool = Executors.newFixedThreadPool(100);
 
         List<Future<?>> futures = new ArrayList<Future<?>>(10000);
