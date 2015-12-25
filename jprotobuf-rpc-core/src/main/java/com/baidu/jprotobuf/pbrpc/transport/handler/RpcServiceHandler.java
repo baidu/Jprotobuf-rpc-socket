@@ -18,7 +18,6 @@ package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,7 +73,6 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 		BackgroundTask task = new BackgroundTask(ctx, dataPackage, rpcServiceRegistry);
 		// run by async way
 		es.submit(task);
-		System.out.println(((ThreadPoolExecutor) es).getQueue().size());
 	}
 
 	@Override

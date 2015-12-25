@@ -27,6 +27,7 @@ import java.util.Map;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -42,6 +43,7 @@ import io.netty.handler.codec.http.HttpRequest;
  * @author xiemalin
  * @since 3.1.0
  */
+@Sharable
 public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
 
     /**
@@ -103,6 +105,7 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
         }
         ctx.write(response);
         ctx.flush();
+        
     }
 
     @Override

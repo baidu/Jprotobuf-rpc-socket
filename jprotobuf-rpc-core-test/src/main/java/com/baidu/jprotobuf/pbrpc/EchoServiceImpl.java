@@ -47,6 +47,12 @@ public class EchoServiceImpl {
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
+        try {
+			Thread.sleep(100);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+        
         return ret;
     }
 

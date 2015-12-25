@@ -20,19 +20,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * HTTP server controller
@@ -40,92 +41,93 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
  * @author xiemalin
  * @since 3.1.0
  */
-public class HttpServer {
-    
-    private static final Logger LOG = Logger.getLogger(HttpServer.class.getName());
+public class HttpServer extends ServerBootstrap {
 
-    private ServerBootstrap serverBootstrap;
+	private static final Logger LOG = Logger.getLogger(HttpServer.class.getName());
 
-    private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
+	private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
 
-    private EventLoopGroup bossGroup;
-    private EventLoopGroup workerGroup;
-    private Channel channel;
+	private EventLoopGroup bossGroup;
+	private EventLoopGroup workerGroup;
+	private Channel channel;
 
-    private AtomicBoolean stop = new AtomicBoolean(false);
+	private AtomicBoolean stop = new AtomicBoolean(false);
 
-    private RpcServer rpcServer;
-    
-    private HttpServerInboundHandler handler;
-    
-    private AtomicBoolean initialized = new AtomicBoolean(false);
+	private HttpServerInboundHandler handler;
 
-    /**
-     * 
-     */
-    public HttpServer(RpcServer rpcServer) {
-        this.rpcServer = rpcServer;
-        bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup();
-        
-        handler = new HttpServerInboundHandler(rpcServer);
-    }
+	
 
-    public void start(int port) {
+	/**
+	 * 
+	 */
+	public HttpServer(final RpcServer rpcServer) {
+		bossGroup = new NioEventLoopGroup();
+		workerGroup = new NioEventLoopGroup();
 
-        serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                    	if (initialized.compareAndSet(false, true)) {
-                    		// server端发送的是httpResponse，所以要使用HttpResponseEncoder进行编码
-                    		ch.pipeline().addLast(new HttpResponseEncoder());
-                    		// server端接收到的是httpRequest，所以要使用HttpRequestDecoder进行解码
-                    		ch.pipeline().addLast(new HttpRequestDecoder());
-                    		ch.pipeline().addLast(handler);
-                    	}
-                    	
-                    }
-                }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
+		handler = new HttpServerInboundHandler(rpcServer);
+		
+		group(bossGroup, workerGroup);
+		
+		channel(NioServerSocketChannel.class);
+		
+		this.childHandler(new ChannelInitializer<SocketChannel>() {
+			@Override
+			public void initChannel(SocketChannel ch) throws Exception {
+					ch.pipeline()
+							.addLast("IDLE_HANDLER", new IdleStateHandler(rpcServer.getRpcServerOptions().getKeepAliveTime(),
+									rpcServer.getRpcServerOptions().getKeepAliveTime(),
+									rpcServer.getRpcServerOptions().getKeepAliveTime()));
 
-        serverBootstrap.bind(port).addListener(new ChannelFutureListener() {
+					// server端发送的是httpResponse，所以要使用HttpResponseEncoder进行编码
+					ch.pipeline().addLast("HTTP_RESPONSE", new HttpResponseEncoder());
+					// server端接收到的是httpRequest，所以要使用HttpRequestDecoder进行解码
+					ch.pipeline().addLast("HTTP_REQUEST", new HttpRequestDecoder());
+					ch.pipeline().addLast("STAUTS_NADLER", handler);
 
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess()) {
-                    channel = future.channel();
-                    // TODO notifyStarted();
-                } else {
-                    // TODO notifyFailed(future.cause());
-                }
-            }
-        });
+			}
+		});
+	}
 
-        LOG.log(Level.INFO, "Http starting at port: " + port);
-    }
+	public void start(int port) {
 
-    public void waitForStop() throws InterruptedException {
-        while (!stop.get()) {
-            Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
-        }
-        stop();
-    }
+		bind(port).addListener(new ChannelFutureListener() {
 
-    public void stop() {
-        stop.compareAndSet(false, true);
-    }
+			public void operationComplete(ChannelFuture future) throws Exception {
+				if (future.isSuccess()) {
+					channel = future.channel();
+					// TODO notifyStarted();
+				} else {
+					// TODO notifyFailed(future.cause());
+				}
+			}
+		});
 
-    public void shutdownNow() {
-        if (channel != null && channel.isOpen()) {
-            channel.close();
-        }
+		LOG.log(Level.INFO, "Http starting at port: " + port);
+	}
 
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-        
-        if (handler != null) {
-            handler.close();
-        }
-    }
+	public void waitForStop() throws InterruptedException {
+		while (!stop.get()) {
+			Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
+		}
+		stop();
+	}
+
+	public void stop() {
+		stop.compareAndSet(false, true);
+	}
+
+	public void shutdownNow() {
+		stop();
+		if (channel != null && channel.isOpen()) {
+			channel.close();
+		}
+
+		bossGroup.shutdownGracefully();
+		workerGroup.shutdownGracefully();
+
+		if (handler != null) {
+			handler.close();
+		}
+	}
 
 }
