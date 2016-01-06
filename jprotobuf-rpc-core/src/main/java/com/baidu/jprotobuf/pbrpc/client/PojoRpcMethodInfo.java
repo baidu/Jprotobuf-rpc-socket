@@ -18,6 +18,9 @@ package com.baidu.jprotobuf.pbrpc.client;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
@@ -49,7 +52,26 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
         }
         Class<? extends Object> outputClass = getOutputClass();
         if (outputClass != null) {
-            outputCodec = ProtobufProxy.create(outputClass);
+        	// future type return
+        	if (outputClass.isAssignableFrom(Future.class)) {
+        		
+        		Type genericReturnType = method.getGenericReturnType();
+        		if (genericReturnType instanceof ParameterizedType) {
+        			ParameterizedType pt = (ParameterizedType) genericReturnType;
+        			Type[] types = pt.getActualTypeArguments();
+        			if (types != null && types.length == 1) {
+        				outputClass = (Class) types[0];
+        			} else {
+        				outputClass = null;
+        			}
+        		} else {
+        			outputClass = null;
+        		}
+        	}
+        	
+        	if (outputClass != null) {
+        		outputCodec = ProtobufProxy.create(outputClass);
+        	}
         }
     }
 

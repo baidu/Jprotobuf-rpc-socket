@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
@@ -59,6 +60,18 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     private RegistryCenterService registryCenterService;
     
     private List<RegisterInfo> cachedRisterInfoList;
+    
+	private InvokerInterceptor interceptor;
+
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		this.interceptor = interceptor;
+	}
     
 
     /**
@@ -176,6 +189,7 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
         
         rpcServiceRegistryBean.setRemoteInvocationExecutor(remoteInvocationExecutor);
         prRpcServer = new RpcServer(this, rpcServiceRegistryBean);
+        prRpcServer.setInterceptor(interceptor);
         
         for (Object service : registerServices) {
             prRpcServer.registerService(service);

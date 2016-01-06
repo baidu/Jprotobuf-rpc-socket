@@ -39,6 +39,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
@@ -70,6 +71,18 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             new HashMap<String, List<ProtobufRpcProxy<T>>>();
 
     private AtomicBoolean proxied = new AtomicBoolean(false);
+    
+	private InvokerInterceptor interceptor;
+
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		this.interceptor = interceptor;
+	}
 
     /**
      * get the lookupStubOnStartup
@@ -115,6 +128,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
+        protobufRpcProxy.setInterceptor(interceptor);
         return protobufRpcProxy;
     }
 

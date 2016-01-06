@@ -30,84 +30,98 @@ import com.google.protobuf.GeneratedMessage;
  * @author xiemalin
  * @since 1.2
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
-    
-    /**
-     * Logger for this class
-     */
-    private static final Logger LOGGER = Logger.getLogger(MessageGeneratedRpcHandler.class.getName());
-    
-    /**
-     * Logger for this class
-     */
-    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
-    private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
-    private Method parseFromMethod;
+	private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
-    /**
-     * @param method
-     * @param service
-     * @param protobufPRCService
-     */
-    public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
-        super(method, service, protobufPRCService);
+	private Method parseFromMethod;
 
-        if (getInputClass() != null) {
-            if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
-                try {
-                    parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        }
-    }
+	/**
+	 * @param method
+	 * @param service
+	 * @param protobufPRCService
+	 */
+	public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
+		super(method, service, protobufPRCService);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf.pbrpc
-     * .server.RpcData)
-     */
-    protected RpcData doRealHandle(RpcData data) throws Exception {
+		if (getInputClass() != null) {
+			if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
+				try {
+					parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
+				} catch (Exception e) {
+					throw new RuntimeException(e.getMessage(), e);
+				}
+			}
+		}
+	}
 
-        Object input = null;
-        Object[] param;
-        Object ret;
-        if (data.getData() != null && parseFromMethod != null) {
-            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
-            param = new Object[] { input };
-        } else {
-            param = new Object[0];
-        }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf.
+	 * pbrpc .server.RpcData)
+	 */
+	protected RpcData doRealHandle(RpcData data) throws Exception {
 
-        RpcData retData = new RpcData();
-        // process attachment
-        if (getAttachmentHandler() != null) {
-            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(),
-                    getServiceName(), getMethodName(), param);
-            retData.setAttachment(responseAttachment);
-        }
+		Object input = null;
+		Object[] param;
+		Object ret = null;
+		if (data.getData() != null && parseFromMethod != null) {
+			input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
+			param = new Object[] { input };
+		} else {
+			param = new Object[0];
+		}
 
-        long time = System.currentTimeMillis();
-        ret = getMethod().invoke(getService(), param);
-        PERFORMANCE_LOGGER.info("RPC server invoke method(local) '" + getMethod().getName() + "' time took:"
-                + (System.currentTimeMillis() - time) + " ms");
+		RpcData retData = new RpcData();
+		// process attachment
+		if (getAttachmentHandler() != null) {
+			byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
+					getMethodName(), param);
+			retData.setAttachment(responseAttachment);
+		}
 
-        if (ret == null) {
-            return retData;
-        }
+		long time = System.currentTimeMillis();
+		// check intercepter
+		if (getInterceptor() != null) {
+			getInterceptor().beforeInvoke(getService(), getMethod(), param);
 
-        if (ret != null && ret instanceof GeneratedMessage) {
-            byte[] response = ((GeneratedMessage) ret).toByteArray();
-            retData.setData(response);
-        }
+			ret = getInterceptor().process(getService(), getMethod(), param);
+			if (ret != null) {
+				PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
+						+ "' time took:" + (System.currentTimeMillis() - time) + " ms");
 
-        return retData;
-    }
+				if (ret instanceof GeneratedMessage) {
+					byte[] response = ((GeneratedMessage) ret).toByteArray();
+					retData.setData(response);
+				}
+
+				return retData;
+			}
+		}
+
+		ret = getMethod().invoke(getService(), param);
+		long took = (System.currentTimeMillis() - time);
+		PERFORMANCE_LOGGER
+				.fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
+
+		if (ret == null) {
+			return retData;
+		}
+
+		if (ret != null && ret instanceof GeneratedMessage) {
+			byte[] response = ((GeneratedMessage) ret).toByteArray();
+			retData.setData(response);
+		}
+
+		return retData;
+	}
 
 }

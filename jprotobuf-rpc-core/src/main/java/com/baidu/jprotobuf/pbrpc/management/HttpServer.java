@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
-import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

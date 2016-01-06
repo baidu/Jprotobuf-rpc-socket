@@ -32,8 +32,9 @@ public class EchoServicePerformanceMain {
         
         System.out.println("-------------------jprotobuf-----------------------------");
         EchoServicePerformanceTest test =  new EchoServicePerformanceTest();
+        test.setTotalRequestSize(100000);
         
-/*        test.performanceOneTreadTest();
+        test.performanceOneTreadTest();
         test.tearDown();
         
         test.performanceOneTreadTest2();
@@ -52,12 +53,13 @@ public class EchoServicePerformanceMain {
         test.tearDown();
         
         test.performance20TreadsTestWithLongText();
-        test.tearDown();*/
+        test.tearDown();
         
         test.performance40TreadsTestWithLongText();
         test.tearDown();
         
         com.baidu.jprotobuf.pbrpc.proto.EchoServicePerformanceTest test2 = new com.baidu.jprotobuf.pbrpc.proto.EchoServicePerformanceTest();
+        test2.setTotalRequestSize(100000);
         System.out.println("-------------------protobuf-----------------------------");
         
         test2.performanceOneTreadTest();

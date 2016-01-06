@@ -55,6 +55,14 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage out;
 
     int totalRequestSize = 1000;
+    
+    /**
+	 * set totalRequestSize value to totalRequestSize
+	 * @param totalRequestSize the totalRequestSize to set
+	 */
+	public void setTotalRequestSize(int totalRequestSize) {
+		this.totalRequestSize = totalRequestSize;
+	}
 
     Runnable runnable = new Runnable() {
 

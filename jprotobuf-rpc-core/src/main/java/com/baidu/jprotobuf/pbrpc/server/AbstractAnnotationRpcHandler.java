@@ -24,6 +24,7 @@ import com.baidu.jprotobuf.pbrpc.LogIDHolder;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
@@ -50,6 +51,26 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
     private ServerAttachmentHandler attachmentHandler;
     protected String inputIDl;
     protected String outputIDL;
+    
+	private InvokerInterceptor interceptor;
+
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		this.interceptor = interceptor;
+	}
+	
+	/**
+	 * get the interceptor
+	 * @return the interceptor
+	 */
+	protected InvokerInterceptor getInterceptor() {
+		return interceptor;
+	}
     
     /**
      * get the method

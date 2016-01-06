@@ -22,6 +22,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
@@ -48,5 +49,10 @@ public @interface RpcExporter {
      * bean name of RPC server options bean type must be {@link RpcServerOptions}
      */
     String rpcServerOptionsBeanName() default "";
+    
+    /**
+     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}
+     */
+    String invokerIntercepterBeanName() default "";
     
 }

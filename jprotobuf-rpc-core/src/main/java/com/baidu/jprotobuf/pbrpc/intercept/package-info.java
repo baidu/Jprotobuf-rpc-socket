@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.baidu.jprotobuf.pbrpc.spring;
-
-import org.springframework.stereotype.Service;
-
-import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
-import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
-
 /**
- * Echo service for annotation exporter 
- * 
+ * 拦截器模块
+ *
  * @author xiemalin
- * @since 2.17
+ * @since 3.4.0
  */
-@Service("echoServiceAOP")
-@RpcExporter(port = "1031", rpcServerOptionsBeanName = "rpcServerOptions", invokerIntercepterBeanName = "annoServerInterceptor")
-public class AnnotationEchoServiceImpl extends EchoServiceImpl {
-    
-
-}
+package com.baidu.jprotobuf.pbrpc.intercept;

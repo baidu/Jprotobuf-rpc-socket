@@ -16,13 +16,16 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
@@ -50,6 +53,19 @@ public abstract class BaseEchoServiceTest extends BaseTest {
             rpcServerOptions = new RpcServerOptions();
         }
         rpcServer = new RpcServer(rpcServerOptions);
+        rpcServer.setInterceptor(new InvokerInterceptor() {
+			
+			@Override
+			public Object process(Object target, Method method, Object[] args) {
+				System.out.println("server intercepr method:" + method);
+				return null;
+			}
+			
+			@Override
+			public void beforeInvoke(Object target, Method method, Object[] args) {
+				Assert.assertNotNull(method);
+			}
+		});
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
@@ -63,6 +79,21 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         
         pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(PORT);
+        
+        pbrpcProxy.setInterceptor(new InvokerInterceptor() {
+			
+			@Override
+			public Object process(Object target, Method method, Object[] args) {
+				System.out.println("client intercepr method:" + method);
+				return null;
+			}
+			
+			@Override
+			public void beforeInvoke(Object target, Method method, Object[] args) {
+				Assert.assertNotNull(method);
+			}
+		});
+        
         echoService = pbrpcProxy.proxy();
     }
     

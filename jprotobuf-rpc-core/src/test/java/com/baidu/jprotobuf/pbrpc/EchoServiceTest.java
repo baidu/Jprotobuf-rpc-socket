@@ -16,11 +16,12 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
-import org.junit.Ignore;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
-import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
 import junit.framework.Assert;
 
@@ -35,88 +36,112 @@ import junit.framework.Assert;
  */
 
 public class EchoServiceTest extends BaseEchoServiceTest {
-    
-    /* (non-Javadoc)
-     * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
-     */
-    @Override
-    protected RpcServerOptions getRpcServerOptions() {
 
-        RpcServerOptions rpcServerOptions = new RpcServerOptions();
-        rpcServerOptions.setHttpServerPort(8866);
-        
-        return rpcServerOptions;
-    }
-    
-    /**
-     * test client auto recover connection from server.
-     */
-    @Test
-    public void testAutoRecoverConnection() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
+	 */
+	@Override
+	protected RpcServerOptions getRpcServerOptions() {
 
-        EchoInfo echoInfo = getEchoInfo();
-        
-        EchoServiceImpl ecohImpl = new EchoServiceImpl();
-        
-        EchoInfo response = echoService.echo(echoInfo);
-        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-        
-        // here stop server
-        stopServer();
-        
-        try {
-            echoService.echo(echoInfo);
-            Assert.fail("should be connect server failed.");
-        } catch (Exception e) {
-            Assert.assertNotNull(e);
-        }
-        
-        startServer();
-        
-        response = echoService.echo(echoInfo);
-        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-    }
+		RpcServerOptions rpcServerOptions = new RpcServerOptions();
+		rpcServerOptions.setHttpServerPort(8866);
 
-    /**
-     * @return
-     */
-    private EchoInfo getEchoInfo() {
-        String message = "xiemalin";
-        // test success
-        EchoInfo echoInfo = new EchoInfo();
-        echoInfo.setMessage(message);
-        return echoInfo;
-    }
-    
-    @Test
-    public void testAttachment() {
-        
-        EchoInfo echoInfo = getEchoInfo();
-        
-        EchoServiceImpl ecohImpl = new EchoServiceImpl();
-        
-        EchoInfo response = echoService.echoWithAttachement(echoInfo);
-        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-    }
-    
-    @Test
-    public void testGzip() {
-        EchoInfo echoInfo = getEchoInfo();
-        
-        EchoServiceImpl ecohImpl = new EchoServiceImpl();
-        
-        EchoInfo response = echoService.echoGzip(echoInfo);
-        Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
-    }
-    
-    @Test
-    public void testSnappy() {
-        EchoInfo echoInfo = getEchoInfo();
-        
-        EchoServiceImpl ecohImpl = new EchoServiceImpl();
-        
-        EchoInfo response = echoService.echoSnappy(echoInfo);
-        Assert.assertEquals(ecohImpl.dealWithSnappyEnable(echoInfo).getMessage(), response.getMessage());
-    }
+		return rpcServerOptions;
+	}
+
+	/**
+	 * test client auto recover connection from server.
+	 */
+	@Test
+	public void testAutoRecoverConnection() {
+
+		EchoInfo echoInfo = getEchoInfo();
+
+		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+		EchoInfo response = echoService.echo(echoInfo);
+		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+
+		// here stop server
+		stopServer();
+
+		try {
+			echoService.echo(echoInfo);
+			Assert.fail("should be connect server failed.");
+		} catch (Exception e) {
+			Assert.assertNotNull(e);
+		}
+
+		startServer();
+
+		response = echoService.echo(echoInfo);
+		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+	}
+
+	/**
+	 * @return
+	 */
+	private EchoInfo getEchoInfo() {
+		String message = "xiemalin";
+		// test success
+		EchoInfo echoInfo = new EchoInfo();
+		echoInfo.setMessage(message);
+		return echoInfo;
+	}
+
+	@Test
+	public void testAttachment() {
+
+		EchoInfo echoInfo = getEchoInfo();
+
+		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+		EchoInfo response = echoService.echoWithAttachement(echoInfo);
+		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+	}
+
+	@Test
+	public void testGzip() {
+		EchoInfo echoInfo = getEchoInfo();
+
+		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+		EchoInfo response = echoService.echoGzip(echoInfo);
+		Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
+	}
+
+	@Test
+	public void testSnappy() {
+		EchoInfo echoInfo = getEchoInfo();
+
+		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+		EchoInfo response = echoService.echoSnappy(echoInfo);
+		Assert.assertEquals(ecohImpl.dealWithSnappyEnable(echoInfo).getMessage(), response.getMessage());
+	}
+
+	@Test
+	public void testAyncCall() {
+		EchoInfo echoInfo = getEchoInfo();
+
+		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+		
+		Future<EchoInfo> echoAsync = echoService.echoAsync(echoInfo);
+		
+		try {
+			EchoInfo response = echoAsync.get();
+			Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+		} catch (InterruptedException e) {
+			Assert.fail(e.getMessage());
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			Assert.fail(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		
+	}
 
 }

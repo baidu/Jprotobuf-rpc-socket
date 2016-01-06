@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
@@ -53,6 +54,18 @@ public class RpcServiceRegistry {
      * if override exist allowed. default is not allowed
      */
     private boolean dummyOverride = false;
+    
+	private InvokerInterceptor interceptor;
+
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		this.interceptor = interceptor;
+	}
 
     /**
      * default constructor
@@ -107,6 +120,7 @@ public class RpcServiceRegistry {
         } else {
             rpcHandler = new MessageGeneratedRpcHandler(method, service, protobufPRCService);
         }
+        rpcHandler.setInterceptor(interceptor);
         if (StringUtils.isEmpty(rpcHandler.getServiceName())) {
             throw new IllegalArgumentException(" serviceName from 'serviceExporter' is empty.");
         }

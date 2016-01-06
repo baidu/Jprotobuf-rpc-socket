@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.spring.HaProtobufRpcProxyBean;
 
 /**
@@ -67,4 +68,9 @@ public @interface HaRpcProxy {
      * failover interceptor bean name
      */
     String failoverInteceptorBeanName() default "";
+    
+    /**
+     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}
+     */
+    String invokerIntercepterBeanName() default "";
 }

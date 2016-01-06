@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.management.HttpServer;
 import com.baidu.jprotobuf.pbrpc.server.IDLServiceExporter;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
@@ -73,6 +74,18 @@ public class RpcServer extends ServerBootstrap {
 
 	private BlockingQueue<Runnable> blockingqueue = new LinkedBlockingQueue<Runnable>();
 	private ThreadPoolExecutor es;
+	
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		if (rpcServiceRegistry != null) {
+			rpcServiceRegistry.setInterceptor(interceptor);
+		}
+	}
 
 	/**
 	 * get the inetSocketAddress

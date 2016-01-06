@@ -17,7 +17,6 @@ package com.baidu.jprotobuf.pbrpc.spring;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationEvent;
@@ -37,7 +36,6 @@ public class SimpleBean implements InitializingBean, ApplicationListener<Applica
      */
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        System.out.println("Event-->" + event);
         
     }
 
@@ -46,7 +44,6 @@ public class SimpleBean implements InitializingBean, ApplicationListener<Applica
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.out.println("afterPropertiesSet");
         
     }
 

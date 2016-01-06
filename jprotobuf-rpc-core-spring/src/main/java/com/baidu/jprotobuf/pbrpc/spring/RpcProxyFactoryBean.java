@@ -25,6 +25,7 @@ import org.springframework.remoting.support.DefaultRemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.util.Assert;
 
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
@@ -50,6 +51,18 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     private RpcClient rpcClient;
     
     private boolean lookupStubOnStartup = true;
+    
+	private InvokerInterceptor interceptor;
+
+	/**
+	 * set interceptor value to interceptor
+	 * 
+	 * @param interceptor
+	 *            the interceptor to set
+	 */
+	public void setInterceptor(InvokerInterceptor interceptor) {
+		this.interceptor = interceptor;
+	}
 
     /**
      * get the lookupStubOnStartup
@@ -170,6 +183,8 @@ public class RpcProxyFactoryBean extends RpcClientOptions
         pbrpcProxy.setHost(host);
         pbrpcProxy.setRemoteInvocationFactory(remoteInvocationFactory);
         pbrpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
+        
+        pbrpcProxy.setInterceptor(interceptor);
         // 动态生成代理实例
         pbrpcProxy.setProxyBean(pbrpcProxy.proxy());
         

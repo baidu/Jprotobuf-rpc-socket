@@ -47,13 +47,13 @@ public class EchoServiceImpl {
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
-        try {
-			Thread.sleep(100);
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-        
         return ret;
+    }
+    
+
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo2", description ="echo测试服务")
+    public EchoInfo doEchoAnnother(EchoInfo info) {
+        return doEcho(info);
     }
 
     @ProtobufRPCService(serviceName = "echoService", methodName = "echoWithAttachement", 

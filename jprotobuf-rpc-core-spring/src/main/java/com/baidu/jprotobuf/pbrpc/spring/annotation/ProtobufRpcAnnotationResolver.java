@@ -36,6 +36,7 @@ import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 import com.baidu.jprotobuf.pbrpc.spring.HaRpcProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
@@ -76,6 +77,26 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private AtomicBoolean started = new AtomicBoolean(false);
 
     private RegistryCenterService registryCenterService;
+    
+    private InvokerInterceptor clientInterceptor;
+
+	/**
+	 * set clientInterceptor value to clientInterceptor
+	 * @param clientInterceptor the clientInterceptor to set
+	 */
+	public void setClientInterceptor(InvokerInterceptor clientInterceptor) {
+		this.clientInterceptor = clientInterceptor;
+	}
+	
+	private InvokerInterceptor serverInterceptor;
+
+	/**
+	 * set serverInterceptor value to serverInterceptor
+	 * @param serverInterceptor the serverInterceptor to set
+	 */
+	public void setServerInterceptor(InvokerInterceptor serverInterceptor) {
+		this.serverInterceptor = serverInterceptor;
+	}
 
     /**
      * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
@@ -133,6 +154,7 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         int intPort = Integer.valueOf(port);
 
         String host = parsePlaceholder(rpcExporter.host());
+        
 
         RpcServiceExporter rpcServiceExporter = portMappingExpoters.get(intPort);
         if (rpcServiceExporter == null) {
@@ -150,10 +172,24 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             }
 
             rpcServiceExporter = new RpcServiceExporter();
+            
+            String interceptorName = parsePlaceholder(rpcExporter.invokerIntercepterBeanName());
+            if (!StringUtils.isBlank(interceptorName)) {
+            	InvokerInterceptor interceptor = beanFactory.getBean(interceptorName, InvokerInterceptor.class);
+            	rpcServiceExporter.setInterceptor(interceptor);
+            	
+            } else {
+            	if (serverInterceptor != null) {
+            		rpcServiceExporter.setInterceptor(serverInterceptor);
+            	}
+            }
+            
             rpcServiceExporter.setServicePort(intPort);
             rpcServiceExporter.setHost(host);
             rpcServiceExporter.copyFrom(rpcServerOptions);
             rpcServiceExporter.setRegistryCenterService(registryCenterService);
+            
+            
 
             portMappingExpoters.put(intPort, rpcServiceExporter);
 
@@ -264,6 +300,18 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         if (namingServiceLoadBalanceStrategyFactory != null) {
             haRpcProxyFactoryBean.setNamingServiceLoadBalanceStrategyFactory(namingServiceLoadBalanceStrategyFactory);
         }
+        
+        
+        String interceptorName = parsePlaceholder(rpcProxy.invokerIntercepterBeanName());
+        if (!StringUtils.isBlank(interceptorName)) {
+        	InvokerInterceptor interceptor = beanFactory.getBean(interceptorName, InvokerInterceptor.class);
+        	haRpcProxyFactoryBean.setInterceptor(interceptor);
+        	
+        } else {
+        	if (clientInterceptor != null) {
+        		haRpcProxyFactoryBean.setInterceptor(clientInterceptor);
+        	}
+        }
 
         haRpcProxyFactoryBean.afterPropertiesSet();
 
@@ -298,6 +346,18 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         rpcProxyFactoryBean.setPort(intPort);
         rpcProxyFactoryBean.setHost(host);
         rpcProxyFactoryBean.setLookupStubOnStartup(rpcProxy.lookupStubOnStartup());
+        
+        String interceptorName = parsePlaceholder(rpcProxy.invokerIntercepterBeanName());
+        if (!StringUtils.isBlank(interceptorName)) {
+        	InvokerInterceptor interceptor = beanFactory.getBean(interceptorName, InvokerInterceptor.class);
+        	rpcProxyFactoryBean.setInterceptor(interceptor);
+        	
+        } else {
+        	if (clientInterceptor != null) {
+        		rpcProxyFactoryBean.setInterceptor(clientInterceptor);
+        	}
+        }
+        
         rpcProxyFactoryBean.afterPropertiesSet();
 
         rpcClients.add(rpcProxyFactoryBean);

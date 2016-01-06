@@ -30,20 +30,41 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
 
     private boolean done = false; // 会话完成标识
     
+    private CallbackDone callbackDone;
+    
     /**
      * RPC data message
      */
     private RpcDataPackage message; // 响应消息
+    
+    /**
+	 * 
+	 */
+	public BlockingRpcCallback() {
+	}
 
     /**
+	 * @param callbackDone
+	 */
+	public BlockingRpcCallback(CallbackDone callbackDone) {
+		super();
+		this.callbackDone = callbackDone;
+	}
+
+
+	/**
      * @see com.google.protobuf.RpcCallback#run(java.lang.Object)
      */
     public void run(RpcDataPackage message) {
         this.message = message;
+        if (callbackDone != null) {
+        	callbackDone.done();
+        }
         synchronized (this) {
             done = true;
             this.notifyAll();
         }
+        
     }
 
     public RpcDataPackage getMessage() {
@@ -54,4 +75,7 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
         return done;
     }
 
+    public static interface CallbackDone {
+    	void done();
+    }
 }
