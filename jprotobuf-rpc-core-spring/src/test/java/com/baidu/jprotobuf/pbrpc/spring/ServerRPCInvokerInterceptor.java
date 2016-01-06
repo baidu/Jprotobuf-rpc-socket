@@ -31,6 +31,16 @@ public class ServerRPCInvokerInterceptor implements InvokerInterceptor {
 	
 	private String from;
 	
+	private boolean failed = false;
+	
+	/**
+	 * set failed value to failed
+	 * @param failed the failed to set
+	 */
+	public void setFailed(boolean failed) {
+		this.failed = failed;
+	}
+	
 	/**
 	 * set from value to from
 	 * @param from the from to set
@@ -44,6 +54,10 @@ public class ServerRPCInvokerInterceptor implements InvokerInterceptor {
 	 */
 	@Override
 	public void beforeInvoke(Object target, Method method, Object[] args) {
+		if (failed) {
+			throw new RuntimeException("This is a exception. " + from);
+		}
+		
 		System.out.println("ServerRPCInvokerInterceptor--> method=" + method.getName() + " this is from " + from);
 
 	}

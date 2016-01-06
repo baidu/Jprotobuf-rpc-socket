@@ -31,6 +31,16 @@ public class ClientRPCInvokerInterceptor implements InvokerInterceptor {
 	
 	private String from;
 	
+	private boolean failed = false;
+	
+	/**
+	 * set failed value to failed
+	 * @param failed the failed to set
+	 */
+	public void setFailed(boolean failed) {
+		this.failed = failed;
+	}
+	
 	/**
 	 * set from value to from
 	 * @param from the from to set

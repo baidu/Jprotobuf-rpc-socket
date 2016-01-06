@@ -18,7 +18,9 @@ package com.baidu.jprotobuf.pbrpc.spring;
 
 import org.springframework.stereotype.Service;
 
+import com.baidu.jprotobuf.pbrpc.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.EchoServiceImpl;
+import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
 
 /**
@@ -27,9 +29,14 @@ import com.baidu.jprotobuf.pbrpc.spring.annotation.RpcExporter;
  * @author xiemalin
  * @since 2.17
  */
-@Service("echoServiceAOP")
-@RpcExporter(port = "1031", rpcServerOptionsBeanName = "rpcServerOptions", invokerIntercepterBeanName = "annoServerInterceptor")
-public class AnnotationEchoServiceImpl extends EchoServiceImpl {
+@Service
+@RpcExporter(port = "1034", rpcServerOptionsBeanName = "rpcServerOptions", invokerIntercepterBeanName = "failedAnnoServerInterceptor")
+public class AnnotationEchoServiceImpl4 extends EchoServiceImpl {
 
+    @ProtobufRPCService(serviceName = "echoService", methodName = "serverFailed", description ="echo测试服务")
+    public EchoInfo serverfailed(EchoInfo info) {
+        EchoInfo ret = new EchoInfo();
+        return ret;
+    }
 
 }

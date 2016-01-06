@@ -46,4 +46,13 @@ public class AnnotationEchoServiceClient {
     @HaRpcProxy(namingServiceBeanName = "namingService", serviceInterface = EchoService.class,
             lookupStubOnStartup = false, failoverInteceptorBeanName = "timeoutIngoredSocketFailOverInterceptor")
     public EchoService namingServiceOfTimeoutFailed;
+    
+    
+    @RpcProxy(port = "1034", host = "127.0.0.1", serviceInterface = EchoService.class, 
+            lookupStubOnStartup = false, rpcClientOptionsBeanName = "rpcClientOptions", invokerIntercepterBeanName = "failedAnnoClientInterceptor")
+    public EchoService clientFailedInterceptor;
+    
+    @RpcProxy(port = "1034", host = "127.0.0.1", serviceInterface = EchoService.class, 
+            lookupStubOnStartup = false, rpcClientOptionsBeanName = "rpcClientOptions")
+    public EchoService serverFailedInterceptor;
 }

@@ -24,6 +24,12 @@
 		<property name="from" value="from @RpcProxy  setting"></property>
 	</bean>
 
+	<bean id="failedAnnoClientInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
+		<property name="from" value="from @RpcProxy  setting"></property>
+		<property name="failed" value="true"></property>
+	</bean>
+
 	<bean id="annoHaClientInterceptor"
 		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
 		<property name="from" value="from @HaRpcProxy  setting"></property>
@@ -39,6 +45,13 @@
 		class="com.baidu.jprotobuf.pbrpc.spring.ServerRPCInvokerInterceptor">
 		<property name="from" value="from @RpcExporter setting"></property>
 	</bean>
+
+	<bean id="failedAnnoServerInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ServerRPCInvokerInterceptor">
+		<property name="from" value="from @RpcExporter setting"></property>
+		<property name="failed" value="true"></property>
+	</bean>
+
 
 	<bean
 		class="com.baidu.jprotobuf.pbrpc.spring.annotation.CommonAnnotationBeanPostProcessor">

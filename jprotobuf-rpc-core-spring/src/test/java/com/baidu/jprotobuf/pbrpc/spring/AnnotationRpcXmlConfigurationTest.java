@@ -82,6 +82,32 @@ public class AnnotationRpcXmlConfigurationTest extends RpcXmlConfigurationTestBa
         }
     }
     
+    @Test
+    public void testClientInterceptorFailed() {
+        AnnotationEchoServiceClient annotationEchoServiceClient =
+                context.getBean("echoServiceClient", AnnotationEchoServiceClient.class);
+        
+        // test should throw exception and retry max times
+        try {
+            internalRpcRequestAndResponseTimeout(annotationEchoServiceClient.clientFailedInterceptor);
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
+    }
+    
+    @Test
+    public void testServerInterceptorFailed() {
+        AnnotationEchoServiceClient annotationEchoServiceClient =
+                context.getBean("echoServiceClient", AnnotationEchoServiceClient.class);
+        
+        // test should throw exception and retry max times
+        try {
+            internalRpcRequestAndResponseTimeout(annotationEchoServiceClient.serverFailedInterceptor);
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
+    }
+    
     protected void internalRpcRequestAndResponseTimeout(EchoService echoService) {
         EchoInfo echo = new EchoInfo();
         echo.setMessage("world");
