@@ -24,6 +24,7 @@ public class BeanValidatorInvokerInterceptorTest {
 		try {
 			beanValidatorInvokerInterceptor.beforeInvoke(null, null, new Object[] {bean});
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			Assert.fail(e.getMessage());
 		}
 	}

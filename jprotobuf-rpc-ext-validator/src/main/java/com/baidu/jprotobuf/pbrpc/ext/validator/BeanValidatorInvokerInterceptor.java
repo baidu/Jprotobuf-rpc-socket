@@ -48,6 +48,7 @@ public class BeanValidatorInvokerInterceptor implements InvokerInterceptor {
 			return;
 		}
 		
+		boolean voilationFound = false;
 		Set<ConstraintViolation<Object>> results = new HashSet<ConstraintViolation<Object>>();
 		for (Object o : args) {
 			Set<ConstraintViolation<Object>> result = validator.validate(o);
@@ -55,12 +56,15 @@ public class BeanValidatorInvokerInterceptor implements InvokerInterceptor {
 				continue;
 			}
 			
+			voilationFound = true;
 			results.addAll(result);
 			
 		}
 		
-		String message = formatter.format(results);
-		throw new RuntimeException(message);
+		if (voilationFound) {
+			String message = formatter.format(results);
+			throw new RuntimeException(message);
+		}
 		
 		
 	}
