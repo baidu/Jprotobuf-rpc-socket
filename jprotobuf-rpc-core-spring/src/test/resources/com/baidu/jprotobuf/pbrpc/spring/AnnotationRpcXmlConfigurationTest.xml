@@ -13,6 +13,10 @@
 	<context:component-scan base-package="com.baidu.jprotobuf.pbrpc.spring">
 	</context:component-scan>
 
+<!-- 	<bean id="beanValidatorInvokerInceptor"
+		class="com.baidu.jprotobuf.pbrpc.ext.validator.BeanValidatorInvokerInterceptor">
+	</bean> -->
+
 	<bean id="clientInterceptor"
 		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
 		<property name="from"

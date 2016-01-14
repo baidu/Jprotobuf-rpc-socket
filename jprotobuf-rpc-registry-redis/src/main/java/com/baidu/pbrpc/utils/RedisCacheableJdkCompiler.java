@@ -24,8 +24,6 @@ import org.springframework.util.Assert;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.CacheableJdkCompiler;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
-import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
-import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.pbrpc.register.redis.JedisPool;
 import com.baidu.pbrpc.register.redis.RedisClient;
 import com.baidu.pbrpc.register.redis.RedisRegistryService;

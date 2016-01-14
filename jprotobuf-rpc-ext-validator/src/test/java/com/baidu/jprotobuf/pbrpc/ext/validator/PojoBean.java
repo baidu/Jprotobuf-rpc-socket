@@ -11,6 +11,8 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+
 /**
  * A POJO bean using Bean Validation features
  * 
@@ -20,20 +22,25 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class PojoBean {
 
 	// 必须不为 null, 大小是 10
+	@Protobuf
 	@NotNull
 	@Size(min = 10, max = 10, message="order length must be 10")
 	private String orderId;
 	// 必须不为空
+	@Protobuf
 	@NotEmpty
 	private String customer;
 	// 必须是一个电子信箱地址
+	@Protobuf
 	@Email
 	private String email;
 	// 必须不为空
+	@Protobuf
 	@NotEmpty
 	private String address;
 	// 必须不为 null, 必须是下面四个字符串'created', 'paid', 'shipped', 'closed'其中之一
 	// @Status 是一个定制化的 contraint
+	@Protobuf
 	@NotNull
 	private String status;
 	// 必须不为 null
