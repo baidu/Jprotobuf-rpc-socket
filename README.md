@@ -46,7 +46,33 @@ Features:<br>
 </dependency>
 
 ```
-
+使用Jprotobuf pre compile插件进行预编译，提升启动速度
+```xml
+    <plugin>
+        <groupId>com.baidu</groupId>
+        <artifactId>jprotobuf-precompile-plugin</artifactId>
+        <version>1.2.1</version>
+        <configuration>
+            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+            <filterClassPackage>com.baidu</filterClassPackage>
+        </configuration>
+        <executions>
+            <execution>
+                <phase>compile</phase>
+                <goals>
+                    <goal>precompile</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+```
+filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置一个package名称<br>
+maven执行命令如下:<br>
+```property
+mvn jprotobuf:precompile
+or
+mvn package 
+```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-rpc-core/)
 #### Qucik Start ####
 Jprotobuf-rpc-socket基于JProtobuf基础上开发，可帮助大家开发中省去编写Google Protobuf的IDL描述文件的过程。
