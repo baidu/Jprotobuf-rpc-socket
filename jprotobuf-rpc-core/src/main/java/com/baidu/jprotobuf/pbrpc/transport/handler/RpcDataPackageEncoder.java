@@ -80,12 +80,14 @@ public class RpcDataPackageEncoder extends
 	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
 			List<Object> out) throws Exception {
 
-		RpcDataPackage dataPackage = (RpcDataPackage) msg;
+		RpcDataPackage dataPackage = msg;
 
 		byte[] encodeBytes = dataPackage.write();
 		if (encodeBytes != null) {
 			LOG.log(Level.FINE, "Client send content byte size:"
 					+ encodeBytes.length);
+		} else {
+			throw new Exception("byte is null from dataPackage");
 		}
 
 		ByteBuf encodedMessage = Unpooled.copiedBuffer(encodeBytes);

@@ -210,7 +210,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     public void multiExecuteValidTest() throws Exception {
 
         setUp(10, "hello", "world");
-        ExecutorService pool = Executors.newFixedThreadPool(100);
+        ExecutorService pool = Executors.newFixedThreadPool(10);
 
         List<Future<?>> futures = new ArrayList<Future<?>>(10000);
         for (int i = 0; i < 10000; i++) {

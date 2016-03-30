@@ -134,6 +134,8 @@ public class RpcServerOptions {
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
     
+    private int maxSize = Integer.MAX_VALUE;
+    
     /**
      * if http server port > 0 will start http server
      */
@@ -156,6 +158,7 @@ public class RpcServerOptions {
         this.workThreads = options.workThreads;
         this.taskTheads = options.taskTheads;
         this.httpServerPort = options.httpServerPort;
+        this.maxSize = options.maxSize;
     }
     
 
@@ -318,6 +321,24 @@ public class RpcServerOptions {
 
 
     /**
+	 * get the maxSize
+	 * @return the maxSize
+	 */
+	public int getMaxSize() {
+		return maxSize;
+	}
+
+
+	/**
+	 * set maxSize value to maxSize
+	 * @param maxSize the maxSize to set
+	 */
+	public void setMaxSize(int maxSize) {
+		this.maxSize = maxSize;
+	}
+
+
+	/**
      * get the acceptorThreads
      * @return the acceptorThreads
      */

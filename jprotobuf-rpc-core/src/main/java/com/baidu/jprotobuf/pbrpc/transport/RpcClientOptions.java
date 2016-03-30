@@ -50,6 +50,8 @@ public class RpcClientOptions {
 
     // in MILLISECONDS unit
     private int onceTalkTimeout = 1000;
+    
+    private int maxSize = Integer.MAX_VALUE;
 
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
@@ -80,6 +82,7 @@ public class RpcClientOptions {
         this.shareThreadPoolUnderEachProxy = options.shareThreadPoolUnderEachProxy;
         this.jmxEnabled = options.jmxEnabled;
         this.lifo = options.lifo;
+        this.maxSize = options.maxSize;
     }
 
     /**
@@ -394,4 +397,22 @@ public class RpcClientOptions {
     public boolean isLifo() {
         return lifo;
     }
+
+	/**
+	 * get the maxSize
+	 * @return the maxSize
+	 */
+	public int getMaxSize() {
+		return maxSize;
+	}
+
+	/**
+	 * set maxSize value to maxSize
+	 * @param maxSize the maxSize to set
+	 */
+	public void setMaxSize(int maxSize) {
+		this.maxSize = maxSize;
+	}
+    
+    
 }

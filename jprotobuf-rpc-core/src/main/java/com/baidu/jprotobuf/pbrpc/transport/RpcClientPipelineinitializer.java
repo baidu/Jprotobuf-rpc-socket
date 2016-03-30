@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc.transport;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.logging.Level;
@@ -32,61 +33,66 @@ import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 
 public class RpcClientPipelineinitializer extends ChannelInitializer<Channel> {
 
-    private static Logger LOG = Logger.getLogger(RpcClientPipelineinitializer.class.getName());
+	private static Logger LOG = Logger.getLogger(RpcClientPipelineinitializer.class.getName());
 
-    private static final String CLIENT_ENCODER = "client_data_encoder";
-    private static final String CLIENT_DECODER = "client_data_decoder";
+	private static final String CLIENT_ENCODER = "client_data_encoder";
+	private static final String CLIENT_DECODER = "client_data_decoder";
 
-    private static final String RPC_CHANNEL_STATE_AWARE_HANDLER = "RpcChannelStateAwareHandler";
-    private static final String RPC_CHANNEL_IDLE_HANDLER = "idel_channal_handler";
+	private static final String RPC_CHANNEL_STATE_AWARE_HANDLER = "RpcChannelStateAwareHandler";
+	private static final String RPC_CHANNEL_IDLE_HANDLER = "idel_channal_handler";
 
-    private static final String CLIENT_HANDLER = "client_handler";
+	private static final String CLIENT_HANDLER = "client_handler";
 
-    private static final String COMPRESS = "compress_handler";
-    private static final String UNCOMPRESS = "uncompress";
+	private static final String COMPRESS = "compress_handler";
+	private static final String UNCOMPRESS = "uncompress";
 
-    private RpcClient rpcClient;
+	private RpcClient rpcClient;
 
-    /**
-     * @brief construct method
-     * @param timer
-     */
-    public RpcClientPipelineinitializer(RpcClient client) {
-        this.rpcClient = client;
+	/**
+	 * @brief construct method
+	 * @param timer
+	 */
+	public RpcClientPipelineinitializer(RpcClient client) {
+		this.rpcClient = client;
 
-    }
+	}
 
-    /**
-     * @brief 产生处理器管道
-     * @return ChannelPipeline
-     * @throws Exception
-     * @author songhuiqing
-     * @date 2013/03/07 11:14:53
-     */
+	/**
+	 * @brief 产生处理器管道
+	 * @return ChannelPipeline
+	 * @throws Exception
+	 */
 	@Override
 	protected void initChannel(Channel ch) throws Exception {
-		LOG.log(Level.FINEST,
-				"begin process RPC server response to client handler");
+		LOG.log(Level.FINEST, "begin process RPC server response to client handler");
 		ChannelPipeline channelPipe = ch.pipeline();
-        int idleTimeout = this.rpcClient.getRpcClientOptions().getIdleTimeout();
-        channelPipe.addFirst(RPC_CHANNEL_STATE_AWARE_HANDLER, new IdleStateHandler(idleTimeout, idleTimeout,
-                idleTimeout));
-        channelPipe.addFirst(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
+		int idleTimeout = this.rpcClient.getRpcClientOptions().getIdleTimeout();
+		channelPipe.addFirst(RPC_CHANNEL_STATE_AWARE_HANDLER,
+				new IdleStateHandler(idleTimeout, idleTimeout, idleTimeout));
+		channelPipe.addFirst(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
 
 		// check if need to compress for data and attachment
 		channelPipe.addFirst(COMPRESS, new RpcDataPackageCompressHandler());
 		// encode RpcDataPackage to byte array
-		channelPipe.addFirst(CLIENT_ENCODER, new RpcDataPackageEncoder(
-				rpcClient.getRpcClientOptions().getChunkSize()));
+		channelPipe.addFirst(CLIENT_ENCODER, new RpcDataPackageEncoder(rpcClient.getRpcClientOptions().getChunkSize()));
 
 		// receive data from server
+
+		int messageLengthFieldStart = 4;
+		int messageLengthFieldWidth = 4;
+		// Head meta size is 12, so messageLengthFieldStart +
+		// messageLengthFieldWidth + adjustSize = 12;
+		int adjustSize = 4;
+		channelPipe.addLast("frameDecoder",
+				new LengthFieldBasedFrameDecoder(rpcClient.getRpcClientOptions().getMaxSize(), messageLengthFieldStart,
+						messageLengthFieldWidth, adjustSize, 0));
+
 		// receive byte array to encode to RpcDataPackage
 		channelPipe.addLast(CLIENT_DECODER, new RpcDataPackageDecoder(-1));
 		// do uncompress handle
 		channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
 		// do client handler
-		channelPipe.addLast(CLIENT_HANDLER, new RpcClientServiceHandler(
-				rpcClient));
+		channelPipe.addLast(CLIENT_HANDLER, new RpcClientServiceHandler(rpcClient));
 
 	}
 }

@@ -41,7 +41,7 @@ public class RpcDataPackageCompressHandler extends
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
 			List<Object> out) throws Exception {
-		RpcDataPackage dataPackage = (RpcDataPackage) msg;
+		RpcDataPackage dataPackage = msg;
 
 		// check if do compress
 		Integer compressType = dataPackage.getRpcMeta().getCompressType();

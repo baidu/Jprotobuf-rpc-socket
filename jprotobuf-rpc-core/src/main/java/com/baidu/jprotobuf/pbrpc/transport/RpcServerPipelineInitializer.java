@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc.transport;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.ArrayList;
@@ -85,6 +86,14 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 						this.rpcServerOptions.getKeepAliveTime()));
 
 		channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
+
+		int messageLengthFieldStart = 4;
+		int messageLengthFieldWidth = 4;
+		// Head meta size is 12, so messageLengthFieldStart +
+		// messageLengthFieldWidth + adjustSize = 12;
+		int adjustSize = 4;
+		channelPipe.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(rpcServerOptions.getMaxSize(),
+				messageLengthFieldStart, messageLengthFieldWidth, adjustSize, 0));
 
 		RpcDataPackageDecoder rpcDataPackageDecoder = new RpcDataPackageDecoder(
 				this.rpcServerOptions.getChunkPackageTimeout());
