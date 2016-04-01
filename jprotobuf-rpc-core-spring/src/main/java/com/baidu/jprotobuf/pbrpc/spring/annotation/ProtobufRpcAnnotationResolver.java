@@ -79,6 +79,18 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     private RegistryCenterService registryCenterService;
     
     private InvokerInterceptor clientInterceptor;
+    
+    private ProtobufRpcAnnotationRessolverListener protobufRpcAnnotationRessolverListener;
+    
+
+	/**
+	 * set protobufRpcAnnotationRessolverListener value to protobufRpcAnnotationRessolverListener
+	 * @param protobufRpcAnnotationRessolverListener the protobufRpcAnnotationRessolverListener to set
+	 */
+	public void setProtobufRpcAnnotationRessolverListener(
+			ProtobufRpcAnnotationRessolverListener protobufRpcAnnotationRessolverListener) {
+		this.protobufRpcAnnotationRessolverListener = protobufRpcAnnotationRessolverListener;
+	}
 
 	/**
 	 * set clientInterceptor value to clientInterceptor
@@ -189,9 +201,12 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             rpcServiceExporter.copyFrom(rpcServerOptions);
             rpcServiceExporter.setRegistryCenterService(registryCenterService);
             
-            
-
             portMappingExpoters.put(intPort, rpcServiceExporter);
+            
+            if (protobufRpcAnnotationRessolverListener != null) {
+            	protobufRpcAnnotationRessolverListener.onRpcExporterAnnotationParsered(rpcExporter, intPort, 
+            			bean, rpcServiceExporter.getRegisterServices());
+            }
 
         }
 
@@ -361,8 +376,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         rpcProxyFactoryBean.afterPropertiesSet();
 
         rpcClients.add(rpcProxyFactoryBean);
+        
+        Object object = rpcProxyFactoryBean.getObject();;
+        
+        if (protobufRpcAnnotationRessolverListener != null) {
+        	protobufRpcAnnotationRessolverListener.onRpcProxyAnnotationParsed(rpcProxy, rpcProxyFactoryBean, object);
+        }
 
-        return rpcProxyFactoryBean.getObject();
+        return object;
     }
 
     /*
@@ -457,6 +478,10 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
                     LOGGER.fatal(e.getMessage(), e.getCause());
                 }
             }
+        }
+        
+        if (protobufRpcAnnotationRessolverListener != null) {
+        	protobufRpcAnnotationRessolverListener.destroy();
         }
 
     }
