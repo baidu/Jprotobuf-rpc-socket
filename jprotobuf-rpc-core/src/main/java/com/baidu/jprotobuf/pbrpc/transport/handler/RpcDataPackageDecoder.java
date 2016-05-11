@@ -16,12 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +32,10 @@ import java.util.logging.Logger;
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcHeadMeta;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
  * Decode RpcDataPackage from received bytes
@@ -150,7 +149,6 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
         long rpcMessageDecoderStart = System.nanoTime();
         ByteBuffer buffer = buf.nioBuffer(buf.readerIndex(), RpcHeadMeta.SIZE);
 
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
         byte[] bytes = new byte[RpcHeadMeta.SIZE];
         buffer.get(bytes);
 

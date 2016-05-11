@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.google.protobuf.GeneratedMessage;
 
 /**
@@ -33,95 +34,94 @@ import com.google.protobuf.GeneratedMessage;
 @SuppressWarnings({ "unchecked" })
 public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
 
-	/**
-	 * Logger for this class
-	 */
-	private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
+    /**
+     * Logger for this class
+     */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
-	private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
+    private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
-	private Method parseFromMethod;
+    private Method parseFromMethod;
 
-	/**
-	 * @param method
-	 * @param service
-	 * @param protobufPRCService
-	 */
-	public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
-		super(method, service, protobufPRCService);
+    /**
+     * @param method
+     * @param service
+     * @param protobufPRCService
+     */
+    public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
+        super(method, service, protobufPRCService);
 
-		if (getInputClass() != null) {
-			if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
-				try {
-					parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
-				} catch (Exception e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
-			}
-		}
-	}
+        if (getInputClass() != null) {
+            if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
+                try {
+                    parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf.
-	 * pbrpc .server.RpcData)
-	 */
-	protected RpcData doRealHandle(RpcData data) throws Exception {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf. pbrpc .server.RpcData)
+     */
+    protected RpcData doRealHandle(RpcData data) throws Exception {
 
-		Object input = null;
-		Object[] param;
-		Object ret = null;
-		if (data.getData() != null && parseFromMethod != null) {
-			input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
-			param = new Object[] { input };
-		} else {
-			param = new Object[0];
-		}
+        Object input = null;
+        Object[] param;
+        Object ret = null;
+        if (data.getData() != null && parseFromMethod != null) {
+            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
+            param = new Object[] { input };
+        } else {
+            param = new Object[0];
+        }
 
-		RpcData retData = new RpcData();
-		// process attachment
-		if (getAttachmentHandler() != null) {
-			byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
-					getMethodName(), param);
-			retData.setAttachment(responseAttachment);
-		}
+        RpcData retData = new RpcData();
+        // process attachment
+        if (getAttachmentHandler() != null) {
+            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
+                    getMethodName(), param);
+            retData.setAttachment(responseAttachment);
+        }
 
 		long time = System.currentTimeMillis();
 		// check intercepter
 		if (getInterceptor() != null) {
-			getInterceptor().beforeInvoke(getService(), getMethod(), param);
+			MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+			getInterceptor().beforeInvoke(methodInvocationInfo);
 
-			ret = getInterceptor().process(getService(), getMethod(), param);
-			if (ret != null) {
-				PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
-						+ "' time took:" + (System.currentTimeMillis() - time) + " ms");
+            ret = getInterceptor().process(methodInvocationInfo);
+            if (ret != null) {
+                PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
+                        + "' time took:" + (System.currentTimeMillis() - time) + " ms");
 
-				if (ret instanceof GeneratedMessage) {
-					byte[] response = ((GeneratedMessage) ret).toByteArray();
-					retData.setData(response);
-				}
+                if (ret instanceof GeneratedMessage) {
+                    byte[] response = ((GeneratedMessage) ret).toByteArray();
+                    retData.setData(response);
+                }
 
 				return retData;
 			}
 		}
 
-		ret = getMethod().invoke(getService(), param);
-		long took = (System.currentTimeMillis() - time);
-		PERFORMANCE_LOGGER
-				.fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
+        ret = getMethod().invoke(getService(), param);
+        long took = (System.currentTimeMillis() - time);
+        PERFORMANCE_LOGGER
+                .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
 
-		if (ret == null) {
-			return retData;
-		}
+        if (ret == null) {
+            return retData;
+        }
 
-		if (ret != null && ret instanceof GeneratedMessage) {
-			byte[] response = ((GeneratedMessage) ret).toByteArray();
-			retData.setData(response);
-		}
+        if (ret != null && ret instanceof GeneratedMessage) {
+            byte[] response = ((GeneratedMessage) ret).toByteArray();
+            retData.setData(response);
+        }
 
-		return retData;
-	}
+        return retData;
+    }
 
 }

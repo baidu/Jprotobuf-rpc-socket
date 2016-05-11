@@ -54,6 +54,8 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     
 	private InvokerInterceptor interceptor;
 
+	private Object proxy;
+	
 	/**
 	 * set interceptor value to interceptor
 	 * 
@@ -185,11 +187,21 @@ public class RpcProxyFactoryBean extends RpcClientOptions
         pbrpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
         
         pbrpcProxy.setInterceptor(interceptor);
+        
         // 动态生成代理实例
-        pbrpcProxy.setProxyBean(pbrpcProxy.proxy());
+        proxy = pbrpcProxy.proxy();
+        pbrpcProxy.setProxyBean(proxy);
         
         this.serviceProxy = new ProxyFactory(getServiceInterface(), this).getProxy();
     }
+    
+    /**
+	 * get the proxyBean
+	 * @return the proxyBean
+	 */
+	public Object getProxyBean() {
+		return proxy;
+	}
 
     /* (non-Javadoc)
      * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
@@ -203,7 +215,7 @@ public class RpcProxyFactoryBean extends RpcClientOptions
      * set remoteInvocationFactory value to remoteInvocationFactory
      * @param remoteInvocationFactory the remoteInvocationFactory to set
      */
-    protected void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
+    public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
         this.remoteInvocationFactory = remoteInvocationFactory;
     }
 

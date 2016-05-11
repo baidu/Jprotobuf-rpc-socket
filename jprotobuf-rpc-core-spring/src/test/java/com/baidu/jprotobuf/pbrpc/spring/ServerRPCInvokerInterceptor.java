@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import org.springframework.util.Assert;
 
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 
 /**
  * A  {@link InvokerInterceptor} implements to print intercepter message for server
@@ -53,12 +54,12 @@ public class ServerRPCInvokerInterceptor implements InvokerInterceptor {
 	 * @see com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor#beforeInvoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 	 */
 	@Override
-	public void beforeInvoke(Object target, Method method, Object[] args) {
+	public void beforeInvoke(MethodInvocationInfo methodInvocation) {
 		if (failed) {
 			throw new RuntimeException("This is a exception. " + from);
 		}
 		
-		System.out.println("ServerRPCInvokerInterceptor--> method=" + method.getName() + " this is from " + from);
+		System.out.println("ServerRPCInvokerInterceptor--> method=" + methodInvocation.getMethod().getName() + " this is from " + from);
 
 	}
 
@@ -66,8 +67,8 @@ public class ServerRPCInvokerInterceptor implements InvokerInterceptor {
 	 * @see com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor#process(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
 	 */
 	@Override
-	public Object process(Object target, Method method, Object[] args) {
-		Assert.notNull(method);
+	public Object process(MethodInvocationInfo methodInvocation) {
+		Assert.notNull(methodInvocation.getMethod());
 		return null;
 	}
 

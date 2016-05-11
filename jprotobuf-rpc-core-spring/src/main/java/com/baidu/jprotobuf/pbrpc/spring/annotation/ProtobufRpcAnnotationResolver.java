@@ -201,12 +201,9 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             rpcServiceExporter.copyFrom(rpcServerOptions);
             rpcServiceExporter.setRegistryCenterService(registryCenterService);
             
-            portMappingExpoters.put(intPort, rpcServiceExporter);
             
-            if (protobufRpcAnnotationRessolverListener != null) {
-            	protobufRpcAnnotationRessolverListener.onRpcExporterAnnotationParsered(rpcExporter, intPort, 
-            			bean, rpcServiceExporter.getRegisterServices());
-            }
+
+            portMappingExpoters.put(intPort, rpcServiceExporter);
 
         }
 
@@ -216,6 +213,11 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
             registerServices = new ArrayList<Object>();
         }
         registerServices.add(bean);
+        
+        if (protobufRpcAnnotationRessolverListener != null) {
+        	protobufRpcAnnotationRessolverListener.onRpcExporterAnnotationParsered(rpcExporter, intPort, bean, registerServices);
+        }
+        
         rpcServiceExporter.setRegisterServices(registerServices);
 
     }
@@ -355,7 +357,35 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
 
         String host = parsePlaceholder(rpcProxy.host());
 
-        RpcProxyFactoryBean rpcProxyFactoryBean = new RpcProxyFactoryBean();
+        RpcProxyFactoryBean rpcProxyFactoryBean = createRpcProxyFactoryBean(rpcProxy, beanFactory, rpcClientOptions,
+				intPort, host);
+        
+        rpcProxyFactoryBean.afterPropertiesSet();
+        
+        rpcClients.add(rpcProxyFactoryBean);
+        Object object = rpcProxyFactoryBean.getObject();
+        if (protobufRpcAnnotationRessolverListener != null) {
+        	
+        	RpcProxyFactoryBean newRpcProxyFactoryBean = createRpcProxyFactoryBean(rpcProxy, beanFactory, rpcClientOptions,
+    				intPort, host);
+        	
+        	protobufRpcAnnotationRessolverListener.onRpcProxyAnnotationParsed(rpcProxy, newRpcProxyFactoryBean, rpcProxyFactoryBean.getProxyBean());
+        }
+
+        return object;
+    }
+
+	/**
+	 * @param rpcProxy
+	 * @param beanFactory
+	 * @param rpcClientOptions
+	 * @param intPort
+	 * @param host
+	 * @return
+	 */
+	protected RpcProxyFactoryBean createRpcProxyFactoryBean(RpcProxy rpcProxy,
+			ConfigurableListableBeanFactory beanFactory, RpcClientOptions rpcClientOptions, int intPort, String host) {
+		RpcProxyFactoryBean rpcProxyFactoryBean = new RpcProxyFactoryBean();
         rpcProxyFactoryBean.copyFrom(rpcClientOptions);
         rpcProxyFactoryBean.setServiceInterface(rpcProxy.serviceInterface());
         rpcProxyFactoryBean.setPort(intPort);
@@ -372,19 +402,8 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         		rpcProxyFactoryBean.setInterceptor(clientInterceptor);
         	}
         }
-        
-        rpcProxyFactoryBean.afterPropertiesSet();
-
-        rpcClients.add(rpcProxyFactoryBean);
-        
-        Object object = rpcProxyFactoryBean.getObject();;
-        
-        if (protobufRpcAnnotationRessolverListener != null) {
-        	protobufRpcAnnotationRessolverListener.onRpcProxyAnnotationParsed(rpcProxy, rpcProxyFactoryBean, object);
-        }
-
-        return object;
-    }
+		return rpcProxyFactoryBean;
+	}
 
     /*
      * (non-Javadoc)

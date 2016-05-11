@@ -5,6 +5,8 @@ package com.baidu.jprotobuf.pbrpc.ext.validator;
 
 import org.junit.Test;
 
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
+
 import junit.framework.Assert;
 
 /**
@@ -17,12 +19,15 @@ public class BeanValidatorInvokerInterceptorTest {
 
 	private BeanValidatorInvokerInterceptor beanValidatorInvokerInterceptor = new BeanValidatorInvokerInterceptor();
 	
+	
 	@Test
 	public void testValidateSuccess() {
 		PojoBean bean = PojoBean.makeValidate();
 		
+		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null);
+		
 		try {
-			beanValidatorInvokerInterceptor.beforeInvoke(null, null, new Object[] {bean});
+			beanValidatorInvokerInterceptor.beforeInvoke(methodInvocationInfo);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			Assert.fail(e.getMessage());
@@ -32,9 +37,10 @@ public class BeanValidatorInvokerInterceptorTest {
 	@Test
 	public void testValidateFailed() {
 		PojoBean bean = PojoBean.makeInValidate();
+		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null);
 		
 		try {
-			beanValidatorInvokerInterceptor.beforeInvoke(null, null, new Object[] {bean});
+			beanValidatorInvokerInterceptor.beforeInvoke(methodInvocationInfo);
 			Assert.fail("should throw exception here.");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

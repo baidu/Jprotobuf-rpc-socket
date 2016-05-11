@@ -17,11 +17,15 @@
 package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.logging.Logger;
+
+import org.springframework.util.SerializationUtils;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.management.ServerStatus;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 
@@ -89,9 +93,10 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
 
 		// check intercepter
 		if (getInterceptor() != null) {
-			getInterceptor().beforeInvoke(getService(), getMethod(), param);
-
-			ret = getInterceptor().process(getService(), getMethod(), param);
+			MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+			getInterceptor().beforeInvoke(methodInvocationInfo);
+			
+			ret = getInterceptor().process(methodInvocationInfo);
 			if (ret != null) {
 				PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
 						+ "' time took:" + (System.currentTimeMillis() - time) + " ms");

@@ -16,7 +16,6 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
-import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +25,7 @@ import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
@@ -54,17 +54,18 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         }
         rpcServer = new RpcServer(rpcServerOptions);
         rpcServer.setInterceptor(new InvokerInterceptor() {
-			
-			@Override
-			public Object process(Object target, Method method, Object[] args) {
-				System.out.println("server intercepr method:" + method);
-				return null;
-			}
-			
-			@Override
-			public void beforeInvoke(Object target, Method method, Object[] args) {
-				Assert.assertNotNull(method);
-			}
+            
+            @Override
+            public Object process(MethodInvocationInfo methodInvocation) {
+                System.out.println("server intercepr method:" + methodInvocation.getMethod());
+                return null;
+            }
+            
+            @Override
+            public void beforeInvoke(MethodInvocationInfo methodInvocation) {
+                Assert.assertNotNull(methodInvocation.getMethod());
+                
+            }
 		});
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
@@ -82,16 +83,17 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         
         pbrpcProxy.setInterceptor(new InvokerInterceptor() {
 			
-			@Override
-			public Object process(Object target, Method method, Object[] args) {
-				System.out.println("client intercepr method:" + method);
-				return null;
-			}
-			
-			@Override
-			public void beforeInvoke(Object target, Method method, Object[] args) {
-				Assert.assertNotNull(method);
-			}
+            @Override
+            public Object process(MethodInvocationInfo methodInvocation) {
+                System.out.println("server intercepr method:" + methodInvocation.getMethod());
+                return null;
+            }
+            
+            @Override
+            public void beforeInvoke(MethodInvocationInfo methodInvocation) {
+                Assert.assertNotNull(methodInvocation.getMethod());
+                
+            }
 		});
         
         echoService = pbrpcProxy.proxy();

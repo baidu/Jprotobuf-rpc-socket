@@ -32,7 +32,7 @@ public interface InvokerInterceptor {
 	 * @param method method object
 	 * @param args method arguments
 	 */
-	void beforeInvoke(Object target, Method method, Object[] args);
+	void beforeInvoke(MethodInvocationInfo methodInvocation);
 
 	/**
 	 * to do intercept action
@@ -44,5 +44,5 @@ public interface InvokerInterceptor {
 	 *         if return null will continue to another intercepter.
 	 * 		
 	 */
-	Object process(Object target, Method method, Object[] args);
+	Object process(MethodInvocationInfo methodInvocation);
 }

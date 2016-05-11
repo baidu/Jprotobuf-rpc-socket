@@ -84,17 +84,27 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
         RpcDataPackage rpcDataPackage = super.buildRequestDataPackage(rpcMethodInfo, args);
 
         MethodInvocation methodInvocation = CURRENT_PARAMS.get();
-        if (methodInvocation != null) {
-            RemoteInvocation ri = remoteInvocationFactory.createRemoteInvocation(methodInvocation);
-            Map<String, Serializable> map = ri.getAttributes();
-
-            if (map != null) {
-                byte[] data = SerializationUtils.serialize(map);
-                rpcDataPackage.extraParams(data);
-            }
+        
+        RemoteInvocation ri = createRemoteInvocation(methodInvocation);
+        if (ri != null) {
+        	Map<String, Serializable> map = ri.getAttributes();
+        	
+        	if (map != null) {
+        		byte[] data = SerializationUtils.serialize(map);
+        		rpcDataPackage.extraParams(data);
+        	}
         }
 
         return rpcDataPackage;
+    }
+    
+    protected RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
+    	if (methodInvocation != null) {
+            RemoteInvocation ri = remoteInvocationFactory.createRemoteInvocation(methodInvocation);
+            return ri;
+    	}
+    	
+    	return null;
     }
 
     /**

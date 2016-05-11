@@ -13,6 +13,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 
 /**
  * This class is to implements {@link InvokerInterceptor} interface for validating target bean argument before invoke method process
@@ -34,16 +35,14 @@ public class BeanValidatorInvokerInterceptor implements InvokerInterceptor {
 	/**
 	 * To validate bean by Bean-Validation tool. if validate failed will throws RuntimeException
 	 * 
-	 * @param target target invoke object
-	 * @param method method object
-	 * @param args method arguments 
+	 * @param methodInvocationInfo method invocation info
 	 */
 	@Override
-	public void beforeInvoke(Object object, Method method, Object[] args) {
+	public void beforeInvoke(MethodInvocationInfo methodInvocationInfo) {
 		if (formatter == null) {
 			throw new IllegalArgumentException("'property' formatter is null");
 		}
-		
+		Object[] args = methodInvocationInfo.getArgs();
 		if (args == null || args.length == 0) {
 			return;
 		}
@@ -70,7 +69,7 @@ public class BeanValidatorInvokerInterceptor implements InvokerInterceptor {
 	}
 
 	@Override
-	public Object process(Object object, Method method, Object[] args) {
+	public Object process(MethodInvocationInfo methodInvocationInfo) {
 		return null;
 	}
 
