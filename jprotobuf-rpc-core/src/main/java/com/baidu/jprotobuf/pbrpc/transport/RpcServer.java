@@ -38,6 +38,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
+import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
@@ -49,223 +50,226 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  */
 public class RpcServer extends ServerBootstrap {
 
-	/**
-	 * 
-	 */
-	private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
+    /**
+     * 
+     */
+    private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
 
-	private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
+    private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
 
-	private AtomicBoolean stop = new AtomicBoolean(false);
+    private AtomicBoolean stop = new AtomicBoolean(false);
 
-	private RpcServerOptions rpcServerOptions;
+    private RpcServerOptions rpcServerOptions;
 
-	private RpcServerPipelineInitializer rpcServerPipelineInitializer;
+    private RpcServerPipelineInitializer rpcServerPipelineInitializer;
 
-	private EventLoopGroup bossGroup;
-	private EventLoopGroup workerGroup;
-	private Channel channel;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private Channel channel;
 
-	private InetSocketAddress inetSocketAddress;
+    private InetSocketAddress inetSocketAddress;
 
-	private long startTime;
+    private long startTime;
 
-	private HttpServer httpServer;
+    private HttpServer httpServer;
 
-	private BlockingQueue<Runnable> blockingqueue = new LinkedBlockingQueue<Runnable>();
-	private ThreadPoolExecutor es;
-	
-	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
-	 */
-	public void setInterceptor(InvokerInterceptor interceptor) {
-		if (rpcServiceRegistry != null) {
-			rpcServiceRegistry.setInterceptor(interceptor);
-		}
-	}
+    private BlockingQueue<Runnable> blockingqueue = new LinkedBlockingQueue<Runnable>();
+    private ThreadPoolExecutor es;
 
-	/**
-	 * get the inetSocketAddress
-	 * 
-	 * @return the inetSocketAddress
-	 */
-	public InetSocketAddress getInetSocketAddress() {
-		return inetSocketAddress;
-	}
+    /**
+     * set interceptor value to interceptor
+     * 
+     * @param interceptor the interceptor to set
+     */
+    public void setInterceptor(InvokerInterceptor interceptor) {
+        if (rpcServiceRegistry != null) {
+            rpcServiceRegistry.setInterceptor(interceptor);
+        }
+    }
 
-	/**
-	 * get the es
-	 * 
-	 * @return the es
-	 */
-	public ThreadPoolExecutor getEs() {
-		return es;
-	}
-	
-	/**
-	 * rpcServiceRegistry
-	 */
-	private RpcServiceRegistry rpcServiceRegistry;
+    /**
+     * get the inetSocketAddress
+     * 
+     * @return the inetSocketAddress
+     */
+    public InetSocketAddress getInetSocketAddress() {
+        return inetSocketAddress;
+    }
 
-	public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
-			RpcServiceRegistry rpcServiceRegistry) {
-		if (rpcServiceRegistry == null) {
-			throw new RuntimeException("protperty 'rpcServiceRegistry ' is null.");
-		}
+    /**
+     * get the es
+     * 
+     * @return the es
+     */
+    public ThreadPoolExecutor getEs() {
+        return es;
+    }
 
-		if (serverOptions == null) {
-			serverOptions = new RpcServerOptions();
-		}
+    /**
+     * rpcServiceRegistry
+     */
+    private RpcServiceRegistry rpcServiceRegistry;
 
-		this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
-		this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
+    public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
+            RpcServiceRegistry rpcServiceRegistry) {
+        if (rpcServiceRegistry == null) {
+            throw new RuntimeException("protperty 'rpcServiceRegistry ' is null.");
+        }
 
-		es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L, TimeUnit.SECONDS,
-				blockingqueue);
+        if (serverOptions == null) {
+            serverOptions = new RpcServerOptions();
+        }
 
-		this.group(this.bossGroup, this.workerGroup);
-		this.channel(serverChannelClass);
+        if (serverOptions.getIoEventGroupType() == RpcServerOptions.POLL_EVENT_GROUP) {
+            this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
+            this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
+        } else {
+            this.bossGroup = new EpollEventLoopGroup(serverOptions.getAcceptorThreads());
+            this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads());
+        }
 
-		this.option(ChannelOption.SO_BACKLOG, serverOptions.getBacklog());
+        es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L, TimeUnit.SECONDS,
+                blockingqueue);
 
-		this.childOption(ChannelOption.SO_KEEPALIVE, serverOptions.isKeepAlive());
-		this.childOption(ChannelOption.SO_REUSEADDR, true);
-		this.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-		this.childOption(ChannelOption.TCP_NODELAY, serverOptions.isTcpNoDelay());
-		this.childOption(ChannelOption.SO_LINGER, serverOptions.getSoLinger());
-		this.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, serverOptions.getConnectTimeout());
-		this.childOption(ChannelOption.SO_RCVBUF, serverOptions.getReceiveBufferSize());
-		this.childOption(ChannelOption.SO_SNDBUF, serverOptions.getSendBufferSize());
+        this.group(this.bossGroup, this.workerGroup);
+        this.channel(serverChannelClass);
 
-		this.rpcServiceRegistry = rpcServiceRegistry;
-		// do register meta service
-		rpcServiceRegistry.doRegisterMetaService();
-		this.rpcServerOptions = serverOptions;
-		this.rpcServerPipelineInitializer = new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es);
-		this.childHandler(rpcServerPipelineInitializer);
-	}
+        this.option(ChannelOption.SO_BACKLOG, serverOptions.getBacklog());
 
-	public RpcServer(RpcServerOptions serverOptions) {
-		this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry());
-	}
+        this.childOption(ChannelOption.SO_KEEPALIVE, serverOptions.isKeepAlive());
+        this.childOption(ChannelOption.SO_REUSEADDR, true);
+        this.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+        this.childOption(ChannelOption.TCP_NODELAY, serverOptions.isTcpNoDelay());
+        this.childOption(ChannelOption.SO_LINGER, serverOptions.getSoLinger());
+        this.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, serverOptions.getConnectTimeout());
+        this.childOption(ChannelOption.SO_RCVBUF, serverOptions.getReceiveBufferSize());
+        this.childOption(ChannelOption.SO_SNDBUF, serverOptions.getSendBufferSize());
 
-	public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
-		this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry);
-	}
+        this.rpcServiceRegistry = rpcServiceRegistry;
+        // do register meta service
+        rpcServiceRegistry.doRegisterMetaService();
+        this.rpcServerOptions = serverOptions;
+        this.rpcServerPipelineInitializer = new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es);
+        this.childHandler(rpcServerPipelineInitializer);
+    }
 
-	public RpcServer() {
-		this(new RpcServerOptions());
-	}
+    public RpcServer(RpcServerOptions serverOptions) {
+        this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry());
+    }
 
-	public RpcServer(Class<? extends ServerChannel> serverChannelClass) {
-		this(serverChannelClass, new RpcServerOptions(), new RpcServiceRegistry());
-	}
+    public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
+        this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry);
+    }
 
-	public void registerService(IDLServiceExporter service) {
-		rpcServiceRegistry.registerService(service);
-	}
+    public RpcServer() {
+        this(new RpcServerOptions());
+    }
 
-	public void registerService(final Object target) {
-		rpcServiceRegistry.registerService(target);
-	}
+    public RpcServer(Class<? extends ServerChannel> serverChannelClass) {
+        this(serverChannelClass, new RpcServerOptions(), new RpcServiceRegistry());
+    }
 
-	public void start(int port) {
-		InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
-		start(inetSocketAddress);
-	}
+    public void registerService(IDLServiceExporter service) {
+        rpcServiceRegistry.registerService(service);
+    }
 
-	public void start(InetSocketAddress sa) {
-		LOG.log(Level.INFO, "RPC starting at: " + sa);
-		this.bind(sa).addListener(new ChannelFutureListener() {
+    public void registerService(final Object target) {
+        rpcServiceRegistry.registerService(target);
+    }
 
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if (future.isSuccess()) {
-					channel = future.channel();
-					// TODO notifyStarted();
-				} else {
-					// TODO notifyFailed(future.cause());
-				}
-			}
-		});
-		this.inetSocketAddress = sa;
+    public void start(int port) {
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
+        start(inetSocketAddress);
+    }
 
-		startTime = System.currentTimeMillis();
+    public void start(InetSocketAddress sa) {
+        LOG.log(Level.INFO, "RPC starting at: " + sa);
+        this.bind(sa).addListener(new ChannelFutureListener() {
 
-		// check if need start http server
-		if (rpcServerOptions.getHttpServerPort() > 0) {
-			httpServer = new HttpServer(this);
-			httpServer.start(rpcServerOptions.getHttpServerPort());
-		}
-	}
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (future.isSuccess()) {
+                    channel = future.channel();
+                    // TODO notifyStarted();
+                } else {
+                    // TODO notifyFailed(future.cause());
+                }
+            }
+        });
+        this.inetSocketAddress = sa;
 
-	public void waitForStop() throws InterruptedException {
-		while (!stop.get()) {
-			Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
-		}
-		shutdown();
-	}
+        startTime = System.currentTimeMillis();
 
-	public void stop() {
-		stop.set(true);
-	}
+        // check if need start http server
+        if (rpcServerOptions.getHttpServerPort() > 0) {
+            httpServer = new HttpServer(this);
+            httpServer.start(rpcServerOptions.getHttpServerPort());
+        }
+    }
 
-	public AtomicBoolean getStop() {
-		return stop;
-	}
+    public void waitForStop() throws InterruptedException {
+        while (!stop.get()) {
+            Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
+        }
+        shutdown();
+    }
 
-	public boolean isStop() {
-		return stop.get();
-	}
+    public void stop() {
+        stop.set(true);
+    }
 
-	public void shutdown() {
-		stop();
-		if (channel != null && channel.isOpen()) {
-			channel.close();
-		}
+    public AtomicBoolean getStop() {
+        return stop;
+    }
 
-		bossGroup.shutdownGracefully();
-		workerGroup.shutdownGracefully();
+    public boolean isStop() {
+        return stop.get();
+    }
 
-		es.shutdown();
+    public void shutdown() {
+        stop();
+        if (channel != null && channel.isOpen()) {
+            channel.close();
+        }
 
-		if (httpServer != null) {
-			httpServer.shutdownNow();
-		}
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
 
-	}
+        es.shutdown();
 
-	public void setStop(AtomicBoolean stop) {
-		this.stop = stop;
-	}
+        if (httpServer != null) {
+            httpServer.shutdownNow();
+        }
 
-	/**
-	 * get the rpcServerOptions
-	 * 
-	 * @return the rpcServerOptions
-	 */
-	public RpcServerOptions getRpcServerOptions() {
-		return rpcServerOptions;
-	}
+    }
 
-	/**
-	 * set rpcServerOptions value to rpcServerOptions
-	 * 
-	 * @param rpcServerOptions
-	 *            the rpcServerOptions to set
-	 */
-	public void setRpcServerOptions(RpcServerOptions rpcServerOptions) {
-		this.rpcServerOptions = rpcServerOptions;
-	}
+    public void setStop(AtomicBoolean stop) {
+        this.stop = stop;
+    }
 
-	/**
-	 * get the startTime
-	 * 
-	 * @return the startTime
-	 */
-	public long getStartTime() {
-		return startTime;
-	}
+    /**
+     * get the rpcServerOptions
+     * 
+     * @return the rpcServerOptions
+     */
+    public RpcServerOptions getRpcServerOptions() {
+        return rpcServerOptions;
+    }
+
+    /**
+     * set rpcServerOptions value to rpcServerOptions
+     * 
+     * @param rpcServerOptions the rpcServerOptions to set
+     */
+    public void setRpcServerOptions(RpcServerOptions rpcServerOptions) {
+        this.rpcServerOptions = rpcServerOptions;
+    }
+
+    /**
+     * get the startTime
+     * 
+     * @return the startTime
+     */
+    public long getStartTime() {
+        return startTime;
+    }
 }

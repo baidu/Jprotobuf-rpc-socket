@@ -52,6 +52,11 @@ public class RpcClientOptions {
     private int onceTalkTimeout = 1000;
     
     private int maxSize = Integer.MAX_VALUE;
+    
+    public static final int POLL_EVENT_GROUP = 0;
+    public static final int EPOLL_EVENT_GROUP = 1;
+    
+    private int ioEventGroupType = POLL_EVENT_GROUP; // 0=poll, 1=epoll
 
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
@@ -83,6 +88,7 @@ public class RpcClientOptions {
         this.jmxEnabled = options.jmxEnabled;
         this.lifo = options.lifo;
         this.maxSize = options.maxSize;
+        this.ioEventGroupType = options.ioEventGroupType;
     }
 
     /**
@@ -413,6 +419,22 @@ public class RpcClientOptions {
 	public void setMaxSize(int maxSize) {
 		this.maxSize = maxSize;
 	}
+
+    /**
+     * get the ioEventGroupType
+     * @return the ioEventGroupType
+     */
+    public int getIoEventGroupType() {
+        return ioEventGroupType;
+    }
+
+    /**
+     * set ioEventGroupType value to ioEventGroupType
+     * @param ioEventGroupType the ioEventGroupType to set
+     */
+    public void setIoEventGroupType(int ioEventGroupType) {
+        this.ioEventGroupType = ioEventGroupType;
+    }
     
     
 }

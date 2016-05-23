@@ -62,6 +62,8 @@ public class RpcServerOptions {
 		builder.append(httpServerPort);
 		builder.append(", tcpNoDelay=");
 		builder.append(tcpNoDelay);
+	      builder.append(", ioEventGroupType=");
+	        builder.append(ioEventGroupType);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -136,6 +138,11 @@ public class RpcServerOptions {
     
     private int maxSize = Integer.MAX_VALUE;
     
+    public static final int POLL_EVENT_GROUP = 0;
+    public static final int EPOLL_EVENT_GROUP = 1;
+    
+    private int ioEventGroupType = POLL_EVENT_GROUP; // 0=poll, 1=epoll
+    
     /**
      * if http server port > 0 will start http server
      */
@@ -159,6 +166,7 @@ public class RpcServerOptions {
         this.taskTheads = options.taskTheads;
         this.httpServerPort = options.httpServerPort;
         this.maxSize = options.maxSize;
+        this.ioEventGroupType = options.ioEventGroupType;
     }
     
 
@@ -406,6 +414,24 @@ public class RpcServerOptions {
 	public void setTaskTheads(int taskTheads) {
 		this.taskTheads = taskTheads;
 	}
+
+
+    /**
+     * get the ioEventGroupType
+     * @return the ioEventGroupType
+     */
+    public int getIoEventGroupType() {
+        return ioEventGroupType;
+    }
+
+
+    /**
+     * set ioEventGroupType value to ioEventGroupType
+     * @param ioEventGroupType the ioEventGroupType to set
+     */
+    public void setIoEventGroupType(int ioEventGroupType) {
+        this.ioEventGroupType = ioEventGroupType;
+    }
     
     
 }

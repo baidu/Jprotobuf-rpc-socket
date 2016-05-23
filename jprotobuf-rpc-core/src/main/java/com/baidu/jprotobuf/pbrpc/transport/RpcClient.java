@@ -16,21 +16,23 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.DefaultMessageSizeEstimator;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.DefaultMessageSizeEstimator;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
 
 /**
  * RPC client handler class.
@@ -43,12 +45,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RpcClient extends Bootstrap {
 
     /**
-     * Tick count of each wheel instance for timer 
+     * Tick count of each wheel instance for timer
      */
     private static final int DEFAULT_TICKS_PER_WHEEL = 2048;
 
     /**
-     * Tick duration for timer 
+     * Tick duration for timer
      */
     private static final int DEFAULT_TICK_DURATION = 100;
 
@@ -59,7 +61,7 @@ public class RpcClient extends Bootstrap {
     private static Timer timer = createTimer(); // 初始化定时器
     private RpcClientOptions rpcClientOptions;
     private ChannelPool channelPool;
-    private NioEventLoopGroup workerGroup;
+    private EventLoopGroup workerGroup;
 
     private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger();
 
@@ -82,7 +84,13 @@ public class RpcClient extends Bootstrap {
     }
 
     public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
-        this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getThreadPoolSize());
+
+        if (rpcClientOptions.getIoEventGroupType() == RpcClientOptions.EPOLL_EVENT_GROUP) {
+            this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getThreadPoolSize());
+        } else {
+            this.workerGroup = new EpollEventLoopGroup(rpcClientOptions.getThreadPoolSize());
+        }
+
         this.group(workerGroup);
         this.channel(clientChannelClass);
         this.handler(new RpcClientPipelineinitializer(this));

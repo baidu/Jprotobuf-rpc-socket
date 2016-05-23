@@ -32,8 +32,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.springframework.util.SerializationUtils;
-
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
