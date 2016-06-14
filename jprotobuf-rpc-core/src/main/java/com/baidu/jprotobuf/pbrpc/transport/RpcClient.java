@@ -85,7 +85,7 @@ public class RpcClient extends Bootstrap {
 
     public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
 
-        if (rpcClientOptions.getIoEventGroupType() == RpcClientOptions.EPOLL_EVENT_GROUP) {
+        if (rpcClientOptions.getIoEventGroupType() == RpcClientOptions.POLL_EVENT_GROUP) {
             this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getThreadPoolSize());
         } else {
             this.workerGroup = new EpollEventLoopGroup(rpcClientOptions.getThreadPoolSize());
