@@ -128,8 +128,10 @@ public class RpcServer extends ServerBootstrap {
             this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads());
         }
 
-        es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L, TimeUnit.SECONDS,
-                blockingqueue);
+        if (serverOptions.getTaskTheads() > 0) {
+            es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L, TimeUnit.SECONDS,
+                    blockingqueue);
+        }
 
         this.group(this.bossGroup, this.workerGroup);
         this.channel(serverChannelClass);
@@ -234,7 +236,9 @@ public class RpcServer extends ServerBootstrap {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
 
-        es.shutdown();
+        if (es != null) {
+            es.shutdown();
+        }
 
         if (httpServer != null) {
             httpServer.shutdownNow();

@@ -23,5 +23,12 @@
 			<version>${netty-all.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<type>jar</type>
+			<scope>provider</scope>
+		</dependency>
 	</dependencies>
 </project>

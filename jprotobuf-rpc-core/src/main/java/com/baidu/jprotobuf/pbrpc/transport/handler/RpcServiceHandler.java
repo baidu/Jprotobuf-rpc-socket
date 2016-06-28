@@ -71,8 +71,13 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
 		BackgroundTask task = new BackgroundTask(ctx, dataPackage, rpcServiceRegistry);
-		// run by async way
-		es.submit(task);
+		
+		if (es != null) {
+		    // run by async way
+		    es.submit(task);
+		} else {
+		    task.run(); // run at current thread
+		}
 	}
 
 	@Override

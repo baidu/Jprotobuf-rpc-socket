@@ -131,7 +131,7 @@ public class RpcServerOptions {
     
     private int acceptorThreads = 0; // acceptor threads. default use Netty default value
     private int workThreads = 0; // work threads. default use Netty default value
-    private int taskTheads = 20; // real execute task threads
+    private int taskTheads = 0; // real execute task threads
     
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;

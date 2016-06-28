@@ -54,7 +54,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 1000;
+    int totalRequestSize = 10000;
     
     /**
 	 * set totalRequestSize value to totalRequestSize
