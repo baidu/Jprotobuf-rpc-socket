@@ -130,12 +130,14 @@ public class ServerStatus {
         ret.append("Compress enabled(Gzip Snappy)").append(LINE_BREAK);
         ret.append("Attachment enabled").append(LINE_BREAK);
         
-        ret.append("--------------Thread status----------------").append(LINE_BREAK);
-        ret.append("Max task count:").append(rpcServer.getEs().getMaximumPoolSize()).append(LINE_BREAK);
-        ret.append("Running task count:").append(rpcServer.getEs().getActiveCount()).append(LINE_BREAK);
-        ret.append("Waiting task count:").append(rpcServer.getEs().getQueue().size()).append(LINE_BREAK);
-
-        ret.append(LINE_BREAK).append(LINE_BREAK);
+        if (rpcServer.getEs() != null) {
+            ret.append("--------------Thread status----------------").append(LINE_BREAK);
+            ret.append("Max task count:").append(rpcServer.getEs().getMaximumPoolSize()).append(LINE_BREAK);
+            ret.append("Running task count:").append(rpcServer.getEs().getActiveCount()).append(LINE_BREAK);
+            ret.append("Waiting task count:").append(rpcServer.getEs().getQueue().size()).append(LINE_BREAK);
+            
+            ret.append(LINE_BREAK).append(LINE_BREAK);
+        }
         ret.append(PRE_STARTS);
         ret.append("--------------properties info(").append(RpcServerOptions.class.getDeclaredFields().length)
                 .append(")----------------").append(LINE_BREAK);
