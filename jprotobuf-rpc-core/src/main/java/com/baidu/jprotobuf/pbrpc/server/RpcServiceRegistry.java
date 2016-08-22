@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.server;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,9 +26,11 @@ import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
+import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
+import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
@@ -54,18 +57,17 @@ public class RpcServiceRegistry {
      * if override exist allowed. default is not allowed
      */
     private boolean dummyOverride = false;
-    
-	private InvokerInterceptor interceptor;
 
-	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
-	 */
-	public void setInterceptor(InvokerInterceptor interceptor) {
-		this.interceptor = interceptor;
-	}
+    private InvokerInterceptor interceptor;
+
+    /**
+     * set interceptor value to interceptor
+     * 
+     * @param interceptor the interceptor to set
+     */
+    public void setInterceptor(InvokerInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
     /**
      * default constructor
@@ -127,7 +129,40 @@ public class RpcServiceRegistry {
         return rpcHandler;
     }
 
-    private void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
+    public void doDynamicRegisterService(final String methodSignature, Method method, Object service,
+            final Class<? extends ServerAttachmentHandler> cls) {
+        ProtobufRPCService protobufPRCService = new ProtobufRPCService() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return ProtobufRPCService.class;
+            }
+
+            @Override
+            public String serviceName() {
+                return Constants.DYNAMIC_SERVICE_NAME;
+            }
+
+            @Override
+            public String methodName() {
+                return methodSignature;
+            }
+
+            @Override
+            public String description() {
+                return "";
+            }
+
+            @Override
+            public Class<? extends ServerAttachmentHandler> attachmentHandler() {
+                return cls;
+            }
+        };
+
+        doRegiterService(method, service, protobufPRCService);
+    }
+
+    protected void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         String methodSignature = rpcHandler.getMethodSignature();
 

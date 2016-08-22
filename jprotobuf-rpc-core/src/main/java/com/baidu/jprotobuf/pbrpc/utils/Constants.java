@@ -29,4 +29,7 @@ public class Constants {
     public static final String PBRPC_SCHEME = "pbrpc";
     
     public static final String SERVICE_KEY_PREIFX = "baidu-rpc:";
+    
+    
+    public static final String DYNAMIC_SERVICE_NAME = "__DYANMICE_SERVICE__";
 }

@@ -196,6 +196,10 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
         this.rpcClient = rpcClient;
     }
+    
+    protected  Method[] getMethds() {
+        return interfaceClass.getMethods();
+    }
 
     public synchronized T proxy() {
 
@@ -204,9 +208,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
 
         // to parse interface
-        Method[] methods = interfaceClass.getMethods();
+        Method[] methods =  getMethds();
         for (Method method : methods) {
-            ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
+            ProtobufRPC protobufPRC = getProtobufRPCAnnotation(method);
             if (protobufPRC != null) {
                 String serviceName = protobufPRC.serviceName();
                 String methodName = protobufPRC.methodName();
@@ -246,7 +250,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                                 + " by serviceSignature '" + methodSignature + "'");
                     }
                     eHost = address.getHostName();
-                    port = address.getPort();
+                    ePort = address.getPort();
                 }
 
                 String channelKey = methodSignature;
@@ -295,6 +299,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
 
     }
+    
+    
 	private Object processEqualsHashCodeToStringMethod(Method method, final Object[] args) {
 		String name = method.getName();
 		
@@ -312,6 +318,12 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 		}
 		
 		return NULL;
+	}
+	
+	
+	protected ProtobufRPC getProtobufRPCAnnotation(Method method) {
+	    ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
+	    return protobufPRC;
 	}
 	
 
@@ -337,7 +349,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 
         final long time = System.currentTimeMillis();
 
-        ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
+        ProtobufRPC protobufPRC = getProtobufRPCAnnotation(method);
         if (protobufPRC == null) {
             throw new IllegalAccessError("Target method is not marked annotation @ProtobufPRC. method name :"
                     + method.getDeclaringClass().getName() + "." + method.getName());

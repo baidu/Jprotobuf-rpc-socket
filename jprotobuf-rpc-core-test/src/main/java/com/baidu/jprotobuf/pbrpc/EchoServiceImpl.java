@@ -87,4 +87,8 @@ public class EchoServiceImpl {
         ret.setMessage("hello:" + info.getMessage());
         return ret;
     }
+    
+    public EchoInfo doEchoDynamic(EchoInfo info) {
+        return info;
+    }
 }

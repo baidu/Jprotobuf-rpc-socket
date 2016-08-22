@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.management.HttpServer;
 import com.baidu.jprotobuf.pbrpc.server.IDLServiceExporter;
@@ -129,8 +131,8 @@ public class RpcServer extends ServerBootstrap {
         }
 
         if (serverOptions.getTaskTheads() > 0) {
-            es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L, TimeUnit.SECONDS,
-                    blockingqueue);
+            es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L,
+                    TimeUnit.SECONDS, blockingqueue);
         }
 
         this.group(this.bossGroup, this.workerGroup);
@@ -177,6 +179,11 @@ public class RpcServer extends ServerBootstrap {
 
     public void registerService(final Object target) {
         rpcServiceRegistry.registerService(target);
+    }
+
+    public void registerDynamicService(String methodSignature, Method method, Object service,
+            Class<? extends ServerAttachmentHandler> cls) {
+        rpcServiceRegistry.doDynamicRegisterService(methodSignature, method, service, cls);
     }
 
     public void start(int port) {
