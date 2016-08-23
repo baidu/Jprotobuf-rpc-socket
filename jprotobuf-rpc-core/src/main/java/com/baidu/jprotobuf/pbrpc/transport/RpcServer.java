@@ -191,19 +191,29 @@ public class RpcServer extends ServerBootstrap {
         start(inetSocketAddress);
     }
 
-    public void start(InetSocketAddress sa) {
+    public void start(final InetSocketAddress sa) {
         LOG.log(Level.INFO, "RPC starting at: " + sa);
+        
         this.bind(sa).addListener(new ChannelFutureListener() {
 
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
                     channel = future.channel();
-                    // TODO notifyStarted();
+                    initAfterBindPort(sa);
                 } else {
-                    // TODO notifyFailed(future.cause());
+                    shutdown();
+                    throw new Exception("bind port failed:" + sa.toString() + " message:" + future.toString());
+                    
                 }
             }
         });
+        
+    }
+
+    /**
+     * @param sa
+     */
+    protected void initAfterBindPort(final InetSocketAddress sa) {
         this.inetSocketAddress = sa;
 
         startTime = System.currentTimeMillis();
