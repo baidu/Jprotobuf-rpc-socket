@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,64 +27,74 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
  */
 public class ErrorDataException extends Exception {
 
-    /**
-     * serialVersionUID
-     */
+    /** serialVersionUID. */
     private static final long serialVersionUID = -9052741930614009382L;
     
+    /** The rpc data package. */
     private RpcDataPackage rpcDataPackage;
+    
+    /** The error code. */
     private int errorCode;
     
     /**
-     * get the errorCode
-     * @return the errorCode
+     * Gets the error code.
+     *
+     * @return the error code
      */
     public int getErrorCode() {
         return errorCode;
     }
 
     /**
-     * set errorCode value to errorCode
-     * @param errorCode the errorCode to set
+     * Sets the error code.
+     *
+     * @param errorCode the new error code
      */
     public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
     }
 
     /**
-     * get the rpcDataPackage
-     * @return the rpcDataPackage
+     * Gets the rpc data package.
+     *
+     * @return the rpc data package
      */
     public RpcDataPackage getRpcDataPackage() {
         return rpcDataPackage;
     }
 
     /**
-     * set rpcDataPackage value to rpcDataPackage
-     * @param rpcDataPackage the rpcDataPackage to set
+     * Sets the rpc data package.
+     *
+     * @param rpcDataPackage the new rpc data package
      */
     public void setRpcDataPackage(RpcDataPackage rpcDataPackage) {
         this.rpcDataPackage = rpcDataPackage;
     }
 
     /**
-     * 
+     * Instantiates a new error data exception.
      */
     public ErrorDataException() {
         super();
     }
 
     /**
-     * @param message
-     * @param cause
+     * Instantiates a new error data exception.
+     *
+     * @param message the message
+     * @param cause the cause
      */
     public ErrorDataException(String message, Throwable cause) {
         super(message, cause);
     }
     
     /**
-     * @param message
-     * @param cause
+     * Instantiates a new error data exception.
+     *
+     * @param message the message
+     * @param cause the cause
+     * @param errorCode the error code
      */
     public ErrorDataException(String message, Throwable cause, int errorCode) {
         super(message, cause);
@@ -92,14 +102,19 @@ public class ErrorDataException extends Exception {
     }
 
     /**
-     * @param message
+     * Instantiates a new error data exception.
+     *
+     * @param message the message
      */
     public ErrorDataException(String message) {
         super(message);
     }
 
     /**
-     * @param message
+     * Instantiates a new error data exception.
+     *
+     * @param message the message
+     * @param errorCode the error code
      */
     public ErrorDataException(String message, int errorCode) {
         super(message);
@@ -107,14 +122,19 @@ public class ErrorDataException extends Exception {
     }
     
     /**
-     * @param cause
+     * Instantiates a new error data exception.
+     *
+     * @param cause the cause
      */
     public ErrorDataException(Throwable cause) {
         super(cause);
     }
     
     /**
-     * @param cause
+     * Instantiates a new error data exception.
+     *
+     * @param cause the cause
+     * @param errorCode the error code
      */
     public ErrorDataException(Throwable cause, int errorCode) {
         super(cause);

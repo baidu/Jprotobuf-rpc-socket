@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,10 @@ public class ReflectionUtils {
      * given class and superclasses.
      * <p>The same named method occurring on subclass and superclass will
      * appear twice, unless excluded by a {@link MethodFilter}.
+     *
      * @param targetClass class to start looking at
      * @param mc the callback to invoke for each method
+     * @throws IllegalArgumentException the illegal argument exception
      * @see #doWithMethods(Class, MethodCallback, MethodFilter)
      */
     public static void doWithMethods(Class<?> targetClass, MethodCallback mc) throws IllegalArgumentException {
@@ -46,9 +48,11 @@ public class ReflectionUtils {
      * given class and superclasses.
      * <p>The same named method occurring on subclass and superclass will
      * appear twice, unless excluded by the specified {@link MethodFilter}.
+     *
      * @param targetClass class to start looking at
      * @param mc the callback to invoke for each method
      * @param mf the filter that determines the methods to apply the callback to
+     * @throws IllegalArgumentException the illegal argument exception
      */
     public static void doWithMethods(Class<?> targetClass, MethodCallback mc, MethodFilter mf)
             throws IllegalArgumentException {
@@ -74,8 +78,10 @@ public class ReflectionUtils {
     }
     
     /**
-     * @param cls
-     * @return
+     * Checks if is void.
+     *
+     * @param cls the cls
+     * @return true, if is void
      */
     public static boolean isVoid(Class<?> cls) {
         if (cls == Void.class || cls == void.class) {
@@ -91,7 +97,10 @@ public class ReflectionUtils {
 
         /**
          * Perform an operation using the given method.
+         *
          * @param method the method to operate on
+         * @throws IllegalArgumentException the illegal argument exception
+         * @throws IllegalAccessException the illegal access exception
          */
         void doWith(Method method) throws IllegalArgumentException, IllegalAccessException;
     }
@@ -104,7 +113,9 @@ public class ReflectionUtils {
 
         /**
          * Determine whether the given method matches.
+         *
          * @param method the method to check
+         * @return true, if successful
          */
         boolean matches(Method method);
     }

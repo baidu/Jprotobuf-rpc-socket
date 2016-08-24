@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,20 +25,24 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.google.protobuf.GeneratedMessage;
 
 /**
- * RPC method description info for Google generated java code
- * 
+ * RPC method description info for Google generated java code.
+ *
  * @author xiemalin
  * @since 1.2
  */
 public class GeneratedMessageRpcMethodInfo extends RpcMethodInfo {
 
+    /** The Constant PROTOBUF_PARSE_METHOD. */
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
+    /** The parse from method. */
     private Method parseFromMethod;
 
     /**
-     * @param method
-     * @param protobufPRC
+     * Instantiates a new generated message rpc method info.
+     *
+     * @param method the method
+     * @param protobufPRC the protobuf prc
      */
     public GeneratedMessageRpcMethodInfo(Method method, ProtobufRPC protobufPRC) {
         super(method, protobufPRC);

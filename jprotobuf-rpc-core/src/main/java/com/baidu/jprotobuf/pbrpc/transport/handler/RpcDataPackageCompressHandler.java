@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
 /**
- * Do data compress handler
- * 
+ * Do data compress handler.
+ *
  * @author xiemalin
  * @since 1.4
  */
@@ -38,6 +38,9 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 public class RpcDataPackageCompressHandler extends
 		MessageToMessageEncoder<RpcDataPackage> {
 
+	/* (non-Javadoc)
+	 * @see io.netty.handler.codec.MessageToMessageEncoder#encode(io.netty.channel.ChannelHandlerContext, java.lang.Object, java.util.List)
+	 */
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
 			List<Object> out) throws Exception {

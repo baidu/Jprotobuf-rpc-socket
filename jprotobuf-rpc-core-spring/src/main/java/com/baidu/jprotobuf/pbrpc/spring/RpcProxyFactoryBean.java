@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,61 +30,74 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
 /**
- * {@link FactoryBean} for PbRpc proxies
- * 
+ * {@link FactoryBean} for PbRpc proxies.
+ *
  * @author xiemalin
  * @since 2.17
  */
 public class RpcProxyFactoryBean extends RpcClientOptions 
         implements FactoryBean<Object>, InitializingBean, MethodInterceptor, DisposableBean {
     
+    /** The remote invocation factory. */
     private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
 
+    /** The service interface. */
     private Class serviceInterface;
 
+    /** The host. */
     private String host;
 
+    /** The port. */
     private int port; 
     
+    /** The pbrpc proxy. */
     private ProtobufRpcProxyBean pbrpcProxy;
+    
+    /** The service proxy. */
     private Object serviceProxy;
+    
+    /** The rpc client. */
     private RpcClient rpcClient;
     
+    /** The lookup stub on startup. */
     private boolean lookupStubOnStartup = true;
     
+	/** The interceptor. */
 	private InvokerInterceptor interceptor;
 
+	/** The proxy. */
 	private Object proxy;
 	
 	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
+	 * Sets the interceptor.
+	 *
+	 * @param interceptor the new interceptor
 	 */
 	public void setInterceptor(InvokerInterceptor interceptor) {
 		this.interceptor = interceptor;
 	}
 
     /**
-     * get the lookupStubOnStartup
-     * @return the lookupStubOnStartup
+     * Checks if is lookup stub on startup.
+     *
+     * @return true, if is lookup stub on startup
      */
     public boolean isLookupStubOnStartup() {
         return lookupStubOnStartup;
     }
 
     /**
-     * set lookupStubOnStartup value to lookupStubOnStartup
-     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     * Sets the lookup stub on startup.
+     *
+     * @param lookupStubOnStartup the new lookup stub on startup
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
 
     /**
-     * get the host
-     * 
+     * Gets the host.
+     *
      * @return the host
      */
     public String getHost() {
@@ -92,18 +105,17 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * set host value to host
-     * 
-     * @param host
-     *            the host to set
+     * Sets the host.
+     *
+     * @param host the new host
      */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * get the port
-     * 
+     * Gets the port.
+     *
      * @return the port
      */
     public int getPort() {
@@ -111,21 +123,18 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * set port value to port
-     * 
-     * @param port
-     *            the port to set
+     * Sets the port.
+     *
+     * @param port the new port
      */
     public void setPort(int port) {
         this.port = port;
     }
 
     /**
-     * Set the interface of the service to access. The interface must be
-     * suitable for the particular service and remoting strategy.
-     * <p>
-     * Typically required to be able to create a suitable service proxy, but can
-     * also be optional if the lookup returns a typed proxy.
+     * Sets the service interface.
+     *
+     * @param serviceInterface the new service interface
      */
     public void setServiceInterface(Class serviceInterface) {
         if (serviceInterface != null && !serviceInterface.isInterface()) {
@@ -135,7 +144,9 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * Return the interface of the service to access.
+     * Gets the service interface.
+     *
+     * @return the service interface
      */
     public Class getServiceInterface() {
         return this.serviceInterface;
@@ -196,9 +207,10 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     }
     
     /**
-	 * get the proxyBean
-	 * @return the proxyBean
-	 */
+     * Gets the proxy bean.
+     *
+     * @return the proxy bean
+     */
 	public Object getProxyBean() {
 		return proxy;
 	}
@@ -212,8 +224,9 @@ public class RpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * set remoteInvocationFactory value to remoteInvocationFactory
-     * @param remoteInvocationFactory the remoteInvocationFactory to set
+     * Sets the remote invocation factory.
+     *
+     * @param remoteInvocationFactory the new remote invocation factory
      */
     public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
         this.remoteInvocationFactory = remoteInvocationFactory;

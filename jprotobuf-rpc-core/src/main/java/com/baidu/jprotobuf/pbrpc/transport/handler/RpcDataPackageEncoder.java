@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,46 +36,49 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 public class RpcDataPackageEncoder extends
 		MessageToMessageEncoder<RpcDataPackage> {
 
-	/**
-	 * log this class
-	 */
+	/** log this class. */
 	private static final Logger LOG = Logger
 			.getLogger(RpcDataPackageEncoder.class.getName());
 
+	/** The chunk size. */
 	private long chunkSize = -1;
 
 	/**
-	 * get the chunkSize
-	 * 
-	 * @return the chunkSize
+	 * Gets the chunk size.
+	 *
+	 * @return the chunk size
 	 */
 	public long getChunkSize() {
 		return chunkSize;
 	}
 
 	/**
-	 * set chunkSize value to chunkSize
-	 * 
-	 * @param chunkSize
-	 *            the chunkSize to set
+	 * Sets the chunk size.
+	 *
+	 * @param chunkSize the new chunk size
 	 */
 	public void setChunkSize(long chunkSize) {
 		this.chunkSize = chunkSize;
 	}
 
 	/**
-     * 
-     */
+	 * Instantiates a new rpc data package encoder.
+	 */
 	public RpcDataPackageEncoder() {
 	}
 
 	/**
-	 * @param chunkSize
+	 * Instantiates a new rpc data package encoder.
+	 *
+	 * @param chunkSize the chunk size
 	 */
 	public RpcDataPackageEncoder(long chunkSize) {
 		this.chunkSize = chunkSize;
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.handler.codec.MessageToMessageEncoder#encode(io.netty.channel.ChannelHandlerContext, java.lang.Object, java.util.List)
+	 */
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RpcDataPackage msg,
 			List<Object> out) throws Exception {

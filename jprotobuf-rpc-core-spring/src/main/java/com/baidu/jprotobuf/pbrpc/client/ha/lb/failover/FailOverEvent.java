@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +24,20 @@ import org.aopalliance.intercept.MethodInvocation;
  * @since 2.16
  */
 public interface FailOverEvent {
+    
     /**
-     * if detect target is recovered
-     * 
-     * @param targetName
+     * if detect target is recovered.
+     *
+     * @param targetName the target name
      */
     void onTargetRecover(String targetName);
 
     /**
-     * if detect target is fail on specified invoke action
-     * 
-     * @param targetName
-     * @param bean
-     * @param invocation
+     * if detect target is fail on specified invoke action.
+     *
+     * @param targetName the target name
+     * @param bean the bean
+     * @param invocation the invocation
      */
     void onTargetFailed(String targetName, Object bean,
             MethodInvocation invocation);

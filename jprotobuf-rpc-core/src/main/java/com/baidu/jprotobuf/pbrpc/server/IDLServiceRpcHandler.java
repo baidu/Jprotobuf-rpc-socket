@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,21 @@ package com.baidu.jprotobuf.pbrpc.server;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 
 /**
- * RPC handler for IDLServiceExporter
- * 
+ * RPC handler for IDLServiceExporter.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class IDLServiceRpcHandler implements RpcHandler {
     
+    /** The idl service exporter. */
     @SuppressWarnings("unused")
 	private IDLServiceExporter idlServiceExporter;
     
     /**
-     * @param idlServiceExporter
+     * Instantiates a new IDL service rpc handler.
+     *
+     * @param idlServiceExporter the idl service exporter
      */
     public IDLServiceRpcHandler(IDLServiceExporter idlServiceExporter) {
         super();

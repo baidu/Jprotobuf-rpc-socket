@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,21 @@ import com.google.protobuf.GeneratedMessage;
 @SuppressWarnings({ "unchecked" })
 public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
+    /** The Constant PROTOBUF_PARSE_METHOD. */
     private static final String PROTOBUF_PARSE_METHOD = "parseFrom";
 
+    /** The parse from method. */
     private Method parseFromMethod;
 
     /**
-     * @param method
-     * @param service
-     * @param protobufPRCService
+     * Instantiates a new message generated rpc handler.
+     *
+     * @param method the method
+     * @param service the service
+     * @param protobufPRCService the protobuf prc service
      */
     public MessageGeneratedRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super(method, service, protobufPRCService);

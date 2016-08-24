@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,87 +24,83 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * 请求包的元数据主要描述了需要调用的RPC方法信息
+ * 请求包的元数据主要描述了需要调用的RPC方法信息.
  *
  * @author xiemalin
- * @since 1.0
  * @see RpcMeta
+ * @since 1.0
  */
 public class RpcRequestMeta implements Readable, Writerable {
     
 
-    /**
-     * default encode and decode handler
-     */
+    /** default encode and decode handler. */
     private static final Codec<RpcRequestMeta> CODEC = ProtobufProxy.create(RpcRequestMeta.class);
 
-    /**
-     * 服务名
-     */
+    /** 服务名. */
     @Protobuf(required = true)
     private String serviceName;
     
-    /**
-     * 方法名
-     */
+    /** 方法名. */
     @Protobuf(required = true)
     private String methodName;
     
-    /**
-     * 用于打印日志。可用于存放BFE_LOGID。该参数可选。
-     */
+    /** 用于打印日志。可用于存放BFE_LOGID。该参数可选。. */
     @Protobuf
     private Long logId;
     
-    /**
-     * 非PbRpc规范，用于传输额外的参数
-     */
+    /** 非PbRpc规范，用于传输额外的参数. */
     @Protobuf(fieldType = FieldType.BYTES)
     private byte[] extraParam;
 
     /**
-     * get the serivceName
-     * @return the serivceName
+     * Gets the serivce name.
+     *
+     * @return the serivce name
      */
     public String getSerivceName() {
         return serviceName;
     }
 
     /**
-     * set serivceName value to serivceName
-     * @param serviceName the serivceName to set
+     * Sets the 服务名.
+     *
+     * @param serviceName the new 服务名
      */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
 
     /**
-     * get the methodName
-     * @return the methodName
+     * Gets the 方法名.
+     *
+     * @return the 方法名
      */
     public String getMethodName() {
         return methodName;
     }
 
     /**
-     * set methodName value to methodName
-     * @param methodName the methodName to set
+     * Sets the 方法名.
+     *
+     * @param methodName the new 方法名
      */
     public void setMethodName(String methodName) {
         this.methodName = methodName;
     }
 
     /**
-     * get the logId
-     * @return the logId
+     * Gets the 用于打印日志。可用于存放BFE_LOGID。该参数可选。.
+     *
+     * @return the 用于打印日志。可用于存放BFE_LOGID。该参数可选。
      */
     public Long getLogId() {
         return logId;
     }
 
     /**
-     * set logId value to logId
-     * @param logId the logId to set
+     * Sets the 用于打印日志。可用于存放BFE_LOGID。该参数可选。.
+     *
+     * @param logId the new 用于打印日志。可用于存放BFE_LOGID。该参数可选。
      */
     public void setLogId(Long logId) {
         this.logId = logId;
@@ -127,9 +123,9 @@ public class RpcRequestMeta implements Readable, Writerable {
     }
     
     /**
-     * copy {@link RpcRequestMeta}
-     * 
-     * @param meta
+     * copy {@link RpcRequestMeta}.
+     *
+     * @param meta the meta
      */
     private void copy(RpcRequestMeta meta) {
         if (meta == null) {
@@ -153,23 +149,27 @@ public class RpcRequestMeta implements Readable, Writerable {
     }
 
     /**
-     * get the extraParam
-     * @return the extraParam
+     * Gets the 非PbRpc规范，用于传输额外的参数.
+     *
+     * @return the 非PbRpc规范，用于传输额外的参数
      */
     public byte[] getExtraParam() {
         return extraParam;
     }
 
     /**
-     * set extraParam value to extraParam
-     * @param extraParam the extraParam to set
+     * Sets the 非PbRpc规范，用于传输额外的参数.
+     *
+     * @param extraParam the new 非PbRpc规范，用于传输额外的参数
      */
     public void setExtraParam(byte[] extraParam) {
         this.extraParam = extraParam;
     }
 
     /**
-     * @return
+     * Copy.
+     *
+     * @return the rpc request meta
      */
     public RpcRequestMeta copy() {
         RpcRequestMeta rpcRequestMeta = new RpcRequestMeta();

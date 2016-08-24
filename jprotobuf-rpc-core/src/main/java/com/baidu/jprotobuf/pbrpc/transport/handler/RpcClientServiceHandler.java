@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,24 +36,25 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientCallState;
 public class RpcClientServiceHandler extends
 		SimpleChannelInboundHandler<RpcDataPackage> {
 
-	/**
-	 * log this class
-	 */
+	/** log this class. */
 	private static final Logger LOG = Logger
 			.getLogger(RpcClientServiceHandler.class.getName());
 
-	/**
-	 * RPC client
-	 */
+	/** RPC client. */
 	private RpcClient rpcClient;
 
 	/**
-	 * @param rpcClient
+	 * Instantiates a new rpc client service handler.
+	 *
+	 * @param rpcClient the rpc client
 	 */
 	public RpcClientServiceHandler(RpcClient rpcClient) {
 		this.rpcClient = rpcClient;
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext, java.lang.Object)
+	 */
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx,
 			RpcDataPackage dataPackage) throws Exception {
@@ -83,6 +84,9 @@ public class RpcClientServiceHandler extends
 		ctx.fireChannelReadComplete();
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext, java.lang.Throwable)
+	 */
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {

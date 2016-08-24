@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,25 @@ package com.baidu.jprotobuf.pbrpc.management;
  */
 public class HttpConstants {
 
+    /** The Constant LINE_BREAK. */
     public static final String LINE_BREAK = "<br>";
     
+    /** The Constant PRE_STARTS. */
     public static final String PRE_STARTS = "<pre>";
     
+    /** The Constant PRE_ENDS. */
     public static final String PRE_ENDS = "</pre>";
     
+    /** The Constant HTML_HEAD. */
     public static final String HTML_HEAD = "<html><head><meta http-equiv=\"Content-Type\" "
             + "content=\"text/html; charset=utf-8\"></head>";
     
+    /** The Constant HTML_TAIL. */
     public static final String HTML_TAIL = "</html>";
     
+    /** The Constant BOLD_FONT. */
     public static final String BOLD_FONT = "<B>";
     
+    /** The Constant BOLD_FONT_END. */
     public static final String BOLD_FONT_END = "</B>";
 }

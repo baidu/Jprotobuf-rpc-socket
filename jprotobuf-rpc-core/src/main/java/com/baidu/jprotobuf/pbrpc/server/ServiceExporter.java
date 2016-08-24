@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,32 +18,34 @@ package com.baidu.jprotobuf.pbrpc.server;
 
 
 /**
- * RPC service exporter interface
- * 
- * @author xiemalin
+ * RPC service exporter interface.
  *
+ * @author xiemalin
  * @param <I> input parameter
  * @param <O> response result
  */
 public interface ServiceExporter<I, O> {
     
     /**
-     * 
+     * Gets the service name.
+     *
      * @return the service name
      */
     String getServiceName();
     
     /**
+     * Gets the method name.
+     *
      * @return the method name
      */
     String getMethodName();
 
     /**
      * execute service action.
-     * 
-     * @param input
-     * @return
-     * @throws Exception
+     *
+     * @param input the input
+     * @return the o
+     * @throws Exception the exception
      */
     O execute(I input) throws Exception;
 }

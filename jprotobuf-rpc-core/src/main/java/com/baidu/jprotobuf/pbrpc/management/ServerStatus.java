@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,42 +42,60 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 /**
- * Server status
- * 
+ * Server status.
  *
  * @author xiemalin
  * @since 3.1.0
  */
 public class ServerStatus {
 
-    /**
-     * 
-     */
+    /** The Constant SECONDS_IN_HOUR. */
     private static final int SECONDS_IN_HOUR = 3600;
-    /**
-     * 
-     */
+    
+    /** The Constant SECONDS_IN_DAY. */
     private static final int SECONDS_IN_DAY = 86400;
+    
+    /** The port. */
     private int port;
+    
+    /** The http port. */
     private int httpPort;
+    
+    /** The start time. */
     private long startTime;
 
+    /** The rpc server. */
     private RpcServer rpcServer;
     
+    /** The close. */
     private transient boolean close = false;
 
+    /** The Constant REQUEST_COUNTS. */
     public static final ConcurrentHashMap<String, AtomicLong> REQUEST_COUNTS =
             new ConcurrentHashMap<String, AtomicLong>();
     
+    /** The Constant ASYNC_REQUEST. */
     public static final BlockingQueue<RequestInfo> ASYNC_REQUEST = new LinkedBlockingQueue<ServerStatus.RequestInfo>();
     
+    /** The es. */
     private static ExecutorService es;
 
+    /**
+     * Incr.
+     *
+     * @param serviceSignature the service signature
+     * @param timetook the timetook
+     */
     public static void incr(String serviceSignature, long timetook) {
         
         ASYNC_REQUEST.add(new RequestInfo(timetook, serviceSignature));
     }
     
+    /**
+     * Do incr.
+     *
+     * @param requestInfo the request info
+     */
     private static void doIncr(RequestInfo requestInfo) {
         AtomicLong newOne = new AtomicLong();
         AtomicLong oldOne = REQUEST_COUNTS.putIfAbsent(requestInfo.signature, newOne);
@@ -87,6 +105,11 @@ public class ServerStatus {
         newOne.incrementAndGet();
     }
 
+    /**
+     * Instantiates a new server status.
+     *
+     * @param rpcServer the rpc server
+     */
     public ServerStatus(RpcServer rpcServer) {
         super();
         this.rpcServer = rpcServer;
@@ -190,6 +213,12 @@ public class ServerStatus {
         return ret.toString();
     }
 
+    /**
+     * Gets the online duration.
+     *
+     * @param startTime the start time
+     * @return the online duration
+     */
     private String getOnlineDuration(long startTime) {
         StringBuilder ret = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime) / 1000;
@@ -203,9 +232,23 @@ public class ServerStatus {
         return ret.toString();
     }
     
+    /**
+     * The Class RequestInfo.
+     */
     private static class RequestInfo {
+        
+        /** The took. */
         private long took;
+        
+        /** The signature. */
         private String signature;
+        
+        /**
+         * Instantiates a new request info.
+         *
+         * @param took the took
+         * @param signature the signature
+         */
         public RequestInfo(long took, String signature) {
             super();
             this.took = took;
@@ -216,7 +259,7 @@ public class ServerStatus {
     }
 
     /**
-     * 
+     * Close.
      */
     public void close() {
         close = true;

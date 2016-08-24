@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,22 +66,19 @@ import com.baidu.jprotobuf.pbrpc.spring.PropertyPlaceholderConfigurerTool;
  * Common annotation bean post processor. it uses {@link AnnotationParserCallback}<br>
  * interface to define specified {@link Annotation} then recognize the Class to do <br>
  * bean define action
- * 
- * @see AnnotationParserCallback
+ *
  * @author xiemalin
+ * @see AnnotationParserCallback
  * @since 2.17
  */
 public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
         MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware, DisposableBean, InitializingBean,
         ApplicationListener<ApplicationEvent> {
-    /**
-     * log this class
-     */
+    
+    /** log this class. */
     protected static final Log LOGGER = LogFactory.getLog(AutowiredAnnotationBeanPostProcessor.class);
 
-    /**
-     * call back class for {@link AnnotationParserCallback}
-     */
+    /** call back class for {@link AnnotationParserCallback}. */
     private AnnotationParserCallback callback;
 
     /**
@@ -89,25 +86,17 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      */
     private int order = Ordered.LOWEST_PRECEDENCE - 3;
 
-    /**
-     * {@link ConfigurableListableBeanFactory} instance
-     */
+    /** {@link ConfigurableListableBeanFactory} instance. */
     private ConfigurableListableBeanFactory beanFactory;
 
-    /**
-     * all injected meta data
-     */
+    /** all injected meta data. */
     private final Map<Class<?>, InjectionMetadata> injectionMetadataCache =
             new ConcurrentHashMap<Class<?>, InjectionMetadata>();
 
-    /**
-     * loaded property instance
-     */
+    /** loaded property instance. */
     private Properties propertyResource;
 
-    /**
-     * to support placeholder
-     */
+    /** to support placeholder. */
     private PlaceholderResolver resolver;
 
     /**
@@ -115,56 +104,45 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      */
     private Vector<BeanInfo> typeAnnotationedBeans = new Vector<BeanInfo>();
 
-    /**
-     * status to control start only once
-     */
+    /** status to control start only once. */
     private AtomicBoolean started = new AtomicBoolean(false);
 
     /**
-     * get callback
-     * 
-     * @return the callback
+     * Gets the call back class for {@link AnnotationParserCallback}.
+     *
+     * @return the call back class for {@link AnnotationParserCallback}
      */
     private AnnotationParserCallback getCallback() {
         return callback;
     }
 
     /**
-     * set callback
-     * 
-     * @param callback the callback to set
+     * Sets the call back class for {@link AnnotationParserCallback}.
+     *
+     * @param callback the new call back class for {@link AnnotationParserCallback}
      */
     public void setCallback(AnnotationParserCallback callback) {
         this.callback = callback;
     }
 
     /**
-     * set order
-     * 
-     * @param order the order
+     * Sets the start lowest order in spring container.
+     *
+     * @param order the new start lowest order in spring container
      */
     public void setOrder(int order) {
         this.order = order;
     }
 
-    /**
-     * get order
-     * 
-     * @return the order
+    /* (non-Javadoc)
+     * @see org.springframework.core.Ordered#getOrder()
      */
     public int getOrder() {
         return this.order;
     }
 
-    /**
-     * Callback that supplies the owning factory to a bean instance.
-     * <p>
-     * Invoked after the population of normal bean properties but before an initialization callback such as
-     * {@link InitializingBean#afterPropertiesSet()} or a custom init-method.
-     * 
-     * @param beanFactory owning BeanFactory (never {@code null}). The bean can immediately call methods on the factory.
-     * @throws BeansException in case of initialization errors
-     * @see BeanInitializationException
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
      */
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
@@ -225,7 +203,7 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * <p>
      * Also allows for replacing the property values to apply, typically through creating a new MutablePropertyValues
      * instance based on the original PropertyValues, adding or removing specific values.
-     * 
+     *
      * @param pvs the property values that the factory is about to apply (never {@code null})
      * @param pds the relevant property descriptors for the target bean (with ignored dependency types - which the
      *            factory handles specifically - already filtered out)
@@ -233,6 +211,7 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * @param beanName the name of the bean
      * @return the actual property values to apply to to the given bean (can be the passed-in PropertyValues instance),
      *         or {@code null} to skip property population
+     * @throws BeansException the beans exception
      * @throws org.springframework.beans.BeansException in case of errors
      * @see org.springframework.beans.MutablePropertyValues
      */
@@ -282,10 +261,10 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     /**
-     * To parse all method to find out annotation info
-     * 
+     * To parse all method to find out annotation info.
+     *
      * @param clazz target class
-     * @param annotion target annotation to find
+     * @param annotions the annotions
      * @param elements injected element of all methods
      */
     protected void parseMethods(final Class<?> clazz, final List<Class<? extends Annotation>> annotions,
@@ -311,10 +290,10 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     /**
-     * To parse all field to find out annotation info
-     * 
+     * To parse all field to find out annotation info.
+     *
      * @param clazz target class
-     * @param annotion target annotation to find
+     * @param annotions the annotions
      * @param elements injected element of all fields
      */
     protected void parseFields(final Class<?> clazz, final List<Class<? extends Annotation>> annotions,
@@ -339,14 +318,12 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      */
     private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
 
-        /**
-         * target annotation type
-         */
+        /** target annotation type. */
         private final Annotation annotation;
 
         /**
-         * Constructor with field and annotation type
-         * 
+         * Constructor with field and annotation type.
+         *
          * @param field field instance
          * @param annotation annotation type
          */
@@ -355,6 +332,9 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
             this.annotation = annotation;
         }
 
+        /* (non-Javadoc)
+         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues)
+         */
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
             Field field = (Field) this.member;
@@ -378,14 +358,13 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * Class representing injection information about an annotated method.
      */
     private class AutowiredMethodElement extends InjectionMetadata.InjectedElement {
-        /**
-         * target annotation type
-         */
+        
+        /** target annotation type. */
         private final Annotation annotation;
 
         /**
-         * Constructor with method and annotation type
-         * 
+         * Constructor with method and annotation type.
+         *
          * @param method method instance
          * @param annotation annotation type
          * @param pd {@link PropertyDescriptor} instance.
@@ -395,6 +374,9 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
             this.annotation = annotation;
         }
 
+        /* (non-Javadoc)
+         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues)
+         */
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
             if (this.skip == null && this.pd != null && pvs != null && pvs.contains(this.pd.getName())) {
@@ -442,8 +424,8 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     /**
-     * Invoke callback destroy method
-     * 
+     * Invoke callback destroy method.
+     *
      * @throws Exception in case of callback do destroy action error
      */
     public void destroy() throws Exception {
@@ -454,8 +436,8 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     /**
-     * Initialize propertyResource instance load
-     * 
+     * Initialize propertyResource instance load.
+     *
      * @throws Exception in case of any error
      */
     public void afterPropertiesSet() throws Exception {
@@ -500,24 +482,22 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     }
 
     /**
-     * Wrapped bean info
-     * 
+     * Wrapped bean info.
+     *
      * @author xiemalin
      * @since 1.0.0.0
      */
     private static class BeanInfo {
-        /**
-         * bean name
-         */
+        
+        /** bean name. */
         private String name;
-        /**
-         * annotation type
-         */
+        
+        /** annotation type. */
         private Annotation annotation;
 
         /**
-         * Constructor with bean, name and annotation type
-         * 
+         * Constructor with bean, name and annotation type.
+         *
          * @param name bean name
          * @param annotation annotation type
          */

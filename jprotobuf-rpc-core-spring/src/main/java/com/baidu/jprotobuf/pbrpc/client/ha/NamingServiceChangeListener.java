@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,13 @@ import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
  */
 public abstract class NamingServiceChangeListener {
 
+    /** The Constant LOG. */
     private static final Logger LOG = Logger.getLogger(NamingServiceChangeListener.class.getName());
 
+    /** The timer. */
     private Timer timer;
+    
+    /** The update list task. */
     private TimerTask updateListTask;
 
     /**
@@ -53,28 +57,45 @@ public abstract class NamingServiceChangeListener {
      */
     private long period = 1000;
 
+    /**
+     * Gets the naming service.
+     *
+     * @return the naming service
+     */
     public abstract NamingService getNamingService();
 
     /**
-     * set delay value to delay
-     * 
-     * @param delay the delay to set
+     * Sets the delay in milliseconds before NamingService result refresh update task is to be executed.
+     *
+     * @param delay the new delay in milliseconds before NamingService result refresh update task is to be executed
      */
     public void setDelay(long delay) {
         this.delay = delay;
     }
 
     /**
-     * set period value to period
-     * 
-     * @param period the period to set
+     * Sets the time in milliseconds between successive NamingService result refresh update task executions.
+     *
+     * @param period the new time in milliseconds between successive NamingService result refresh update task executions
      */
     public void setPeriod(long period) {
         this.period = period;
     }
 
+    /**
+     * Re init.
+     *
+     * @param service the service
+     * @param list the list
+     * @throws Exception the exception
+     */
     protected abstract void reInit(String service, List<RegisterInfo> list) throws Exception;
 
+    /**
+     * Start update naming service task.
+     *
+     * @param serviceMap the service map
+     */
     protected void startUpdateNamingServiceTask(Map<String, List<RegisterInfo>> serviceMap) {
         if (getNamingService() == null) {
             return;
@@ -85,16 +106,32 @@ public abstract class NamingServiceChangeListener {
         this.timer.scheduleAtFixedRate(updateListTask, delay, period);
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         if (timer != null) {
             timer.cancel();
         }
     }
 
+    /**
+     * The Class UpdateNamingServiceTask.
+     */
     private final class UpdateNamingServiceTask extends TimerTask {
+        
+        /** The load balancer. */
         NamingServiceChangeListener loadBalancer;
+        
+        /** The service map. */
         private Map<String, List<RegisterInfo>> serviceMap;
 
+        /**
+         * Instantiates a new update naming service task.
+         *
+         * @param loadBalancer the load balancer
+         * @param serviceMap the service map
+         */
         public UpdateNamingServiceTask(NamingServiceChangeListener loadBalancer,
                 Map<String, List<RegisterInfo>> serviceMap) {
             this.loadBalancer = loadBalancer;
@@ -115,6 +152,9 @@ public abstract class NamingServiceChangeListener {
 
         }
 
+        /* (non-Javadoc)
+         * @see java.util.TimerTask#run()
+         */
         @Override
         public void run() {
             try {

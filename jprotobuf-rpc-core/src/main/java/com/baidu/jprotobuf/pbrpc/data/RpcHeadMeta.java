@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,36 +28,31 @@ import java.nio.ByteBuffer;
  */
 public class RpcHeadMeta implements Writerable, Readable {
     
-    /**
-     * RPC meta head size
-     */
+    /** RPC meta head size. */
     public static final int SIZE = 12;
 
-    /**
-     * 协议标识 
-     */
+    /** 协议标识. */
     private byte[] magicCode;
     
-    /**
-     * message body size include
-     */
+    /** message body size include. */
     private int messageSize;
     
-    /**
-     * RPC meta size
-     */
+    /** RPC meta size. */
     private int metaSize;
 
     /**
-     * get the magicCode
-     * @return the magicCode
+     * Gets the 协议标识.
+     *
+     * @return the 协议标识
      */
     public byte[] getMagicCode() {
         return magicCode;
     }
     
     /**
-     * @return the magic code of string
+     * Gets the magic code as string.
+     *
+     * @return the magic code as string
      */
     public String getMagicCodeAsString() {
         if (magicCode == null) {
@@ -67,8 +62,9 @@ public class RpcHeadMeta implements Writerable, Readable {
     }
     
     /**
-     * set magicCode value to magicCode
-     * @param magicCode magic code string
+     * Sets the 协议标识.
+     *
+     * @param magicCode the new 协议标识
      */
     public void setMagicCode(String magicCode) {
         if (magicCode == null) {
@@ -78,8 +74,9 @@ public class RpcHeadMeta implements Writerable, Readable {
     }
 
     /**
-     * set magicCode value to magicCode
-     * @param magicCode the magicCode to set
+     * Sets the 协议标识.
+     *
+     * @param magicCode the new 协议标识
      */
     public void setMagicCode(byte[] magicCode) {
         if (magicCode == null || magicCode.length != 4) {
@@ -89,32 +86,36 @@ public class RpcHeadMeta implements Writerable, Readable {
     }
 
     /**
-     * get the messageSize
-     * @return the messageSize
+     * Gets the message body size include.
+     *
+     * @return the message body size include
      */
     public int getMessageSize() {
         return messageSize;
     }
 
     /**
-     * set messageSize value to messageSize
-     * @param messageSize the messageSize to set
+     * Sets the message body size include.
+     *
+     * @param messageSize the new message body size include
      */
     public void setMessageSize(int messageSize) {
         this.messageSize = messageSize;
     }
 
     /**
-     * get the metaSize
-     * @return the metaSize
+     * Gets the rPC meta size.
+     *
+     * @return the rPC meta size
      */
     public int getMetaSize() {
         return metaSize;
     }
 
     /**
-     * set metaSize value to metaSize
-     * @param metaSize the metaSize to set
+     * Sets the rPC meta size.
+     *
+     * @param metaSize the new rPC meta size
      */
     public void setMetaSize(int metaSize) {
         this.metaSize = metaSize;
@@ -150,6 +151,11 @@ public class RpcHeadMeta implements Writerable, Readable {
         allocate.clear();
     }
     
+    /**
+     * Copy.
+     *
+     * @return the rpc head meta
+     */
     public RpcHeadMeta copy() {
         RpcHeadMeta rpcHeadMeta = new RpcHeadMeta();
         rpcHeadMeta.setMagicCode(getMagicCode());

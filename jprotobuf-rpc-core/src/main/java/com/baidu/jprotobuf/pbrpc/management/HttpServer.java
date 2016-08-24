@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,29 +35,40 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 /**
- * HTTP server controller
+ * HTTP server controller.
  *
  * @author xiemalin
  * @since 3.1.0
  */
 public class HttpServer extends ServerBootstrap {
 
+	/** The Constant LOG. */
 	private static final Logger LOG = Logger.getLogger(HttpServer.class.getName());
 
+	/** The Constant DEFAULT_WAIT_STOP_INTERVAL. */
 	private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
 
+	/** The boss group. */
 	private EventLoopGroup bossGroup;
+	
+	/** The worker group. */
 	private EventLoopGroup workerGroup;
+	
+	/** The channel. */
 	private Channel channel;
 
+	/** The stop. */
 	private AtomicBoolean stop = new AtomicBoolean(false);
 
+	/** The handler. */
 	private HttpServerInboundHandler handler;
 
 	
 
 	/**
-	 * 
+	 * Instantiates a new http server.
+	 *
+	 * @param rpcServer the rpc server
 	 */
 	public HttpServer(final RpcServer rpcServer) {
 		bossGroup = new NioEventLoopGroup();
@@ -87,6 +98,11 @@ public class HttpServer extends ServerBootstrap {
 		});
 	}
 
+	/**
+	 * Start.
+	 *
+	 * @param port the port
+	 */
 	public void start(int port) {
 
 		bind(port).addListener(new ChannelFutureListener() {
@@ -104,6 +120,11 @@ public class HttpServer extends ServerBootstrap {
 		LOG.log(Level.INFO, "Http starting at port: " + port);
 	}
 
+	/**
+	 * Wait for stop.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 */
 	public void waitForStop() throws InterruptedException {
 		while (!stop.get()) {
 			Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
@@ -111,10 +132,16 @@ public class HttpServer extends ServerBootstrap {
 		stop();
 	}
 
+	/**
+	 * Stop.
+	 */
 	public void stop() {
 		stop.compareAndSet(false, true);
 	}
 
+	/**
+	 * Shutdown now.
+	 */
 	public void shutdownNow() {
 		stop();
 		if (channel != null && channel.isOpen()) {

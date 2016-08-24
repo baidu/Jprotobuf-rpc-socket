@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,75 +33,84 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
 /**
- * 
- * {@link FactoryBean} for Ha PbRpc proxies
- * 
+ * {@link FactoryBean} for Ha PbRpc proxies.
+ *
  * @author xiemalin
  * @since 2.17
  */
 public class HaRpcProxyFactoryBean extends RpcClientOptions
         implements FactoryBean<Object>, InitializingBean, MethodInterceptor, DisposableBean {
 
+    /** The remote invocation factory. */
     private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
 
+    /** The service interface. */
     private Class<Object> serviceInterface;
 
+    /** The pbrpc proxy. */
     private HaProtobufRpcProxyBean<Object> pbrpcProxy;
+    
+    /** The service proxy. */
     private Object serviceProxy;
+    
+    /** The rpc client. */
     private RpcClient rpcClient;
 
+    /** The naming service. */
     private NamingService namingService;
 
+    /** The naming service load balance strategy factory. */
     private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
+    
+    /** The fail over interceptor. */
     private SocketFailOverInterceptor failOverInterceptor;
     
+	/** The interceptor. */
 	private InvokerInterceptor interceptor;
 
 	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
+	 * Sets the interceptor.
+	 *
+	 * @param interceptor the new interceptor
 	 */
 	public void setInterceptor(InvokerInterceptor interceptor) {
 		this.interceptor = interceptor;
 	}
 
+    /** The lookup stub on startup. */
     private boolean lookupStubOnStartup = true;
 
     /**
-     * get the lookupStubOnStartup
-     * 
-     * @return the lookupStubOnStartup
+     * Checks if is lookup stub on startup.
+     *
+     * @return true, if is lookup stub on startup
      */
     public boolean isLookupStubOnStartup() {
         return lookupStubOnStartup;
     }
 
     /**
-     * set lookupStubOnStartup value to lookupStubOnStartup
-     * 
-     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     * Sets the lookup stub on startup.
+     *
+     * @param lookupStubOnStartup the new lookup stub on startup
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
 
     /**
-     * set namingService value to namingService
-     * 
-     * @param namingService the namingService to set
+     * Sets the naming service.
+     *
+     * @param namingService the new naming service
      */
     public void setNamingService(NamingService namingService) {
         this.namingService = namingService;
     }
 
     /**
-     * Set the interface of the service to access. The interface must be suitable for the particular service and
-     * remoting strategy.
-     * <p>
-     * Typically required to be able to create a suitable service proxy, but can also be optional if the lookup returns
-     * a typed proxy.
+     * Sets the service interface.
+     *
+     * @param serviceInterface the new service interface
      */
     public void setServiceInterface(Class serviceInterface) {
         if (serviceInterface != null && !serviceInterface.isInterface()) {
@@ -111,7 +120,9 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * Return the interface of the service to access.
+     * Gets the service interface.
+     *
+     * @return the service interface
      */
     public Class getServiceInterface() {
         return this.serviceInterface;
@@ -174,9 +185,9 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     }
 
     /**
-     * set remoteInvocationFactory value to remoteInvocationFactory
-     * 
-     * @param remoteInvocationFactory the remoteInvocationFactory to set
+     * Sets the remote invocation factory.
+     *
+     * @param remoteInvocationFactory the new remote invocation factory
      */
     protected void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
         this.remoteInvocationFactory = remoteInvocationFactory;
@@ -197,8 +208,9 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     }
     
     /**
-     * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
-     * @param namingServiceLoadBalanceStrategyFactory the namingServiceLoadBalanceStrategyFactory to set
+     * Sets the naming service load balance strategy factory.
+     *
+     * @param namingServiceLoadBalanceStrategyFactory the new naming service load balance strategy factory
      */
     public void setNamingServiceLoadBalanceStrategyFactory(
             NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory) {
@@ -206,8 +218,9 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     }
     
     /**
-     * set failOverInterceptor value to failOverInterceptor
-     * @param failOverInterceptor the failOverInterceptor to set
+     * Sets the fail over interceptor.
+     *
+     * @param failOverInterceptor the new fail over interceptor
      */
     public void setFailOverInterceptor(SocketFailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;

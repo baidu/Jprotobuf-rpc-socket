@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,33 @@ package com.baidu.jprotobuf.pbrpc.intercept;
 import java.lang.reflect.Method;
 
 /**
- * A method invocation includes all needed information for method invoke process
- * 
+ * A method invocation includes all needed information for method invoke process.
  *
  * @author xiemalin
  * @since 3.4.1
  */
 public class MethodInvocationInfo {
 
+	/** The target. */
 	private Object target;
+	
+	/** The args. */
 	private Object[] args;
+	
+	/** The method. */
 	private Method method;
 	
+	/** The extra params. */
 	private byte[] extraParams;
 	
 
 	/**
-	 * @param target
-	 * @param args
-	 * @param method
-	 * @param extraParams
+	 * Instantiates a new method invocation info.
+	 *
+	 * @param target the target
+	 * @param args the args
+	 * @param method the method
+	 * @param extraParams the extra params
 	 */
 	public MethodInvocationInfo(Object target, Object[] args, Method method, byte[] extraParams) {
 		super();
@@ -48,7 +55,8 @@ public class MethodInvocationInfo {
 	}
 
 	/**
-	 * get the args
+	 * Gets the args.
+	 *
 	 * @return the args
 	 */
 	public Object[] getArgs() {
@@ -56,15 +64,17 @@ public class MethodInvocationInfo {
 	}
 
 	/**
-	 * set args value to args
-	 * @param args the args to set
+	 * Sets the args.
+	 *
+	 * @param args the new args
 	 */
 	public void setArgs(Object[] args) {
 		this.args = args;
 	}
 
 	/**
-	 * get the target
+	 * Gets the target.
+	 *
 	 * @return the target
 	 */
 	public Object getTarget() {
@@ -72,15 +82,17 @@ public class MethodInvocationInfo {
 	}
 
 	/**
-	 * set target value to target
-	 * @param target the target to set
+	 * Sets the target.
+	 *
+	 * @param target the new target
 	 */
 	public void setTarget(Object target) {
 		this.target = target;
 	}
 
 	/**
-	 * get the method
+	 * Gets the method.
+	 *
 	 * @return the method
 	 */
 	public Method getMethod() {
@@ -88,24 +100,27 @@ public class MethodInvocationInfo {
 	}
 
 	/**
-	 * set method value to method
-	 * @param method the method to set
+	 * Sets the method.
+	 *
+	 * @param method the new method
 	 */
 	public void setMethod(Method method) {
 		this.method = method;
 	}
 
 	/**
-	 * get the extraParams
-	 * @return the extraParams
+	 * Gets the extra params.
+	 *
+	 * @return the extra params
 	 */
 	public byte[] getExtraParams() {
 		return extraParams;
 	}
 
 	/**
-	 * set extraParams value to extraParams
-	 * @param extraParams the extraParams to set
+	 * Sets the extra params.
+	 *
+	 * @param extraParams the new extra params
 	 */
 	public void setExtraParams(byte[] extraParams) {
 		this.extraParams = extraParams;

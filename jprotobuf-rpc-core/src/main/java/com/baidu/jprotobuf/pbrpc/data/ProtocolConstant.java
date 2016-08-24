@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,27 +26,25 @@ import java.nio.charset.Charset;
  */
 public class ProtocolConstant {
 
-    /**
-     * default magic code
-     */
+    /** default magic code. */
     public static final String MAGIC_CODE = "PRPC";
     
-    /**
-     * default charset
-     */
+    /** default charset. */
     public static Charset CHARSET = Charset.forName("utf-8");
 
     /**
-     * get the cHARSET
-     * @return the cHARSET
+     * Gets the char set.
+     *
+     * @return the char set
      */
     public static Charset getCharSet() {
         return CHARSET;
     }
 
     /**
-     * set charSet value to CHARSET
-     * @param charSet the CHARSET to set
+     * Sets the charset.
+     *
+     * @param charSet the new charset
      */
     public static void setCharset(Charset charSet) {
         CHARSET = charSet;

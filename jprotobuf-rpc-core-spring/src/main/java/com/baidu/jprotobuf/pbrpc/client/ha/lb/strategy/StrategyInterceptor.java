@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.FailOverEvent;
 public interface StrategyInterceptor extends FailOverEvent {
 
     /**
-     * before strategy elect method invoke
+     * before strategy elect method invoke.
+     *
      * @param lbStratety {@link LoadBalanceStrategy}
      * @param invocation {@link MethodInvocation}
      */
@@ -38,8 +39,8 @@ public interface StrategyInterceptor extends FailOverEvent {
             MethodInvocation invocation);
 
     /**
-     * after strategy elect method invoke
-     * 
+     * after strategy elect method invoke.
+     *
      * @param electKey elect returned target name
      * @param invocation {@link MethodInvocation}
      */
@@ -54,10 +55,10 @@ public interface StrategyInterceptor extends FailOverEvent {
     boolean isDoElection(MethodInvocation invocation);
 
     /**
-     * do elect action
-     * 
+     * do elect action.
+     *
      * @param invocation {@link MethodInvocation}
-     * @return
+     * @return the string
      */
     String elect(MethodInvocation invocation);
 

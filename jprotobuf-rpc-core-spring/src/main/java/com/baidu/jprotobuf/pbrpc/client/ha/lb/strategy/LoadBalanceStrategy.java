@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,43 +20,53 @@ import java.util.Set;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 
 /**
- * load balance strategy interface
- * @see LoadBalanceProxyFactoryBean
+ * load balance strategy interface.
+ *
  * @author xiemalin
+ * @see LoadBalanceProxyFactoryBean
  * @since 2.16
  */
 public interface LoadBalanceStrategy {
+    
     /**
-     * do load balance and get target
-     * @return
+     * do load balance and get target.
+     *
+     * @return the string
      */
     String elect();
 	
 	/**
 	 * remove target from load balance target list.
-	 * @param t
+	 *
+	 * @param t the t
 	 */
 	void removeTarget(String t);
 	
 	/**
 	 * add target to load balance target list.
-	 * @param t
+	 *
+	 * @param t the t
 	 */
 	void recoverTarget(String t);
 	
 	/**
-	 * get availabled load balance target list. 
-	 * @return
+	 * Gets the targets.
+	 *
+	 * @return the targets
 	 */
 	Set<String> getTargets();
 	
 	/**
+	 * Checks for targets.
+	 *
 	 * @return true if availabled load balance target list is not empty
 	 */
 	boolean hasTargets();
 	
-	/** 
-	 * @return failed load balance target
+	/**
+	 * Gets the failed targets.
+	 *
+	 * @return the failed targets
 	 */
 	Set<String> getFailedTargets();
 	

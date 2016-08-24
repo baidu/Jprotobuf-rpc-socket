@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,45 +47,51 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 
 /**
- * Supports annotation resolver for {@link RpcProxy} and {@link RpcExporter}
- * 
+ * Supports annotation resolver for {@link RpcProxy} and {@link RpcExporter}.
+ *
  * @author xiemalin
  * @since 2.17
  */
 public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallback implements InitializingBean {
 
-    /**
-     * log this class
-     */
+    /** log this class. */
     protected static final Log LOGGER = LogFactory.getLog(ProtobufRpcAnnotationResolver.class);
 
+    /** The rpc clients. */
     private List<RpcProxyFactoryBean> rpcClients = new ArrayList<RpcProxyFactoryBean>();
 
+    /** The ha rpc clients. */
     private List<HaRpcProxyFactoryBean> haRpcClients = new ArrayList<HaRpcProxyFactoryBean>();
 
+    /** The port mapping expoters. */
     private Map<Integer, RpcServiceExporter> portMappingExpoters = new HashMap<Integer, RpcServiceExporter>();
 
+    /** The naming service load balance strategy factory. */
     private NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory;
 
+    /** The fail over interceptor. */
     private SocketFailOverInterceptor failOverInterceptor;
 
+    /** The compiler. */
     private Compiler compiler;
 
-    /**
-     * status to control start only once
-     */
+    /** status to control start only once. */
     private AtomicBoolean started = new AtomicBoolean(false);
 
+    /** The registry center service. */
     private RegistryCenterService registryCenterService;
     
+    /** The client interceptor. */
     private InvokerInterceptor clientInterceptor;
     
+    /** The protobuf rpc annotation ressolver listener. */
     private ProtobufRpcAnnotationRessolverListener protobufRpcAnnotationRessolverListener;
     
 
 	/**
-	 * set protobufRpcAnnotationRessolverListener value to protobufRpcAnnotationRessolverListener
-	 * @param protobufRpcAnnotationRessolverListener the protobufRpcAnnotationRessolverListener to set
+	 * Sets the protobuf rpc annotation ressolver listener.
+	 *
+	 * @param protobufRpcAnnotationRessolverListener the new protobuf rpc annotation ressolver listener
 	 */
 	public void setProtobufRpcAnnotationRessolverListener(
 			ProtobufRpcAnnotationRessolverListener protobufRpcAnnotationRessolverListener) {
@@ -93,27 +99,30 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
 	}
 
 	/**
-	 * set clientInterceptor value to clientInterceptor
-	 * @param clientInterceptor the clientInterceptor to set
+	 * Sets the client interceptor.
+	 *
+	 * @param clientInterceptor the new client interceptor
 	 */
 	public void setClientInterceptor(InvokerInterceptor clientInterceptor) {
 		this.clientInterceptor = clientInterceptor;
 	}
 	
+	/** The server interceptor. */
 	private InvokerInterceptor serverInterceptor;
 
 	/**
-	 * set serverInterceptor value to serverInterceptor
-	 * @param serverInterceptor the serverInterceptor to set
+	 * Sets the server interceptor.
+	 *
+	 * @param serverInterceptor the new server interceptor
 	 */
 	public void setServerInterceptor(InvokerInterceptor serverInterceptor) {
 		this.serverInterceptor = serverInterceptor;
 	}
 
     /**
-     * set namingServiceLoadBalanceStrategyFactory value to namingServiceLoadBalanceStrategyFactory
-     * 
-     * @param namingServiceLoadBalanceStrategyFactory the namingServiceLoadBalanceStrategyFactory to set
+     * Sets the naming service load balance strategy factory.
+     *
+     * @param namingServiceLoadBalanceStrategyFactory the new naming service load balance strategy factory
      */
     public void setNamingServiceLoadBalanceStrategyFactory(
             NamingServiceLoadBalanceStrategyFactory namingServiceLoadBalanceStrategyFactory) {
@@ -121,18 +130,18 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     }
 
     /**
-     * set failOverInterceptor value to failOverInterceptor
-     * 
-     * @param failOverInterceptor the failOverInterceptor to set
+     * Sets the fail over interceptor.
+     *
+     * @param failOverInterceptor the new fail over interceptor
      */
     public void setFailOverInterceptor(SocketFailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;
     }
 
     /**
-     * set registryCenterService value to registryCenterService
-     * 
-     * @param registryCenterService the registryCenterService to set
+     * Sets the registry center service.
+     *
+     * @param registryCenterService the new registry center service
      */
     public void setRegistryCenterService(RegistryCenterService registryCenterService) {
         this.registryCenterService = registryCenterService;
@@ -158,6 +167,13 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         return bean;
     }
 
+    /**
+     * Parses the rpc exporter annotation.
+     *
+     * @param rpcExporter the rpc exporter
+     * @param beanFactory the bean factory
+     * @param bean the bean
+     */
     private void parseRpcExporterAnnotation(RpcExporter rpcExporter, ConfigurableListableBeanFactory beanFactory,
             Object bean) {
 
@@ -280,6 +296,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         return value;
     }
 
+    /**
+     * Parses the ha rpc proxy annotation.
+     *
+     * @param rpcProxy the rpc proxy
+     * @param beanFactory the bean factory
+     * @return the object
+     * @throws Exception the exception
+     */
     private Object parseHaRpcProxyAnnotation(HaRpcProxy rpcProxy, ConfigurableListableBeanFactory beanFactory)
             throws Exception {
 
@@ -337,6 +361,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
         return haRpcProxyFactoryBean.getObject();
     }
 
+    /**
+     * Parses the rpc proxy annotation.
+     *
+     * @param rpcProxy the rpc proxy
+     * @param beanFactory the bean factory
+     * @return the object
+     * @throws Exception the exception
+     */
     private Object parseRpcProxyAnnotation(RpcProxy rpcProxy, ConfigurableListableBeanFactory beanFactory)
             throws Exception {
 
@@ -376,12 +408,14 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     }
 
 	/**
-	 * @param rpcProxy
-	 * @param beanFactory
-	 * @param rpcClientOptions
-	 * @param intPort
-	 * @param host
-	 * @return
+	 * Creates the rpc proxy factory bean.
+	 *
+	 * @param rpcProxy the rpc proxy
+	 * @param beanFactory the bean factory
+	 * @param rpcClientOptions the rpc client options
+	 * @param intPort the int port
+	 * @param host the host
+	 * @return the rpc proxy factory bean
 	 */
 	protected RpcProxyFactoryBean createRpcProxyFactoryBean(RpcProxy rpcProxy,
 			ConfigurableListableBeanFactory beanFactory, RpcClientOptions rpcClientOptions, int intPort, String host) {
@@ -506,9 +540,9 @@ public class ProtobufRpcAnnotationResolver extends AbstractAnnotationParserCallb
     }
 
     /**
-     * set compiler value to compiler
-     * 
-     * @param compiler the compiler to set
+     * Sets the compiler.
+     *
+     * @param compiler the new compiler
      */
     public void setCompiler(Compiler compiler) {
         this.compiler = compiler;

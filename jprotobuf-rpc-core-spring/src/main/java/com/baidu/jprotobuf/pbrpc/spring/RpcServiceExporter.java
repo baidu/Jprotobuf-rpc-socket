@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,29 +45,37 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class RpcServiceExporter extends RpcServerOptions implements InitializingBean, DisposableBean {
 
+    /** The pr rpc server. */
     private RpcServer prRpcServer;
     
+    /** The service port. */
     private int servicePort;
     
+    /** The host. */
     private String host;
     
+    /** The register services. */
     private List<Object> registerServices;
     
+    /** The rpc service registry bean. */
     private RpcServiceRegistryBean rpcServiceRegistryBean;
     
+    /** The remote invocation executor. */
     private RemoteInvocationExecutor remoteInvocationExecutor = new DefaultRemoteInvocationExecutor();
     
+    /** The registry center service. */
     private RegistryCenterService registryCenterService;
     
+    /** The cached rister info list. */
     private List<RegisterInfo> cachedRisterInfoList;
     
+	/** The interceptor. */
 	private InvokerInterceptor interceptor;
 
 	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
+	 * Sets the interceptor.
+	 *
+	 * @param interceptor the new interceptor
 	 */
 	public void setInterceptor(InvokerInterceptor interceptor) {
 		this.interceptor = interceptor;
@@ -75,72 +83,80 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     
 
     /**
-     * set registryCenterService value to registryCenterService
-     * @param registryCenterService the registryCenterService to set
+     * Sets the registry center service.
+     *
+     * @param registryCenterService the new registry center service
      */
     public void setRegistryCenterService(RegistryCenterService registryCenterService) {
         this.registryCenterService = registryCenterService;
     }
 
     /**
-     * Set the RemoteInvocationExecutor to use for this exporter.
-     * Default is a DefaultRemoteInvocationExecutor.
-     * <p>A custom invocation executor can extract further context information
-     * from the invocation, for example user credentials.
+     * Sets the remote invocation executor.
+     *
+     * @param remoteInvocationExecutor the new remote invocation executor
      */
     public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor) {
         this.remoteInvocationExecutor = remoteInvocationExecutor;
     }
 
     /**
-     * Return the RemoteInvocationExecutor used by this exporter.
+     * Gets the remote invocation executor.
+     *
+     * @return the remote invocation executor
      */
     public RemoteInvocationExecutor getRemoteInvocationExecutor() {
         return this.remoteInvocationExecutor;
     }
     
     /**
-     * set rpcServiceRegistryBean value to rpcServiceRegistryBean
-     * @param rpcServiceRegistryBean the rpcServiceRegistryBean to set
+     * Sets the rpc service registry bean.
+     *
+     * @param rpcServiceRegistryBean the new rpc service registry bean
      */
     public void setRpcServiceRegistryBean(RpcServiceRegistryBean rpcServiceRegistryBean) {
         this.rpcServiceRegistryBean = rpcServiceRegistryBean;
     }
 
     /**
-     * get the registerServices
-     * @return the registerServices
+     * Gets the register services.
+     *
+     * @return the register services
      */
     public List<Object> getRegisterServices() {
         return registerServices;
     }
 
     /**
-     * set registerServices value to registerServices
-     * @param registerServices the registerServices to set
+     * Sets the register services.
+     *
+     * @param registerServices the new register services
      */
     public void setRegisterServices(List<Object> registerServices) {
         this.registerServices = registerServices;
     }
 
     /**
-     * get the servicePort
-     * @return the servicePort
+     * Gets the service port.
+     *
+     * @return the service port
      */
     protected int getServicePort() {
         return servicePort;
     }
 
     /**
-     * set servicePort value to servicePort
-     * @param servicePort the servicePort to set
+     * Sets the service port.
+     *
+     * @param servicePort the new service port
      */
     public void setServicePort(int servicePort) {
         this.servicePort = servicePort;
     }
 
     /**
-     * get the host
+     * Gets the host.
+     *
      * @return the host
      */
     protected String getHost() {
@@ -148,8 +164,9 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     }
 
     /**
-     * set host value to host
-     * @param host the host to set
+     * Sets the host.
+     *
+     * @param host the new host
      */
     public void setHost(String host) {
         this.host = host;

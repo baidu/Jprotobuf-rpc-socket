@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class RpcServiceRegistry {
 
-    /**
-     * log this class
-     */
+    /** log this class. */
     protected static final Logger LOGGER = Logger.getLogger(RpcServiceRegistry.class.getName());
 
     /**
@@ -58,41 +56,53 @@ public class RpcServiceRegistry {
      */
     private boolean dummyOverride = false;
 
+    /** The interceptor. */
     private InvokerInterceptor interceptor;
 
     /**
-     * set interceptor value to interceptor
-     * 
-     * @param interceptor the interceptor to set
+     * Sets the interceptor.
+     *
+     * @param interceptor the new interceptor
      */
     public void setInterceptor(InvokerInterceptor interceptor) {
         this.interceptor = interceptor;
     }
 
     /**
-     * default constructor
+     * default constructor.
      */
     public RpcServiceRegistry() {
     }
 
+    /**
+     * Do register meta service.
+     */
     public void doRegisterMetaService() {
         RpcServiceMetaServiceProvider metaService = new RpcServiceMetaServiceProvider(this);
         registerService(metaService);
     }
 
+    /**
+     * Un register all.
+     */
     public void unRegisterAll() {
         serviceMap.clear();
     }
 
     /**
-     * set dummyOverride value to dummyOverride
-     * 
-     * @param dummyOverride the dummyOverride to set
+     * Sets the if override exist allowed.
+     *
+     * @param dummyOverride the new if override exist allowed
      */
     public void setDummyOverride(boolean dummyOverride) {
         this.dummyOverride = dummyOverride;
     }
 
+    /**
+     * Register service.
+     *
+     * @param target the target
+     */
     public void registerService(final Object target) {
         if (target == null) {
             throw new IllegalArgumentException("Param 'target' is null.");
@@ -114,6 +124,14 @@ public class RpcServiceRegistry {
 
     }
 
+    /**
+     * Do create rpc handler.
+     *
+     * @param method the method
+     * @param service the service
+     * @param protobufPRCService the protobuf prc service
+     * @return the rpc handler
+     */
     protected RpcHandler doCreateRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         boolean messageType = RpcMethodInfo.isMessageType(method);
         AbstractAnnotationRpcHandler rpcHandler;
@@ -129,6 +147,14 @@ public class RpcServiceRegistry {
         return rpcHandler;
     }
 
+    /**
+     * Do dynamic register service.
+     *
+     * @param methodSignature the method signature
+     * @param method the method
+     * @param service the service
+     * @param cls the cls
+     */
     public void doDynamicRegisterService(final String methodSignature, Method method, Object service,
             final Class<? extends ServerAttachmentHandler> cls) {
         ProtobufRPCService protobufPRCService = new ProtobufRPCService() {
@@ -162,6 +188,13 @@ public class RpcServiceRegistry {
         doRegiterService(method, service, protobufPRCService);
     }
 
+    /**
+     * Do regiter service.
+     *
+     * @param method the method
+     * @param service the service
+     * @param protobufPRCService the protobuf prc service
+     */
     protected void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         String methodSignature = rpcHandler.getMethodSignature();
@@ -185,22 +218,43 @@ public class RpcServiceRegistry {
 
     }
 
+    /**
+     * Gets the method signature.
+     *
+     * @param serviceName the service name
+     * @param method the method
+     * @return the method signature
+     */
     private String getMethodSignature(String serviceName, String method) {
         String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, method);
         return methodSignature;
     }
 
+    /**
+     * Lookup service.
+     *
+     * @param serviceName the service name
+     * @param methodName the method name
+     * @return the rpc handler
+     */
     public RpcHandler lookupService(String serviceName, String methodName) {
         String methodSignature = getMethodSignature(serviceName, methodName);
         return serviceMap.get(methodSignature);
     }
 
+    /**
+     * Gets the services.
+     *
+     * @return the services
+     */
     public Collection<RpcHandler> getServices() {
         return serviceMap.values();
     }
 
     /**
-     * @param serviceExporter
+     * Register service.
+     *
+     * @param serviceExporter the service exporter
      */
     public void registerService(IDLServiceExporter serviceExporter) {
         if (serviceExporter == null) {

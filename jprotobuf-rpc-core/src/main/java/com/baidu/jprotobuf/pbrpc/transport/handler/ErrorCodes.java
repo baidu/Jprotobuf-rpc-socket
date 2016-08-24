@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,59 +17,43 @@
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
 /**
- * Error code list
- * 
+ * Error code list.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class ErrorCodes {
 
-    /**
-     * success status
-     */
+    /** success status. */
     public static final int ST_SUCCESS = 0;
 
-    /**
-     * 未知异常
-     */
+    /** 未知异常. */
     public static final int ST_ERROR = 2001;
 
-    /**
-     * 方法未找到异常
-     */
+    /** 方法未找到异常. */
     public static final int ST_SERVICE_NOTFOUND = 1001;
 
-    /**
-     * 方法未找到异常
-     */
+    /** 方法未找到异常. */
     public static final int ST_METHOD_NOTFOUND = 1002;
 
-    /**
-     * 压缩与解压异常
-     */
+    /** 压缩与解压异常. */
     public static final int ST_ERROR_COMPRESS = 3000;
 
-    /**
-     * service not found
-     */
+    /** service not found. */
     public static final String MSG_SERVICE_NOTFOUND = "service not found";
 
-    /**
-     * read time out
-     */
+    /** read time out. */
     public static final int ST_READ_TIMEOUT = 62;
 
-    /**
-     * onceTalkTimeout timeout message
-     */
+    /** onceTalkTimeout timeout message. */
     public static final String MSG_READ_TIMEOUT =
             "method request time out, please check 'onceTalkTimeout' property. current value is:";
 
     /**
-     * check is error code is equals to ST_SUCCESS
-     * 
-     * @param errorCode
-     * @return
+     * check is error code is equals to ST_SUCCESS.
+     *
+     * @param errorCode the error code
+     * @return true, if is success
      */
     public static boolean isSuccess(int errorCode) {
         return ST_SUCCESS == errorCode;

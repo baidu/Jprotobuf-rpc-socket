@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ public class ProxyFactory {
 
     /**
      * To create proxy object. 
-     * 
-     * @param <T> 
-     * @param type proxy class type
+     *
+     * @param <T> the generic type
+     * @param clazz the clazz
+     * @param classLoader the class loader
      * @param handler invocation handler
      * @return proxied object.
      */

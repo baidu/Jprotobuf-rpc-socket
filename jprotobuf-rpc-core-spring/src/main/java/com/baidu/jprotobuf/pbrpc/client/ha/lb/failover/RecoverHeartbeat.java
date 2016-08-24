@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,25 +30,30 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean.Factor
  * @since 2.16
  */
 public class RecoverHeartbeat implements Runnable {
-    /**
-     * Logger for this class
-     */
+    
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger
             .getLogger(RecoverHeartbeat.class.getName());
 
+    /** The proxy factory bean. */
     private LoadBalanceProxyFactoryBean proxyFactoryBean;
 
+    /** The Constant DEFAULT_RECOVER_INTERVAL. */
     private static final long DEFAULT_RECOVER_INTERVAL = 1000L;
 
+    /** The Constant TOO_FREQUENT. */
     private static final long TOO_FREQUENT = 100L;
 
+    /** The runing. */
     private boolean runing;
 
+    /** The close. */
     private boolean close = false;
 
     /**
-     * get heart bean recover interval. unit 
-     * @return
+     * Gets the recover interval.
+     *
+     * @return the recover interval
      */
     private long getRecoverInterval() {
         long recoverInterval = proxyFactoryBean.getRecoverInterval();
@@ -63,22 +68,25 @@ public class RecoverHeartbeat implements Runnable {
     }
 
     /**
-     * @param proxyFactoryBean
-     * @param recoverInterval
+     * Instantiates a new recover heartbeat.
+     *
+     * @param proxyFactoryBean the proxy factory bean
      */
     public RecoverHeartbeat(LoadBalanceProxyFactoryBean proxyFactoryBean) {
         this.proxyFactoryBean = proxyFactoryBean;
     }
 
     /**
-     * @return thread running status
+     * Checks if is runing.
+     *
+     * @return true, if is runing
      */
     public boolean isRuning() {
         return runing;
     }
 
     /**
-     * stop thread and exit
+     * stop thread and exit.
      */
     public void close() {
         close = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.baidu.jprotobuf.pbrpc.meta;
 
 /**
- * To get Rpc service method description
+ * To get Rpc service method description.
  *
  * @author xiemalin
  * @since 2.1
@@ -25,14 +25,16 @@ package com.baidu.jprotobuf.pbrpc.meta;
 public interface RpcMetaAware {
 
     /**
-     * get method parameter proto description
-     * @return null if has no parameter
+     * Gets the input meta proto.
+     *
+     * @return the input meta proto
      */
     String getInputMetaProto();
     
     /**
-     * get method return type proto description
-     * @return null if return type is void
+     * Gets the output meta proto.
+     *
+     * @return the output meta proto
      */
     String getOutputMetaProto();
     

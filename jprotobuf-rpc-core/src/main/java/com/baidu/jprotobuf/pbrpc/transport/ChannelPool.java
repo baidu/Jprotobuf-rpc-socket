@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,26 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
  * 
  */
 public class ChannelPool {
+    
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(ChannelPool.class.getName());
     
+    /** The client config. */
     private final RpcClientOptions clientConfig;
     
+    /** The object factory. */
     private final PooledObjectFactory<Connection> objectFactory;
+    
+    /** The pool. */
     private final GenericObjectPool<Connection> pool;
     
+    /**
+     * Instantiates a new channel pool.
+     *
+     * @param rpcClient the rpc client
+     * @param host the host
+     * @param port the port
+     */
     public ChannelPool(RpcClient rpcClient, String host, int port) {
         this.clientConfig = rpcClient.getRpcClientOptions();
         objectFactory = new ChannelPoolObjectFactory(rpcClient, host, port);
@@ -54,6 +67,11 @@ public class ChannelPool {
         pool.setLifo(clientConfig.isLifo());
     }
     
+    /**
+     * Gets the channel.
+     *
+     * @return the channel
+     */
     public Connection getChannel() {
         Connection channel = null;
         try {
@@ -69,6 +87,11 @@ public class ChannelPool {
         return channel;
     }
     
+    /**
+     * Return channel.
+     *
+     * @param channel the channel
+     */
     public void returnChannel(Connection channel) {
         try {
             if (!clientConfig.isShortConnection()) {
@@ -83,6 +106,9 @@ public class ChannelPool {
         }
     }
     
+    /**
+     * Stop.
+     */
     public void stop() {
         try {
             if (pool != null) {

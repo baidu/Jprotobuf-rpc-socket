@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,7 @@ import java.util.Map.Entry;
  */
 public class MapUtils {
     
-    /**
-     * 
-     */
+    /** The Constant KV_SEPERATE. */
     private static final char KV_SEPERATE = '=';
 
     /**
@@ -48,17 +46,21 @@ public class MapUtils {
     }
 
     /**
-     * @param map
-     * @return
+     * Join.
+     *
+     * @param map the map
+     * @return the string
      */
     public static String join(Map<String, String> map) {
         return join(map, ',');
     }
     
     /**
-     * @param map
-     *  @param separator  the separator character to use
-     * @return
+     * Join.
+     *
+     * @param map the map
+     * @param separator  the separator character to use
+     * @return the string
      */
     public static String join(Map<String, String> map, char separator) {
         if (isEmpty(map)) {
@@ -82,14 +84,22 @@ public class MapUtils {
         
     }
     
+    /**
+     * Parses the map.
+     *
+     * @param joinString the join string
+     * @return the map
+     */
     public static Map<String, String> parseMap(String joinString) {
         return parseMap(joinString, ',');
     }
     
     /**
-     * @param joinString
-     * @param separator
-     * @return
+     * Parses the map.
+     *
+     * @param joinString the join string
+     * @param separator the separator
+     * @return the map
      */
     public static Map<String, String> parseMap(String joinString, char separator) {
         if (StringUtils.isBlank(joinString)) {

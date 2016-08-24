@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,53 +36,84 @@ import io.netty.util.Timer;
 
 /**
  * RPC client handler class.
- * 
+ *
  * @author xiemalin
  * @author songhuiqing
- * @date 2013/03/07 10:30:20
  * @version 1.0.0
+ * @date 2013/03/07 10:30:20
  */
 public class RpcClient extends Bootstrap {
 
-    /**
-     * Tick count of each wheel instance for timer
-     */
+    /** Tick count of each wheel instance for timer. */
     private static final int DEFAULT_TICKS_PER_WHEEL = 2048;
 
-    /**
-     * Tick duration for timer
-     */
+    /** Tick duration for timer. */
     private static final int DEFAULT_TICK_DURATION = 100;
 
+    /** The request map. */
     // 会话状态存储
     private final Map<Long, RpcClientCallState> requestMap = new ConcurrentHashMap<Long, RpcClientCallState>();
 
+    /** The correlation id. */
     private AtomicLong correlationId = new AtomicLong(1); // session标识
+    
+    /** The timer. */
     private static Timer timer = createTimer(); // 初始化定时器
+    
+    /** The rpc client options. */
     private RpcClientOptions rpcClientOptions;
+    
+    /** The channel pool. */
     private ChannelPool channelPool;
+    
+    /** The worker group. */
     private EventLoopGroup workerGroup;
 
+    /** The Constant INSTANCE_COUNT. */
     private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger();
 
+    /**
+     * Creates the timer.
+     *
+     * @return the timer
+     */
     private static Timer createTimer() {
         Timer timer = new HashedWheelTimer(Executors.defaultThreadFactory(), DEFAULT_TICK_DURATION,
                 TimeUnit.MILLISECONDS, DEFAULT_TICKS_PER_WHEEL);
         return timer;
     }
 
+    /**
+     * Instantiates a new rpc client.
+     */
     public RpcClient() {
         this(NioSocketChannel.class);
     }
 
+    /**
+     * Instantiates a new rpc client.
+     *
+     * @param rpcClientOptions the rpc client options
+     */
     public RpcClient(RpcClientOptions rpcClientOptions) {
         this(NioSocketChannel.class, rpcClientOptions);
     }
 
+    /**
+     * Instantiates a new rpc client.
+     *
+     * @param clientChannelClass the client channel class
+     */
     public RpcClient(Class<? extends Channel> clientChannelClass) {
         this(NioSocketChannel.class, new RpcClientOptions());
     }
 
+    /**
+     * Instantiates a new rpc client.
+     *
+     * @param clientChannelClass the client channel class
+     * @param rpcClientOptions the rpc client options
+     */
     public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
 
         if (rpcClientOptions.getIoEventGroupType() == RpcClientOptions.POLL_EVENT_GROUP) {
@@ -109,10 +140,12 @@ public class RpcClient extends Bootstrap {
     }
 
     /**
-     * @brief 应用层删除用户请求状态
-     * @param seqId
-     * @return RpcClientCallState
+     * Removes the pending request.
+     *
      * @author songhuiqing
+     * @param seqId the seq id
+     * @return RpcClientCallState
+     * @brief 应用层删除用户请求状态
      * @date 2013/03/07 10:34:30
      */
     public RpcClientCallState removePendingRequest(long seqId) {
@@ -120,12 +153,14 @@ public class RpcClient extends Bootstrap {
     }
 
     /**
-     * @brief 应用层注册用户请求状态
-     * @param seqId
-     * @param state
-     * @return void
-     * @exception IllegalArgumentException
+     * Register pending request.
+     *
      * @author songhuiqing
+     * @param seqId the seq id
+     * @param state the state
+     * @return void
+     * @exception IllegalArgumentException the illegal argument exception
+     * @brief 应用层注册用户请求状态
      * @date 2013/03/07 10:34:30
      */
     public void registerPendingRequest(long seqId, RpcClientCallState state) {
@@ -136,45 +171,62 @@ public class RpcClient extends Bootstrap {
     }
 
     /**
-     * @brief 生成会话标识
-     * @return long
-     * @author songhuiqing
-     * @date 2013/03/07 10:33:20
+     * Gets the next correlation id.
+     *
+     * @return the next correlation id
      */
     public long getNextCorrelationId() {
         return correlationId.getAndIncrement();
     }
 
+    /**
+     * Gets the timer.
+     *
+     * @return the timer
+     */
     public Timer getTimer() {
         return timer;
     }
 
+    /**
+     * Gets the rpc client options.
+     *
+     * @return the rpc client options
+     */
     public RpcClientOptions getRpcClientOptions() {
         return rpcClientOptions;
     }
 
+    /**
+     * Sets the rpc client options.
+     *
+     * @param rpcClientOptions the new rpc client options
+     */
     public void setRpcClientOptions(RpcClientOptions rpcClientOptions) {
         this.rpcClientOptions = rpcClientOptions;
     }
 
     /**
-     * get the channelPool
-     * 
-     * @return the channelPool
+     * Gets the channel pool.
+     *
+     * @return the channel pool
      */
     protected ChannelPool getChannelPool() {
         return channelPool;
     }
 
     /**
-     * set channelPool value to channelPool
-     * 
-     * @param channelPool the channelPool to set
+     * Sets the channel pool.
+     *
+     * @param channelPool the new channel pool
      */
     protected void setChannelPool(ChannelPool channelPool) {
         this.channelPool = channelPool;
     }
 
+    /**
+     * Shutdown.
+     */
     /*
      * (non-Javadoc)
      * 
@@ -201,7 +253,7 @@ public class RpcClient extends Bootstrap {
     }
 
     /**
-     * do shutdown action
+     * do shutdown action.
      */
     public void stop() {
         shutdown();

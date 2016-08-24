@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,40 +32,59 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
  * default RPC handler for google protobuf generated code.
- * 
+ *
  * @author xiemalin
- * @since 1.0
  * @see RpcServiceRegistry
+ * @since 1.0
  */
 @SuppressWarnings({"rawtypes"})
 public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMetaAware {
 
+    /** The service name. */
     private String serviceName;
+    
+    /** The method name. */
     private String methodName;
+    
+    /** The method. */
     private Method method;
+    
+    /** The input class. */
     private Class inputClass;
+    
+    /** The output class. */
     private Class outputClass;
+    
+    /** The service. */
     private Object service;
+    
+    /** The description. */
     private String description;
 
+    /** The attachment handler. */
     private ServerAttachmentHandler attachmentHandler;
+    
+    /** The input i dl. */
     protected String inputIDl;
+    
+    /** The output idl. */
     protected String outputIDL;
     
+	/** The interceptor. */
 	private InvokerInterceptor interceptor;
 
 	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
+	 * Sets the interceptor.
+	 *
+	 * @param interceptor the new interceptor
 	 */
 	public void setInterceptor(InvokerInterceptor interceptor) {
 		this.interceptor = interceptor;
 	}
 	
 	/**
-	 * get the interceptor
+	 * Gets the interceptor.
+	 *
 	 * @return the interceptor
 	 */
 	protected InvokerInterceptor getInterceptor() {
@@ -73,24 +92,25 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
 	}
     
     /**
-     * get the method
-     * 
+     * Gets the method.
+     *
      * @return the method
      */
     public Method getMethod() {
         return method;
     }
 
-    /**
-     * get the service
-     * 
-     * @return the service
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getService()
      */
     public Object getService() {
         return service;
     }
 
     
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc.server.RpcData)
+     */
     public RpcData doHandle(RpcData data) throws Exception {
         Long logId = data.getLogId();
         if (logId != null) {
@@ -103,12 +123,21 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         }
     }
     
+    /**
+     * Do real handle.
+     *
+     * @param data the data
+     * @return the rpc data
+     * @throws Exception the exception
+     */
     protected abstract RpcData doRealHandle(RpcData data) throws Exception;
 
     /**
-     * @param method
-     * @param service
-     * @param protobufPRCService
+     * Instantiates a new abstract annotation rpc handler.
+     *
+     * @param method the method
+     * @param service the service
+     * @param protobufPRCService the protobuf prc service
      */
     public AbstractAnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
         super();
@@ -162,59 +191,55 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         }
     }
     
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodSignature()
+     */
     public String getMethodSignature() {
         String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         return methodSignature;
     }
 
-    /**
-     * get the inputClass
-     * 
-     * @return the inputClass
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getInputClass()
      */
     public Class getInputClass() {
         return inputClass;
     }
 
-    /**
-     * get the outputClass
-     * 
-     * @return the outputClass
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getOutputClass()
      */
     public Class getOutputClass() {
         return outputClass;
     }
 
-    /**
-     * get the serviceName
-     * 
-     * @return the serviceName
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getServiceName()
      */
     public String getServiceName() {
         return serviceName;
     }
 
     /**
-     * set serviceName value to serviceName
-     * 
-     * @param serviceName
-     *            the serviceName to set
+     * Sets the service name.
+     *
+     * @param serviceName the new service name
      */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
 
-    /**
-     * get the methodName
-     * @return the methodName
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodName()
      */
     public String getMethodName() {
         return methodName;
     }
 
     /**
-     * get the attachmentHandler
-     * @return the attachmentHandler
+     * Gets the attachment handler.
+     *
+     * @return the attachment handler
      */
     public ServerAttachmentHandler getAttachmentHandler() {
         return attachmentHandler;
@@ -234,9 +259,8 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         return outputIDL;
     }
 
-    /**
-     * get the description
-     * @return the description
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getDescription()
      */
     public String getDescription() {
         return description;

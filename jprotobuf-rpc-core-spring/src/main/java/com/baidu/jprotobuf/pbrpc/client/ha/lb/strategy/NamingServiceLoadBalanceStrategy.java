@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 
 /**
- * {@link NamingService} support load balance strategy
+ * {@link NamingService} support load balance strategy.
  *
  * @author xiemalin
  * @since 2.17
@@ -26,7 +26,9 @@ import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 public interface NamingServiceLoadBalanceStrategy extends LoadBalanceStrategy {
 
     /**
-     * do reinit once by the naming service
+     * do reinit once by the naming service.
+     *
+     * @param serviceSignature the service signature
      * @param namingService {@link NamingService}
      */
     void doReInit(String serviceSignature, NamingService namingService);

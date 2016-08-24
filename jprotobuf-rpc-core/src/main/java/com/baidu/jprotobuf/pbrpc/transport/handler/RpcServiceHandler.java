@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,33 +41,36 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackage> {
 
-	/**
-	 * log this class
-	 */
+	/** log this class. */
 	private static final Logger LOG = Logger.getLogger(RpcServiceHandler.class.getName());
 	
+	/** The es. */
 	private ExecutorService es;
 	
 	/**
-	 * set es value to es
-	 * @param es the es to set
+	 * Sets the es.
+	 *
+	 * @param es the new es
 	 */
 	public void setEs(ExecutorService es) {
 		this.es = es;
 	}
 	
-	/**
-	 * {@link RpcServiceRegistry}
-	 */
+	/** {@link RpcServiceRegistry}. */
 	private final RpcServiceRegistry rpcServiceRegistry;
 
 	/**
-	 * @param rpcServiceRegistry
+	 * Instantiates a new rpc service handler.
+	 *
+	 * @param rpcServiceRegistry the rpc service registry
 	 */
 	public RpcServiceHandler(RpcServiceRegistry rpcServiceRegistry) {
 		this.rpcServiceRegistry = rpcServiceRegistry;
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext, java.lang.Object)
+	 */
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RpcDataPackage dataPackage) throws Exception {
 		BackgroundTask task = new BackgroundTask(ctx, dataPackage, rpcServiceRegistry);
@@ -80,6 +83,9 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext, java.lang.Throwable)
+	 */
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		LOG.log(Level.SEVERE, cause.getCause().getMessage(), cause.getCause());
@@ -106,15 +112,26 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 		ctx.fireChannelRead(data);
 	}
 
+	/**
+	 * The Class BackgroundTask.
+	 */
 	private static class BackgroundTask implements Runnable {
 
+		/** The ctx. */
 		private ChannelHandlerContext ctx;
+		
+		/** The data package. */
 		private RpcDataPackage dataPackage;
+		
+		/** The rpc service registry. */
 		private RpcServiceRegistry rpcServiceRegistry;
 
 		/**
-		 * @param ctx
-		 * @param dataPackage
+		 * Instantiates a new background task.
+		 *
+		 * @param ctx the ctx
+		 * @param dataPackage the data package
+		 * @param rpcServiceRegistry the rpc service registry
 		 */
 		public BackgroundTask(ChannelHandlerContext ctx, RpcDataPackage dataPackage,
 				RpcServiceRegistry rpcServiceRegistry) {

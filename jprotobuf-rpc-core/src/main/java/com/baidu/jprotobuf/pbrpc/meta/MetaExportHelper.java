@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,38 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class MetaExportHelper {
 
-    /**
-     * default output charset name
-     */
+    /** default output charset name. */
     public static final String CHARSET_NAME = "utf-8";
 
+    /**
+     * Export idl.
+     *
+     * @param servicePort the service port
+     * @return the string
+     */
     public static String exportIDL(int servicePort) {
         return exportIDL(null, servicePort, CHARSET_NAME);
     }
 
+    /**
+     * Export idl.
+     *
+     * @param serviceHost the service host
+     * @param servicePort the service port
+     * @return the string
+     */
     public static String exportIDL(String serviceHost, int servicePort) {
         return exportIDL(serviceHost, servicePort, CHARSET_NAME);
     }
 
+    /**
+     * Export idl.
+     *
+     * @param serviceHost the service host
+     * @param servicePort the service port
+     * @param charset the charset
+     * @return the string
+     */
     public static String exportIDL(String serviceHost, int servicePort, String charset) {
         StringBuilder ret = new StringBuilder();
         RpcClient rpcClient = new RpcClient();
@@ -77,10 +96,23 @@ public class MetaExportHelper {
 
     }
     
+    /**
+     * Export rpc meta.
+     *
+     * @param servicePort the service port
+     * @return the rpc service meta list
+     */
     public static RpcServiceMetaList exportRPCMeta(int servicePort) {
         return exportRPCMeta(null, servicePort);
     }
 
+    /**
+     * Export rpc meta.
+     *
+     * @param serviceHost the service host
+     * @param servicePort the service port
+     * @return the rpc service meta list
+     */
     public static RpcServiceMetaList exportRPCMeta(String serviceHost, int servicePort) {
         RpcClient rpcClient = new RpcClient();
 

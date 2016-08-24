@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,13 @@ import java.util.Map;
  */
 public class RegisterInfo {
 
-    /**
-     * host info
-     */
+    /** host info. */
     private String host;
 
+    /** The port. */
     private int port;
 
-    /**
-     * the unique mark for each service info
-     */
+    /** the unique mark for each service info. */
     private String service;
 
     /*
@@ -97,88 +94,87 @@ public class RegisterInfo {
         return true;
     }
 
-    /**
-     * protocol info
-     */
+    /** protocol info. */
     private String protocol;
 
+    /** The extra infos. */
     private Map<String, String> extraInfos;
 
     /**
-     * get the host
-     * 
-     * @return the host
+     * Gets the host info.
+     *
+     * @return the host info
      */
     public String getHost() {
         return host;
     }
 
     /**
-     * set host value to host
-     * 
-     * @param host the host to set
+     * Sets the host info.
+     *
+     * @param host the new host info
      */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * get the service
-     * 
-     * @return the service
+     * Gets the unique mark for each service info.
+     *
+     * @return the unique mark for each service info
      */
     public String getService() {
         return service;
     }
 
     /**
-     * set service value to service
-     * 
-     * @param service the service to set
+     * Sets the unique mark for each service info.
+     *
+     * @param service the new unique mark for each service info
      */
     public void setService(String service) {
         this.service = service;
     }
 
     /**
-     * get the protocol
-     * 
-     * @return the protocol
+     * Gets the protocol info.
+     *
+     * @return the protocol info
      */
     public String getProtocol() {
         return protocol;
     }
 
     /**
-     * set protocol value to protocol
-     * 
-     * @param protocol the protocol to set
+     * Sets the protocol info.
+     *
+     * @param protocol the new protocol info
      */
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
 
     /**
-     * get the extraInfos
-     * 
-     * @return the extraInfos
+     * Gets the extra infos.
+     *
+     * @return the extra infos
      */
     public Map<String, String> getExtraInfos() {
         return extraInfos;
     }
 
     /**
-     * set extraInfos value to extraInfos
-     * 
-     * @param extraInfos the extraInfos to set
+     * Sets the extra infos.
+     *
+     * @param extraInfos the extra infos
      */
     public void setExtraInfos(Map<String, String> extraInfos) {
         this.extraInfos = extraInfos;
     }
 
     /**
-     * get the port
-     * 
+     * Gets the port.
+     *
      * @return the port
      */
     public int getPort() {
@@ -186,9 +182,9 @@ public class RegisterInfo {
     }
 
     /**
-     * set port value to port
-     * 
-     * @param port the port to set
+     * Sets the port.
+     *
+     * @param port the new port
      */
     public void setPort(int port) {
         this.port = port;

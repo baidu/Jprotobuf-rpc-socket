@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,64 +22,75 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * {@link List} collection of {@link RpcServiceMeta}
+ * {@link List} collection of {@link RpcServiceMeta}.
  *
  * @author xiemalin
  * @since 1.0
  */
 public class RpcServiceMetaList {
 
+    /** The rpc service metas. */
     @Protobuf(fieldType = FieldType.OBJECT)
     private List<RpcServiceMeta> rpcServiceMetas;
+    
+    /** The types idl. */
     @Protobuf
     private String typesIDL;
+    
+    /** The rpcs idl. */
     @Protobuf
     private String rpcsIDL;
     
 
     /**
-     * get the rpcServiceMetas
-     * @return the rpcServiceMetas
+     * Gets the rpc service metas.
+     *
+     * @return the rpc service metas
      */
     public List<RpcServiceMeta> getRpcServiceMetas() {
         return rpcServiceMetas;
     }
 
     /**
-     * set rpcServiceMetas value to rpcServiceMetas
-     * @param rpcServiceMetas the rpcServiceMetas to set
+     * Sets the rpc service metas.
+     *
+     * @param rpcServiceMetas the new rpc service metas
      */
     public void setRpcServiceMetas(List<RpcServiceMeta> rpcServiceMetas) {
         this.rpcServiceMetas = rpcServiceMetas;
     }
 
     /**
-     * get the typesIDL
-     * @return the typesIDL
+     * Gets the types idl.
+     *
+     * @return the types idl
      */
     public String getTypesIDL() {
         return typesIDL;
     }
 
     /**
-     * set typesIDL value to typesIDL
-     * @param typesIDL the typesIDL to set
+     * Sets the types idl.
+     *
+     * @param typesIDL the new types idl
      */
     public void setTypesIDL(String typesIDL) {
         this.typesIDL = typesIDL;
     }
 
     /**
-     * get the rpcsIDL
-     * @return the rpcsIDL
+     * Gets the rpcs idl.
+     *
+     * @return the rpcs idl
      */
     public String getRpcsIDL() {
         return rpcsIDL;
     }
 
     /**
-     * set rpcsIDL value to rpcsIDL
-     * @param rpcsIDL the rpcsIDL to set
+     * Sets the rpcs idl.
+     *
+     * @param rpcsIDL the new rpcs idl
      */
     public void setRpcsIDL(String rpcsIDL) {
         this.rpcsIDL = rpcsIDL;

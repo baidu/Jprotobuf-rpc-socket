@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,16 +33,17 @@ import com.google.protobuf.RpcCallback;
  */
 public class RpcChannel {
 
+    /** The log. */
     private static Logger LOG = Logger.getLogger(RpcChannel.class.getName());
 
-    /**
-     * RPC client
-     */
+    /** RPC client. */
     private RpcClient rpcClient;
+    
+    /** The channel pool. */
     private ChannelPool channelPool;
 
     /**
-     * try to do connect
+     * try to do connect.
      */
     public void testChannlConnect() {
         Connection channel = channelPool.getChannel();
@@ -50,9 +51,11 @@ public class RpcChannel {
     }
 
     /**
-     * @param rpcClient
-     * @param host
-     * @param port
+     * Instantiates a new rpc channel.
+     *
+     * @param rpcClient the rpc client
+     * @param host the host
+     * @param port the port
      */
     public RpcChannel(RpcClient rpcClient, String host, int port) {
         this.rpcClient = rpcClient;
@@ -60,15 +63,33 @@ public class RpcChannel {
         rpcClient.setChannelPool(channelPool);
     }
 
+    /**
+     * Gets the connection.
+     *
+     * @return the connection
+     */
     public Connection getConnection() {
         Connection channel = channelPool.getChannel();
         return channel;
     }
 
+    /**
+     * Release connection.
+     *
+     * @param connection the connection
+     */
     public void releaseConnection(Connection connection) {
         channelPool.returnChannel(connection);
     }
 
+    /**
+     * Do transport.
+     *
+     * @param connection the connection
+     * @param rpcDataPackage the rpc data package
+     * @param callback the callback
+     * @param onceTalkTimeout the once talk timeout
+     */
     public void doTransport(Connection connection, RpcDataPackage rpcDataPackage, RpcCallback<RpcDataPackage> callback,
             long onceTalkTimeout) {
         if (rpcDataPackage == null) {
@@ -110,7 +131,7 @@ public class RpcChannel {
     }
 
     /**
-     * 
+     * Close.
      */
     public void close() {
         if (channelPool != null) {

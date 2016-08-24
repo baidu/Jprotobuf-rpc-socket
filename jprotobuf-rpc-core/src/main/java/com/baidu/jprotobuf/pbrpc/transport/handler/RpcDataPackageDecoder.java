@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,31 +38,37 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * Decode RpcDataPackage from received bytes
- * 
+ * Decode RpcDataPackage from received bytes.
+ *
  * @author xiemalin
- * @since 1.0
  * @see RpcDataPackage
+ * @since 1.0
  */
 public class RpcDataPackageDecoder extends ByteToMessageDecoder {
 
-    /**
-     * Default chunk package wait time out check interval
-     */
+    /** Default chunk package wait time out check interval. */
     private static final int DEFAULT_CLEANUP_INTERVAL = 1000;
 
+    /** The log. */
     private static Logger LOG = Logger.getLogger(RpcDataPackageDecoder.class.getName());
     
+    /** The Constant tempTrunkPackages. */
     private static final Map<Long, RpcDataPackage> tempTrunkPackages = new ConcurrentHashMap<Long, RpcDataPackage>();
     
+    /** The Constant startChunkPackageCleanUp. */
     private static final AtomicBoolean startChunkPackageCleanUp = new AtomicBoolean(false);
     
+    /** The es. */
     private ExecutorService es;;
+    
+    /** The stop chunk package timeout clean. */
     private boolean stopChunkPackageTimeoutClean = false;
     
     
     /**
-     * @param chunkPackageTimeout
+     * Instantiates a new rpc data package decoder.
+     *
+     * @param chunkPackageTimeout the chunk package timeout
      */
     public RpcDataPackageDecoder(final int chunkPackageTimeout) {
         if (chunkPackageTimeout <= 0) {
@@ -110,6 +116,9 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
         
     }
     
+	/* (non-Javadoc)
+	 * @see io.netty.handler.codec.ByteToMessageDecoder#decode(io.netty.channel.ChannelHandlerContext, io.netty.buffer.ByteBuf, java.util.List)
+	 */
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
 			List<Object> out) throws Exception {
@@ -119,6 +128,14 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
 		}
 	}
 
+    /**
+     * Decode.
+     *
+     * @param ctx the ctx
+     * @param buf the buf
+     * @return the object
+     * @throws Exception the exception
+     */
     /*
      * (non-Javadoc)
      * 
@@ -215,7 +232,7 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
     }
 
     /**
-     * 
+     * Close.
      */
     public void close() {
         stopChunkPackageTimeoutClean = true;

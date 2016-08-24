@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,34 +32,28 @@ import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 public class IDLServiceExporter extends
         AbstractServiceExporter<IDLProxyObject, IDLProxyObject> implements RpcMetaAware {
     
-    /**
-     * input protobuf IDL
-     */
+    /** input protobuf IDL. */
     private InputStream inputIDL;
 
-    /**
-     * input protobuf IDL defined object name for multiple message object
-     * defined select
-     */
+    /** input protobuf IDL defined object name for multiple message object defined select. */
     private String inputIDLObjectName;
 
-    /**
-     * output protobuf IDL
-     */
+    /** output protobuf IDL. */
     private InputStream outputIDL;
 
-    /**
-     * output protobuf IDL defined object name for multiple message object
-     * defined select
-     */
+    /** output protobuf IDL defined object name for multiple message object defined select. */
     private String outputIDLObjectName;
 
+    /** The input idl proxy object. */
     private IDLProxyObject inputIDLProxyObject;
 
+    /** The output idl proxy object. */
     private IDLProxyObject outputIDLProxyObject;
     
+    /** The input idl str. */
     private String inputIDLStr;
     
+    /** The output idl str. */
     private String outputIDLStr;
 
     /* (non-Javadoc)
@@ -72,8 +66,9 @@ public class IDLServiceExporter extends
     }
 
     /**
-     * get the inputIDLProxyObject
-     * @return the inputIDLProxyObject
+     * Gets the input proxy object.
+     *
+     * @return the input proxy object
      */
     public IDLProxyObject getInputProxyObject() {
         if (inputIDLProxyObject != null) {
@@ -84,8 +79,9 @@ public class IDLServiceExporter extends
     }
     
     /**
-     * get the outputIDLProxyObject
-     * @return the outputIDLProxyObject
+     * Gets the output idl proxy object.
+     *
+     * @return the output idl proxy object
      */
     protected IDLProxyObject getOutputIDLProxyObject() {
         if (outputIDLProxyObject != null) {

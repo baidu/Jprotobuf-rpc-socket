@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,42 +23,50 @@ import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
 
 /**
- * Asynchronous register supports for {@link RegistryCenterService}
+ * Asynchronous register supports for {@link RegistryCenterService}.
  *
  * @author xiemalin
  * @since 2.27
  */
 public abstract class AsyncRegistryService implements RegistryCenterService {
     
+    /** The async queue. */
     private LinkedBlockingDeque<RegisterInfo> asyncQueue = new LinkedBlockingDeque<RegisterInfo>(100);
     
+    /** The stop. */
     private boolean stop;
     
+    /** The es. */
     private ExecutorService es = Executors.newFixedThreadPool(1);
     
     /**
-     * get the stop
-     * @return the stop
+     * Checks if is stop.
+     *
+     * @return true, if is stop
      */
     public boolean isStop() {
         return stop;
     }
     
+    /**
+     * Stop.
+     */
     public void stop() {
         stop = true;
         es.shutdown();
     }
 
     /**
-     * set stop value to stop
-     * @param stop the stop to set
+     * Sets the stop.
+     *
+     * @param stop the new stop
      */
     public void setStop(boolean stop) {
         this.stop = stop;
     }
 
     /**
-     * 
+     * Instantiates a new async registry service.
      */
     public AsyncRegistryService() {
         
@@ -92,6 +100,11 @@ public abstract class AsyncRegistryService implements RegistryCenterService {
     }
 
 
+    /**
+     * Do register.
+     *
+     * @param url the url
+     */
     protected abstract void doRegister(RegisterInfo url);
 
 }

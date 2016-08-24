@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 /**
- * Annotation publish for {@link RpcServiceExporter}
+ * Annotation publish for {@link RpcServiceExporter}.
  *
  * @author xiemalin
  * @since 2.17
@@ -39,19 +39,30 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 public @interface RpcExporter {
 
     /**
-     * RPC server port to publish
+     * RPC server port to publish.
+     *
+     * @return the string
      */
     String port();
     
+    /**
+     * Host.
+     *
+     * @return the string
+     */
     String host() default "";
     
     /**
-     * bean name of RPC server options bean type must be {@link RpcServerOptions}
+     * bean name of RPC server options bean type must be {@link RpcServerOptions}.
+     *
+     * @return the string
      */
     String rpcServerOptionsBeanName() default "";
     
     /**
-     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}
+     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}.
+     *
+     * @return the string
      */
     String invokerIntercepterBeanName() default "";
     

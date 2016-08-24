@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,31 @@ import java.util.logging.Logger;
 
 
 /**
- * A {@link ChannelFutureListener} implementation of RPC operation complete call back
- * 
+ * A {@link ChannelFutureListener} implementation of RPC operation complete call back.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class RpcChannelFutureListener implements ChannelFutureListener {
 
+    /** The log. */
     private static Logger LOG = Logger.getLogger(RpcChannelFutureListener.class.getName());
 
+    /** The conn. */
     private Connection conn;
 
+    /**
+     * Instantiates a new rpc channel future listener.
+     *
+     * @param conn the conn
+     */
     public RpcChannelFutureListener(Connection conn) {
         this.conn = conn;
     }
 
+    /* (non-Javadoc)
+     * @see io.netty.util.concurrent.GenericFutureListener#operationComplete(io.netty.util.concurrent.Future)
+     */
     public void operationComplete(ChannelFuture future) throws Exception {
 
         if (!future.isSuccess()) {

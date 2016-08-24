@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Time task to process each request timeout event
- * 
+ * Time task to process each request timeout event.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class RpcTimerTask implements TimerTask {
 
+    /** The log. */
     public static Logger LOG = Logger.getLogger(RpcTimerTask.class.getName());
 
+    /** The correlation id. */
     private long correlationId;
+    
+    /** The rpc client. */
     private RpcClient rpcClient;
 
+    /** The time. */
     private final long time;
+    
+    /** The time unit. */
     private final TimeUnit timeUnit;
 
+    /**
+     * Instantiates a new rpc timer task.
+     *
+     * @param correlationId the correlation id
+     * @param client the client
+     * @param timeOut the time out
+     * @param timeUnit the time unit
+     */
     public RpcTimerTask(long correlationId, RpcClient client, long timeOut, TimeUnit timeUnit) {
         this.correlationId = correlationId;
         this.rpcClient = client;
@@ -46,6 +61,9 @@ public class RpcTimerTask implements TimerTask {
         this.timeUnit = timeUnit;
     }
 
+    /* (non-Javadoc)
+     * @see io.netty.util.TimerTask#run(io.netty.util.Timeout)
+     */
     public void run(Timeout timeout) throws Exception {
 
         LOG.log(Level.FINE, "correlationId:" + correlationId + " timeout");

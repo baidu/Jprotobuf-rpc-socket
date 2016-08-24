@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,39 +36,56 @@ import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServiceHandler;
 
 /**
- * RPC server channel handler factory
- * 
+ * RPC server channel handler factory.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 
-	/**
-	 * decode handler
-	 */
+	/** decode handler. */
 	private static final String DECODER = "decoder";
 
+	/** The Constant UNCOMPRESS. */
 	private static final String UNCOMPRESS = "uncompress";
+	
+	/** The Constant COMPRESS. */
 	private static final String COMPRESS = "compress";
 
+	/** The Constant RPC_SERVER_HANDLER. */
 	private static final String RPC_SERVER_HANDLER = "rpc_handler";
 
+	/** The log. */
 	private static Logger LOG = Logger.getLogger(RpcServerPipelineInitializer.class.getName());
 
+	/** The rpc service registry. */
 	private final RpcServiceRegistry rpcServiceRegistry;
 
+	/** The Constant RPC_CHANNEL_STATE_AWARE_HANDLER. */
 	private static final String RPC_CHANNEL_STATE_AWARE_HANDLER = "RpcChannelStateAwareHandler";
 
+	/** The Constant RPC_CHANNEL_IDLE_HANDLER. */
 	private static final String RPC_CHANNEL_IDLE_HANDLER = "idel_channal_handler";
 
+	/** The Constant SERVER_DATA_PACK. */
 	private static final String SERVER_DATA_PACK = "server_data_pack";
 
+	/** The rpc server options. */
 	private final RpcServerOptions rpcServerOptions;
 
+	/** The rpc data package decoder list. */
 	private List<RpcDataPackageDecoder> rpcDataPackageDecoderList = new ArrayList<RpcDataPackageDecoder>();
 
+	/** The es. */
 	private ExecutorService es;
 
+	/**
+	 * Instantiates a new rpc server pipeline initializer.
+	 *
+	 * @param rpcServiceRegistry the rpc service registry
+	 * @param rpcServerOptions the rpc server options
+	 * @param es the es
+	 */
 	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions,
 			ExecutorService es) {
 		this.rpcServiceRegistry = rpcServiceRegistry;
@@ -76,6 +93,9 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		this.es = es;
 	}
 
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInitializer#initChannel(io.netty.channel.Channel)
+	 */
 	@Override
 	protected void initChannel(Channel ch) throws Exception {
 		LOG.log(Level.FINE, "begin process RPC server handler");
@@ -116,6 +136,9 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 
 	}
 
+	/**
+	 * Close.
+	 */
 	public void close() {
 		if (rpcDataPackageDecoderList.isEmpty()) {
 			return;

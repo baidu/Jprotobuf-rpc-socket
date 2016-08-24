@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,44 +39,50 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, InitializingBean {
 
-    /**
-     * log this class
-     */
+    /** log this class. */
     protected static final Log LOGGER = LogFactory.getLog(RpcMetaExporter.class);
     
+    /** The service port. */
     private int servicePort;
+    
+    /** The service host. */
     private String serviceHost;
+    
+    /** The path. */
     private String path;
+    
+    /** The local file. */
     private File localFile;
     
 
     /**
-     * set path value to path
-     * @param path the path to set
+     * Sets the path.
+     *
+     * @param path the new path
      */
     public void setPath(String path) {
         this.path = path;
     }
 
     /**
-     * set servicePort value to servicePort
-     * @param servicePort the servicePort to set
+     * Sets the service port.
+     *
+     * @param servicePort the new service port
      */
     public void setServicePort(int servicePort) {
         this.servicePort = servicePort;
     }
 
     /**
-     * set serviceHost value to serviceHost
-     * @param serviceHost the serviceHost to set
+     * Sets the service host.
+     *
+     * @param serviceHost the new service host
      */
     public void setServiceHost(String serviceHost) {
         this.serviceHost = serviceHost;
     }
 
-    /**
-     * status to control start only once
-     */
+    /** status to control start only once. */
     private AtomicBoolean started = new AtomicBoolean(false);
 
     /*
@@ -100,7 +106,7 @@ public class RpcMetaExporter implements ApplicationListener<ApplicationEvent>, I
     }
 
     /**
-     * 
+     * Do export.
      */
     private void doExport() {
         FileOutputStream fos = null;

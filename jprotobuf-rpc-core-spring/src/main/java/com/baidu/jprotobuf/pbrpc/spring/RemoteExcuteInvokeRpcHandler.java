@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,34 +28,41 @@ import com.baidu.jprotobuf.pbrpc.server.RpcData;
 
 
 /**
- * {@link RemoteExcuteInvokeRpcHandler}
+ * {@link RemoteExcuteInvokeRpcHandler}.
+ *
  * @author xiemalin
  * @since 2.17
  */
 public class RemoteExcuteInvokeRpcHandler implements RpcHandler, RpcMetaAware {
     
+    /** The remote invocation executor. */
     private RemoteInvocationExecutor remoteInvocationExecutor = new DefaultRemoteInvocationExecutor();
+    
+    /** The delegator. */
     private final AbstractAnnotationRpcHandler delegator;
 
     /**
-     * Set the RemoteInvocationExecutor to use for this exporter.
-     * Default is a DefaultRemoteInvocationExecutor.
-     * <p>A custom invocation executor can extract further context information
-     * from the invocation, for example user credentials.
+     * Sets the remote invocation executor.
+     *
+     * @param remoteInvocationExecutor the new remote invocation executor
      */
     public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor) {
         this.remoteInvocationExecutor = remoteInvocationExecutor;
     }
 
     /**
-     * Return the RemoteInvocationExecutor used by this exporter.
+     * Gets the remote invocation executor.
+     *
+     * @return the remote invocation executor
      */
     public RemoteInvocationExecutor getRemoteInvocationExecutor() {
         return this.remoteInvocationExecutor;
     }
     
     /**
-     * default constructor with {@link RpcHandler}
+     * default constructor with {@link RpcHandler}.
+     *
+     * @param rpcHandler the rpc handler
      */
     public RemoteExcuteInvokeRpcHandler(AbstractAnnotationRpcHandler rpcHandler) {
         this.delegator = rpcHandler;

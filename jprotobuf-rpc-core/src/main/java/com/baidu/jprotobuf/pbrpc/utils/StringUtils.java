@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@ import java.util.List;
  */
 public class StringUtils {
 
-    /**
-     * 
-     */
+    /** The Constant EMPTY_STRING. */
     public static final String EMPTY_STRING = "";
 
     /**
@@ -265,12 +263,12 @@ public class StringUtils {
      * <p>
      * A <code>null</code> string input has no effect.
      * </p>
-     * 
-     * @see #escapeJava(java.lang.String)
+     *
      * @param out Writer to write escaped string into
      * @param str String to escape values in, may be null
-     * @throws IllegalArgumentException if the Writer is <code>null</code>
      * @throws IOException if error occurs on underlying Writer
+     * @throws IllegalArgumentException if the Writer is <code>null</code>
+     * @see #escapeJava(java.lang.String)
      */
     public static void escapeJava(Writer out, String str) throws IOException {
         escapeJavaStyleString(out, str, false);
@@ -425,11 +423,11 @@ public class StringUtils {
      * <p>
      * A <code>null</code> string input has no effect.
      * </p>
-     * 
+     *
      * @param out the <code>Writer</code> used to output unescaped characters
      * @param str the <code>String</code> to unescape, may be null
-     * @throws IllegalArgumentException if the Writer is <code>null</code>
      * @throws IOException if error occurs on underlying Writer
+     * @throws IllegalArgumentException if the Writer is <code>null</code>
      */
     public static void unescapeJava(Writer out, String str) throws IOException {
         if (out == null) {

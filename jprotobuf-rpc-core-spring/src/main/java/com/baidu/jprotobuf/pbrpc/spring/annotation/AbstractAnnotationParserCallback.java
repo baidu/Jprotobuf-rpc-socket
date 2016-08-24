@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,7 @@ public abstract class AbstractAnnotationParserCallback implements
         AnnotationParserCallback {
 
     
-    /**
-     * configuration resource placeholder resolver
-     */
+    /** configuration resource placeholder resolver. */
     private PlaceholderResolver resolver;
     
     /**
@@ -48,8 +46,8 @@ public abstract class AbstractAnnotationParserCallback implements
     }
     
     /**
-     * test if value contains placeholder marked string
-     * 
+     * test if value contains placeholder marked string.
+     *
      * @param value to test
      * @return true if string is null or contains placeholder marked string
      */
@@ -63,9 +61,8 @@ public abstract class AbstractAnnotationParserCallback implements
         return false;
     }
     
-    /**
-     * set PlaceholderResolver
-     * @param resolver PlaceholderResolver 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.spring.annotation.AnnotationParserCallback#setPlaceholderResolver(com.baidu.jprotobuf.pbrpc.spring.PlaceholderResolver)
      */
     public void setPlaceholderResolver(PlaceholderResolver resolver) {
         this.resolver = resolver;

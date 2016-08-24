@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,28 +53,36 @@ import com.baidu.jprotobuf.pbrpc.utils.Constants;
  */
 public class DynamicProtobufRpcProxy {
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(DynamicProtobufRpcProxy.class.getName());
 
+    /** The rpc client. */
     private RpcClient rpcClient;
 
+    /** The host. */
     private String host;
 
+    /** The port. */
     private int port;
 
+    /** The Constant NULL. */
     private static final Object NULL = new Object();
 
+    /** The rpc channel map. */
     private Map<String, RpcChannel> rpcChannelMap = new HashMap<String, RpcChannel>();
 
+    /** The rpc methods. */
     private Map<String, RpcMethodInfo> rpcMethods = new HashMap<String, RpcMethodInfo>();
 
+    /** The Constant EMPTY_CONFIG. */
     private static final Map<String, String> EMPTY_CONFIG = Collections.emptyMap();
 
+    /** The Constant TIMEOUT_KEY. */
     public static final String TIMEOUT_KEY = "TIME_OUT";
 
     /**
+     * Instantiates a new dynamic protobuf rpc proxy.
+     *
      * @param rpcClient RPC client
      */
     public DynamicProtobufRpcProxy(RpcClient rpcClient) {
@@ -86,16 +94,40 @@ public class DynamicProtobufRpcProxy {
         }
     }
 
+    /**
+     * Invoke.
+     *
+     * @param serviceSignature the service signature
+     * @param proxy the proxy
+     * @param method the method
+     * @param args the args
+     * @param cls the cls
+     * @return the object
+     * @throws Throwable the throwable
+     */
     public Object invoke(final String serviceSignature, Object proxy, final Method method, final Object[] args,
             final Class<? extends ClientAttachmentHandler> cls) throws Throwable {
         return invoke(serviceSignature, proxy, method, args, EMPTY_CONFIG, cls);
     }
 
+    /**
+     * Gets the timeout.
+     *
+     * @param config the config
+     * @return the timeout
+     */
     private long getTimeout(final Map<String, String> config) {
         return getLong(config, TIMEOUT_KEY);
 
     }
 
+    /**
+     * Gets the long.
+     *
+     * @param config the config
+     * @param key the key
+     * @return the long
+     */
     private long getLong(final Map<String, String> config, String key) {
         if (config == null) {
             return 0L;
@@ -105,6 +137,18 @@ public class DynamicProtobufRpcProxy {
         return StringUtils.toLong(value, 0L);
     }
 
+    /**
+     * Invoke.
+     *
+     * @param serviceSignature the service signature
+     * @param proxy the proxy
+     * @param method the method
+     * @param args the args
+     * @param config the config
+     * @param cls the cls
+     * @return the object
+     * @throws Throwable the throwable
+     */
     public Object invoke(final String serviceSignature, Object proxy, final Method method, final Object[] args,
             final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls) throws Throwable {
 
@@ -189,6 +233,18 @@ public class DynamicProtobufRpcProxy {
         }
     }
 
+    /**
+     * Do invoke.
+     *
+     * @param serviceSignature the service signature
+     * @param rpcChannel the rpc channel
+     * @param proxy the proxy
+     * @param rpcMethodInfo the rpc method info
+     * @param method the method
+     * @param args the args
+     * @return the object
+     * @throws Throwable the throwable
+     */
     /*
      * (non-Javadoc)
      * 
@@ -277,14 +333,22 @@ public class DynamicProtobufRpcProxy {
         return o;
     }
 
+    /**
+     * Builds the request data package.
+     *
+     * @param rpcMethodInfo the rpc method info
+     * @param args the args
+     * @return the rpc data package
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
         return rpcDataPackage;
     }
 
     /**
-     * do wait {@link BlockingRpcCallback} return
-     * 
+     * do wait {@link BlockingRpcCallback} return.
+     *
      * @param method java method object
      * @param args method arguments
      * @param serviceName service name
@@ -339,6 +403,14 @@ public class DynamicProtobufRpcProxy {
         return o;
     }
 
+    /**
+     * Process equals hash code to string method.
+     *
+     * @param serviceSignature the service signature
+     * @param method the method
+     * @param args the args
+     * @return the object
+     */
     private Object processEqualsHashCodeToStringMethod(String serviceSignature, Method method, final Object[] args) {
         String name = method.getName();
 
@@ -359,23 +431,26 @@ public class DynamicProtobufRpcProxy {
     }
 
     /**
-     * set host value to host
-     * 
-     * @param host the host to set
+     * Sets the host.
+     *
+     * @param host the new host
      */
     public void setHost(String host) {
         this.host = host;
     }
 
     /**
-     * set port value to port
-     * 
-     * @param port the port to set
+     * Sets the port.
+     *
+     * @param port the new port
      */
     public void setPort(int port) {
         this.port = port;
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         Collection<RpcChannel> rpcChannels = rpcChannelMap.values();
         for (RpcChannel rpcChann : rpcChannels) {

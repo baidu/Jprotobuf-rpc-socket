@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,24 +28,26 @@ import com.google.protobuf.RpcCallback;
  */
 public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
 
+    /** The done. */
     private boolean done = false; // 会话完成标识
     
+    /** The callback done. */
     private CallbackDone callbackDone;
     
-    /**
-     * RPC data message
-     */
+    /** RPC data message. */
     private RpcDataPackage message; // 响应消息
     
     /**
-	 * 
-	 */
+     * Instantiates a new blocking rpc callback.
+     */
 	public BlockingRpcCallback() {
 	}
 
     /**
-	 * @param callbackDone
-	 */
+     * Instantiates a new blocking rpc callback.
+     *
+     * @param callbackDone the callback done
+     */
 	public BlockingRpcCallback(CallbackDone callbackDone) {
 		super();
 		this.callbackDone = callbackDone;
@@ -53,8 +55,11 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
 
 
 	/**
-     * @see com.google.protobuf.RpcCallback#run(java.lang.Object)
-     */
+	 * Run.
+	 *
+	 * @param message the message
+	 * @see com.google.protobuf.RpcCallback#run(java.lang.Object)
+	 */
     public void run(RpcDataPackage message) {
         this.message = message;
         if (callbackDone != null) {
@@ -67,15 +72,32 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
         
     }
 
+    /**
+     * Gets the rPC data message.
+     *
+     * @return the rPC data message
+     */
     public RpcDataPackage getMessage() {
         return message;
     }
 
+    /**
+     * Checks if is done.
+     *
+     * @return true, if is done
+     */
     public boolean isDone() {
         return done;
     }
 
+    /**
+     * The Interface CallbackDone.
+     */
     public static interface CallbackDone {
-    	void done();
+    	
+	    /**
+	     * Done.
+	     */
+	    void done();
     }
 }

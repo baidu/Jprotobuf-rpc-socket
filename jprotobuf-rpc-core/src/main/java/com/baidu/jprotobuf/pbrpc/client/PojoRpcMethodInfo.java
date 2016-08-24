@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,17 @@ import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 @SuppressWarnings({"unchecked","rawtypes"})
 public class PojoRpcMethodInfo extends RpcMethodInfo {
     
+    /** The input codec. */
     private Codec inputCodec;
     
+    /** The output codec. */
     private Codec outputCodec;
 
     /**
-     * @param method
-     * @param protobufPRC
+     * Instantiates a new pojo rpc method info.
+     *
+     * @param method the method
+     * @param protobufPRC the protobuf prc
      */
     public PojoRpcMethodInfo(Method method, ProtobufRPC protobufPRC) {
         super(method, protobufPRC);

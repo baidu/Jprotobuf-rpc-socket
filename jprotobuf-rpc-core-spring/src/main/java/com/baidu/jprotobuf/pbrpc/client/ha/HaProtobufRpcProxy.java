@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,70 +47,103 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
  * A enhanced {@link ProtobufRpcProxy} supports naming service and load blanace.
- * 
- * 
+ *
  * @author xiemalin
+ * @param <T> the generic type
  * @since 2.16
  */
 public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implements MethodInterceptor {
 
+    /** The Constant LOG. */
     private static final Logger LOG = Logger.getLogger(HaProtobufRpcProxy.class.getName());
 
+    /** The rpc client. */
     private final RpcClient rpcClient;
+    
+    /** The interface class. */
     private final Class<T> interfaceClass;
+    
+    /** The naming service. */
     private final NamingService namingService;
+    
+    /** The load balance strategy factory. */
     private NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory;
+    
+    /** The fail over interceptor. */
     private SocketFailOverInterceptor failOverInterceptor;
+    
+    /** The proxy instance. */
     private T proxyInstance;
 
+    /** The lookup stub on startup. */
     private boolean lookupStubOnStartup = true;
 
+    /** The instances map. */
     private Map<String, Object> instancesMap = new HashMap<String, Object>();
+    
+    /** The lb map. */
     private Map<String, LoadBalanceProxyFactoryBean> lbMap = new HashMap<String, LoadBalanceProxyFactoryBean>();
+    
+    /** The protobuf rpc proxy list map. */
     private Map<String, List<ProtobufRpcProxy<T>>> protobufRpcProxyListMap =
             new HashMap<String, List<ProtobufRpcProxy<T>>>();
 
+    /** The proxied. */
     private AtomicBoolean proxied = new AtomicBoolean(false);
     
+	/** The interceptor. */
 	private InvokerInterceptor interceptor;
 
 	/**
-	 * set interceptor value to interceptor
-	 * 
-	 * @param interceptor
-	 *            the interceptor to set
+	 * Sets the interceptor.
+	 *
+	 * @param interceptor the new interceptor
 	 */
 	public void setInterceptor(InvokerInterceptor interceptor) {
 		this.interceptor = interceptor;
 	}
 
     /**
-     * get the lookupStubOnStartup
-     * 
-     * @return the lookupStubOnStartup
+     * Checks if is lookup stub on startup.
+     *
+     * @return true, if is lookup stub on startup
      */
     public boolean isLookupStubOnStartup() {
         return lookupStubOnStartup;
     }
 
     /**
-     * set lookupStubOnStartup value to lookupStubOnStartup
-     * 
-     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     * Sets the lookup stub on startup.
+     *
+     * @param lookupStubOnStartup the new lookup stub on startup
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
 
-    /**
-     * log this class
-     */
+    /** log this class. */
     protected static final Log LOGGER = LogFactory.getLog(HaProtobufRpcProxy.class);
 
+    /**
+     * Instantiates a new ha protobuf rpc proxy.
+     *
+     * @param rpcClient the rpc client
+     * @param interfaceClass the interface class
+     * @param namingService the naming service
+     */
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService) {
         this(rpcClient, interfaceClass, namingService, null, null);
     }
 
+    /**
+     * Instantiates a new ha protobuf rpc proxy.
+     *
+     * @param rpcClient the rpc client
+     * @param interfaceClass the interface class
+     * @param namingService the naming service
+     * @param loadBalanceStrategyFactory the load balance strategy factory
+     * @param failOverInterceptor the fail over interceptor
+     */
     public HaProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass, NamingService namingService,
             NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory,
             SocketFailOverInterceptor failOverInterceptor) {
@@ -126,12 +159,25 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
     }
 
+    /**
+     * On build protobuf rpc proxy.
+     *
+     * @param rpcClient the rpc client
+     * @param interfaceClass the interface class
+     * @return the protobuf rpc proxy
+     */
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
         protobufRpcProxy.setInterceptor(interceptor);
         return protobufRpcProxy;
     }
 
+    /**
+     * Proxy.
+     *
+     * @return the t
+     * @throws Exception the exception
+     */
     public synchronized T proxy() throws Exception {
         if (proxied.compareAndSet(false, true)) {
             ProtobufRpcProxy<T> protobufRpcProxy = onBuildProtobufRpcProxy(rpcClient, interfaceClass);
@@ -147,6 +193,12 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         return proxyInstance;
     }
 
+    /**
+     * Creates the service proxy.
+     *
+     * @param servers the servers
+     * @throws Exception the exception
+     */
     private void createServiceProxy(Map<String, List<RegisterInfo>> servers) throws Exception {
 
         Iterator<Entry<String, List<RegisterInfo>>> iter = servers.entrySet().iterator();
@@ -157,9 +209,11 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     }
 
     /**
-     * @param servers
-     * @return
-     * @throws Exception
+     * Do proxy.
+     *
+     * @param service the service
+     * @param serversList the servers list
+     * @throws Exception the exception
      */
     private void doProxy(String service, List<RegisterInfo> serversList) throws Exception {
         long current = System.currentTimeMillis();
@@ -218,6 +272,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
                 + " time took:" + (System.currentTimeMillis() - current) + " ms");
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingServiceChangeListener#close()
+     */
     public void close() {
         Collection<List<ProtobufRpcProxy<T>>> values = protobufRpcProxyListMap.values();
         for (List<ProtobufRpcProxy<T>> list : values) {
@@ -232,8 +289,8 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     }
 
     /**
-     * do close action
-     * 
+     * do close action.
+     *
      * @param lbProxyBean {@link LoadBalanceProxyFactoryBean}
      * @param protobufRpcProxyList list of {@link ProtobufRpcProxy}
      */

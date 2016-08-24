@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package com.baidu.jprotobuf.pbrpc.server;
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 
 /**
- * IDL service invoker
- * 
+ * IDL service invoker.
+ *
  * @author xiemalin
  * @since 1.0
  */
@@ -40,16 +40,16 @@ public interface IDLServiceInvoker {
     
     
     /**
-     * get input {@link IDLProxyObject} as for input parameter object. or null if no input parameter
-     * 
-     * @return
+     * Gets the input.
+     *
+     * @return the input
      */
     IDLProxyObject getInput();
     
     /**
-     * get output {@link IDLProxyObject} as for return result. or null if no return result.
-     * 
-     * @return
+     * Gets the output.
+     *
+     * @return the output
      */
     IDLProxyObject getOutput();
 }

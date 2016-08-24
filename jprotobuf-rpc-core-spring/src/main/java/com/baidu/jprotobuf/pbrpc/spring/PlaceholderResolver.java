@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,26 +57,21 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @since 2.17
  */
 public class PlaceholderResolver {
-    /**
-     * Logger for this class
-     */
+    
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger
             .getLogger(PlaceholderResolver.class.getName());
 
-    /** Default placeholder prefix: "${" */
+    /**  Default placeholder prefix: "${". */
     public static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
 
-    /** Default placeholder suffix: "}" */
+    /**  Default placeholder suffix: "}". */
     public static final String DEFAULT_PLACEHOLDER_SUFFIX = "}";
 
-    /**
-     * placeholder prefix
-     */
+    /** placeholder prefix. */
     private String placeholderPrefix = DEFAULT_PLACEHOLDER_PREFIX;
 
-    /**
-     * placeholder suffix
-     */
+    /** placeholder suffix. */
     private String placeholderSuffix = DEFAULT_PLACEHOLDER_SUFFIX;
 
     /**
@@ -84,14 +79,12 @@ public class PlaceholderResolver {
      */
     private PlaceholderResolved resolvedInterceptor;
     
-    /**
-     * all parsed placeholders will store here
-     */
+    /** all parsed placeholders will store here. */
     private Set<String> visitedPlaceholders = new HashSet<String>(50);
 
     /**
-     * Constructor method
-     * 
+     * Constructor method.
+     *
      * @param resolvedInterceptor {@link PlaceholderResolved} can not be null.
      */
     public PlaceholderResolver(
@@ -118,8 +111,8 @@ public class PlaceholderResolver {
     }
     
     /**
-     * test if target string contains placeholderPrefix
-     * 
+     * test if target string contains placeholderPrefix.
+     *
      * @param strVal target string to test
      * @return true if string contains placeholderPrefix
      */
@@ -138,12 +131,12 @@ public class PlaceholderResolver {
      * Parse the given String value recursively, to be able to resolve nested
      * placeholders (when resolved property values in turn contain placeholders
      * again).
-     * 
-     * @param strVal
-     *            the String value to parse
+     *
+     * @param strVal            the String value to parse
      * @param visitedPlaceholders the placeholders that have already been visited
      * during the current resolution attempt (used to detect circular references
      * between placeholders). Only non-null if we're parsing a nested placeholder.
+     * @return the string
      */
     protected String parseStringValue(String strVal,
             Set<String> visitedPlaceholders) {
@@ -223,9 +216,11 @@ public class PlaceholderResolver {
     /**
      * Test whether the given string matches the given substring
      * at the given index.
+     *
      * @param str the original string (or StringBuffer)
      * @param index the index in the original string to start matching against
      * @param substring the substring to match at the given index
+     * @return true, if successful
      */
     public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
         for (int j = 0; j < substring.length(); j++) {
@@ -238,14 +233,18 @@ public class PlaceholderResolver {
     }
 
     /**
-     * @param placeholderPrefix the placeholderPrefix to set
+     * Sets the placeholder prefix.
+     *
+     * @param placeholderPrefix the new placeholder prefix
      */
     public void setPlaceholderPrefix(String placeholderPrefix) {
         this.placeholderPrefix = placeholderPrefix;
     }
 
     /**
-     * @param placeholderSuffix the placeholderSuffix to set
+     * Sets the placeholder suffix.
+     *
+     * @param placeholderSuffix the new placeholder suffix
      */
     public void setPlaceholderSuffix(String placeholderSuffix) {
         this.placeholderSuffix = placeholderSuffix;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import java.util.List;
 public interface RegistryCenterService {
 
     /**
-     * 注册数据，比如：提供者地址，消费者地址，路由规则，覆盖规则，等数据。
-     * 
+     * 注册数据，比如：提供者地址，消费者地址，路由规则，覆盖规则，等数据。.
+     *
      * @param url 注册信息，不允许为空
      */
     void register(RegisterInfo url);
@@ -56,11 +56,11 @@ public interface RegistryCenterService {
     void unsubscribe(RegisterInfo url, NotifyListener listener);
 
     /**
-     * 查询符合条件的已注册数据，与订阅的推模式相对应，这里为拉模式，只返回一次结果。
-     * 
-     * @see com.alibaba.dubbo.registry.NotifyListener#notify(List)
+     * 查询符合条件的已注册数据，与订阅的推模式相对应，这里为拉模式，只返回一次结果。.
+     *
      * @param url 查询条件，不允许为空，
      * @return 已注册信息列表，可能为空，
+     * @see com.alibaba.dubbo.registry.NotifyListener#notify(List)
      */
     List<RegisterInfo> lookup(RegisterInfo url);
 

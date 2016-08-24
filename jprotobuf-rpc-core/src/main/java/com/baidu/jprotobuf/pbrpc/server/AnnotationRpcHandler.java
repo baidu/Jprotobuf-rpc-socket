@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,20 +37,26 @@ import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
-	/**
-	 * Logger for this class
-	 */
+	
+	/** Logger for this class. */
 	private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
+	/** The input codec. */
 	private Codec inputCodec;
+	
+	/** The output codec. */
 	private Codec outputCodec;
 
+	/** The service signature. */
 	private String serviceSignature;
 
 
 	/**
-	 * @param method
-	 * @param service
+	 * Instantiates a new annotation rpc handler.
+	 *
+	 * @param method the method
+	 * @param service the service
+	 * @param protobufPRCService the protobuf prc service
 	 */
 	public AnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
 		super(method, service, protobufPRCService);

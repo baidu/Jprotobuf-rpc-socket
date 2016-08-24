@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,24 +35,41 @@ import java.util.regex.Pattern;
  */
 public class NetUtils {
 
+    /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(NetUtils.class.getName());
 
+    /** The Constant LOCALHOST. */
     public static final String LOCALHOST = "127.0.0.1";
 
+    /** The Constant ANYHOST. */
     public static final String ANYHOST = "0.0.0.0";
 
+    /** The Constant RND_PORT_START. */
     private static final int RND_PORT_START = 30000;
 
+    /** The Constant RND_PORT_RANGE. */
     private static final int RND_PORT_RANGE = 10000;
 
+    /** The Constant RANDOM. */
     private static final Random RANDOM = new Random(System.currentTimeMillis());
     
+    /** The local address. */
     private static volatile InetAddress LOCAL_ADDRESS = null;
 
+    /**
+     * Gets the random port.
+     *
+     * @return the random port
+     */
     public static int getRandomPort() {
         return RND_PORT_START + RANDOM.nextInt(RND_PORT_RANGE);
     }
 
+    /**
+     * Gets the available port.
+     *
+     * @return the available port
+     */
     public static int getAvailablePort() {
         ServerSocket ss = null;
         try {
@@ -71,6 +88,12 @@ public class NetUtils {
         }
     }
 
+    /**
+     * Gets the available port.
+     *
+     * @param port the port
+     * @return the available port
+     */
     public static int getAvailablePort(int port) {
         if (port <= 0) {
             return getAvailablePort();
@@ -94,45 +117,99 @@ public class NetUtils {
         return port;
     }
 
+    /** The Constant MIN_PORT. */
     private static final int MIN_PORT = 0;
 
+    /** The Constant MAX_PORT. */
     private static final int MAX_PORT = 65535;
 
+    /**
+     * Checks if is invalid port.
+     *
+     * @param port the port
+     * @return true, if is invalid port
+     */
     public static boolean isInvalidPort(int port) {
         return port > MIN_PORT || port <= MAX_PORT;
     }
 
+    /** The Constant ADDRESS_PATTERN. */
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("^\\d{1,3}(\\.\\d{1,3}){3}\\:\\d{1,5}$");
 
+    /**
+     * Checks if is valid address.
+     *
+     * @param address the address
+     * @return true, if is valid address
+     */
     public static boolean isValidAddress(String address) {
         return ADDRESS_PATTERN.matcher(address).matches();
     }
 
+    /** The Constant LOCAL_IP_PATTERN. */
     private static final Pattern LOCAL_IP_PATTERN = Pattern.compile("127(\\.\\d{1,3}){3}$");
 
+    /**
+     * Checks if is local host.
+     *
+     * @param host the host
+     * @return true, if is local host
+     */
     public static boolean isLocalHost(String host) {
         return host != null && (LOCAL_IP_PATTERN.matcher(host).matches() || host.equalsIgnoreCase("localhost"));
     }
 
+    /**
+     * Checks if is any host.
+     *
+     * @param host the host
+     * @return true, if is any host
+     */
     public static boolean isAnyHost(String host) {
         return "0.0.0.0".equals(host);
     }
 
+    /**
+     * Checks if is invalid local host.
+     *
+     * @param host the host
+     * @return true, if is invalid local host
+     */
     public static boolean isInvalidLocalHost(String host) {
         return host == null || host.length() == 0 || host.equalsIgnoreCase("localhost") || host.equals("0.0.0.0")
                 || (LOCAL_IP_PATTERN.matcher(host).matches());
     }
 
+    /**
+     * Checks if is valid local host.
+     *
+     * @param host the host
+     * @return true, if is valid local host
+     */
     public static boolean isValidLocalHost(String host) {
         return !isInvalidLocalHost(host);
     }
 
+    /**
+     * Gets the local socket address.
+     *
+     * @param host the host
+     * @param port the port
+     * @return the local socket address
+     */
     public static InetSocketAddress getLocalSocketAddress(String host, int port) {
         return isInvalidLocalHost(host) ? new InetSocketAddress(port) : new InetSocketAddress(host, port);
     }
 
+    /** The Constant IP_PATTERN. */
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
 
+    /**
+     * Checks if is valid address.
+     *
+     * @param address the address
+     * @return true, if is valid address
+     */
     private static boolean isValidAddress(InetAddress address) {
         if (address == null || address.isLoopbackAddress())
             return false;
@@ -141,9 +218,9 @@ public class NetUtils {
     }
 
     /**
-     * 遍历本地网卡，返回第一个合理的IP。
-     * 
-     * @return 本地网卡IP
+     * Gets the local address.
+     *
+     * @return the local address
      */
     public static InetAddress getLocalAddress() {
         if (LOCAL_ADDRESS != null)
@@ -153,11 +230,21 @@ public class NetUtils {
         return localAddress;
     }
 
+    /**
+     * Gets the log host.
+     *
+     * @return the log host
+     */
     public static String getLogHost() {
         InetAddress address = LOCAL_ADDRESS;
         return address == null ? LOCALHOST : address.getHostAddress();
     }
 
+    /**
+     * Gets the local address0.
+     *
+     * @return the local address0
+     */
     private static InetAddress getLocalAddress0() {
         InetAddress localAddress = null;
         try {

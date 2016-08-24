@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,31 +25,32 @@ import java.lang.reflect.Method;
  * @since 2.16
  */
 public interface FailOverInterceptor {
+    
     /**
      * return if target is available.
-     * 
-     * @param o
-     * @param m
-     * @param beanKey
+     *
+     * @param o the o
+     * @param m the m
+     * @param beanKey the bean key
      * @return true if available
      */
     boolean isAvailable(Object o, Method m, String beanKey);
 
     /**
-     * return if failed target is recovered
-     * 
-     * @param o
-     * @param m
-     * @param beanKey
+     * return if failed target is recovered.
+     *
+     * @param o the o
+     * @param m the m
+     * @param beanKey the bean key
      * @return true if recovered
      */
     boolean isRecover(Object o, Method m, String beanKey);
 
     /**
-     * return is catch exception need do fail over action
-     * 
-     * @param t
-     * @param beanKey
+     * return is catch exception need do fail over action.
+     *
+     * @param t the t
+     * @param beanKey the bean key
      * @return true if do fail over action
      */
     boolean isDoFailover(Throwable t, String beanKey);

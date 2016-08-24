@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 
 /**
- * A weighted round robin strategy implementation for {@link LoadBalanceStrategy} interface
- * 
+ * A weighted round robin strategy implementation for {@link LoadBalanceStrategy} interface.
+ *
  * @author xiemalin
  * @see LoadBalanceStrategy
  * @see RoundRobinLoadBalanceStrategy
@@ -38,27 +38,34 @@ import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
  */
 public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceStrategy {
 
+    /** The Constant MIN_LB_FACTOR. */
     private static final int MIN_LB_FACTOR = 1;
 
+    /** The targets. */
     private List<String> targets;
+    
+    /** The current pos. */
     private int currentPos;
 
+    /** The current targets. */
     private Map<String, Integer> currentTargets;
+    
+    /** The failed targets. */
     private Map<String, Integer> failedTargets;
 
+    /** The naming service. */
     private NamingService namingService;
 
-    /**
-     * defalut load factor for {@link RoundRobinLoadBalanceStrategy}
-     */
+    /** defalut load factor for {@link RoundRobinLoadBalanceStrategy}. */
     private static final int DEFAULT_LOAD_FACTOR = 1;
 
+    /** The service signature. */
     private String serviceSignature;
 
     /**
-     * get the namingService
-     * 
-     * @return the namingService
+     * Gets the naming service.
+     *
+     * @return the naming service
      */
     public NamingService getNamingService() {
         return namingService;
@@ -66,8 +73,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
 
     /**
      * Constructor with load balance factors.
-     * 
-     * @param lbFactors
+     *
+     * @param serviceSignature the service signature
+     * @param namingService the naming service
      */
     public RoundRobinLoadBalanceStrategy(String serviceSignature, NamingService namingService) {
 
@@ -76,18 +84,30 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         doReInit(this.serviceSignature, namingService);
     }
 
+    /**
+     * Instantiates a new round robin load balance strategy.
+     *
+     * @param lbFactors the lb factors
+     */
     public RoundRobinLoadBalanceStrategy(Map<String, Integer> lbFactors) {
         init(lbFactors);
     }
 
+    /**
+     * Inits the.
+     *
+     * @param servers the servers
+     */
     protected void init(List<RegisterInfo> servers) {
         Map<String, Integer> lbFactors = parseLbFactors(servers);
         init(lbFactors);
     }
 
     /**
-     * @param servers
-     * @return
+     * Parses the lb factors.
+     *
+     * @param servers the servers
+     * @return the map
      */
     private Map<String, Integer> parseLbFactors(List<RegisterInfo> servers) {
         Map<String, Integer> lbFactors = new HashMap<String, Integer>();
@@ -102,17 +122,30 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return lbFactors;
     }
 
+    /**
+     * Inits the.
+     *
+     * @param lbFactors the lb factors
+     */
     protected synchronized void init(Map<String, Integer> lbFactors) {
         currentTargets = Collections.synchronizedMap(lbFactors);
         failedTargets = Collections.synchronizedMap(new HashMap<String, Integer>(currentTargets.size()));
         reInitTargets(currentTargets);
     }
 
+    /**
+     * Re init targets.
+     *
+     * @param lbFactors the lb factors
+     */
     private void reInitTargets(Map<String, Integer> lbFactors) {
         targets = initTargets(lbFactors);
         currentPos = 0;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#elect()
+     */
     public synchronized String elect() {
         if (targets == null) {
             throw new RuntimeException("no target is available");
@@ -124,6 +157,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return targets.get(currentPos++);
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#getTargets()
+     */
     public synchronized Set<String> getTargets() {
         if (targets == null) {
             return new HashSet<String>(0);
@@ -131,6 +167,12 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return new HashSet<String>(targets);
     }
 
+    /**
+     * Inits the targets.
+     *
+     * @param lbFactors the lb factors
+     * @return the list
+     */
     public List<String> initTargets(Map<String, Integer> lbFactors) {
         if (lbFactors == null || lbFactors.size() == 0) {
             return null;
@@ -152,6 +194,13 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return buildBalanceTargets(lbFactors, MIN_LB_FACTOR);
     }
 
+    /**
+     * Gets the max divisor.
+     *
+     * @param divisors the divisors
+     * @param factors the factors
+     * @return the max divisor
+     */
     private int getMaxDivisor(List<Integer> divisors, Collection<Integer> factors) {
         for (Integer divisor : divisors) {
             if (canModAll(divisor, factors)) {
@@ -161,6 +210,12 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return 1;
     }
 
+    /**
+     * Gets the divisors.
+     *
+     * @param value the value
+     * @return the divisors
+     */
     private List<Integer> getDivisors(int value) {
         if (value <= MIN_LB_FACTOR) {
             return Collections.emptyList();
@@ -177,9 +232,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
     }
 
     /**
-     * lb factor must great than 0
-     * 
-     * @param lbFactor
+     * lb factor must great than 0.
+     *
+     * @param lbFactors the lb factors
      */
     private void fixFactor(Map<String, Integer> lbFactors) {
         Set<Map.Entry<String, Integer>> setEntries = lbFactors.entrySet();
@@ -190,6 +245,13 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         }
     }
 
+    /**
+     * Can mod all.
+     *
+     * @param base the base
+     * @param factors the factors
+     * @return true, if successful
+     */
     private boolean canModAll(int base, Collection<Integer> factors) {
         for (Integer integer : factors) {
             if (integer % base != 0) {
@@ -199,6 +261,13 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return true;
     }
 
+    /**
+     * Builds the balance targets.
+     *
+     * @param lbFactors the lb factors
+     * @param baseFactor the base factor
+     * @return the list
+     */
     private List<String> buildBalanceTargets(Map<String, Integer> lbFactors, int baseFactor) {
         Set<Map.Entry<String, Integer>> setEntries = lbFactors.entrySet();
         int factor;
@@ -213,6 +282,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         return targets;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#removeTarget(java.lang.String)
+     */
     public synchronized void removeTarget(String key) {
         if (currentTargets.containsKey(key)) {
             failedTargets.put(key, currentTargets.get(key));
@@ -221,6 +293,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#recoverTarget(java.lang.String)
+     */
     public synchronized void recoverTarget(String key) {
         if (failedTargets.containsKey(key)) {
             currentTargets.put(key, failedTargets.get(key));
@@ -229,10 +304,16 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#hasTargets()
+     */
     public boolean hasTargets() {
         return (getTargets() != null && !getTargets().isEmpty());
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#getFailedTargets()
+     */
     public Set<String> getFailedTargets() {
         return failedTargets.keySet();
     }

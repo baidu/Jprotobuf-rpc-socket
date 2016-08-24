@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.List;
 import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
 
 /**
- * Listener class for {@link ProtobufRpcAnnotationResolver} while doing annotation parser action
+ * Listener class for {@link ProtobufRpcAnnotationResolver} while doing annotation parser action.
  *
  * @author xiemalin
  * @since 3.4.1
@@ -28,22 +28,25 @@ import com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean;
 public interface ProtobufRpcAnnotationRessolverListener {
 
 	/**
-	 * This method will called after {@link RpcExporter} annotation parsed
-	 * 
+	 * This method will called after {@link RpcExporter} annotation parsed.
+	 *
 	 * @param rpcExporter {@link RpcExporter} annotation
 	 * @param port real port
-	 * @param bean target bean 
+	 * @param bean target bean
 	 * @param registerServices registered service list
 	 */
 	void onRpcExporterAnnotationParsered(RpcExporter rpcExporter, int port, Object bean, List<Object> registerServices);
 
 	
+	/**
+	 * Destroy.
+	 */
 	void destroy();
 
 
 	/**
-	 * This method will called after {@link RpcProxy} annotation parsed
-	 * 
+	 * This method will called after {@link RpcProxy} annotation parsed.
+	 *
 	 * @param rpcProxy {@link RpcProxy} annotation
 	 * @param newRpcProxyFactoryBean a new created {@link RpcProxyFactoryBean}
 	 * @param object target PROXY bean for this {@link RpcProxy} annotation delegated

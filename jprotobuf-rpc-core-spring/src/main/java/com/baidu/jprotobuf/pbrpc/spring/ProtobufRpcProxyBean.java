@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,40 +33,44 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 
 /**
  * To enhance {@link ProtobufRpcProxy} to process extra parameters transportation.
- * 
+ *
  * @author xiemalin
+ * @param <T> the generic type
  * @since 2.17
  */
 public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements MethodInterceptor {
 
+    /** The Constant CURRENT_PARAMS. */
     private static final ThreadLocal<MethodInvocation> CURRENT_PARAMS = new ThreadLocal<MethodInvocation>();
 
+    /** The remote invocation factory. */
     private RemoteInvocationFactory remoteInvocationFactory = new DefaultRemoteInvocationFactory();
 
+    /** The proxy bean. */
     private Object proxyBean;
 
     /**
-     * set proxyBean value to proxyBean
-     * 
-     * @param proxyBean the proxyBean to set
+     * Sets the proxy bean.
+     *
+     * @param proxyBean the new proxy bean
      */
     protected void setProxyBean(Object proxyBean) {
         this.proxyBean = proxyBean;
     }
 
     /**
-     * get the remoteInvocationFactory
-     * 
-     * @return the remoteInvocationFactory
+     * Gets the remote invocation factory.
+     *
+     * @return the remote invocation factory
      */
     public RemoteInvocationFactory getRemoteInvocationFactory() {
         return remoteInvocationFactory;
     }
 
     /**
-     * set remoteInvocationFactory value to remoteInvocationFactory
-     * 
-     * @param remoteInvocationFactory the remoteInvocationFactory to set
+     * Sets the remote invocation factory.
+     *
+     * @param remoteInvocationFactory the new remote invocation factory
      */
     public void setRemoteInvocationFactory(RemoteInvocationFactory remoteInvocationFactory) {
         this.remoteInvocationFactory =
@@ -98,6 +102,12 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
         return rpcDataPackage;
     }
     
+    /**
+     * Creates the remote invocation.
+     *
+     * @param methodInvocation the method invocation
+     * @return the remote invocation
+     */
     protected RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
     	if (methodInvocation != null) {
             RemoteInvocation ri = remoteInvocationFactory.createRemoteInvocation(methodInvocation);
@@ -108,8 +118,10 @@ public class ProtobufRpcProxyBean<T> extends ProtobufRpcProxy<T> implements Meth
     }
 
     /**
-     * @param rpcClient
-     * @param interfaceClass
+     * Instantiates a new protobuf rpc proxy bean.
+     *
+     * @param rpcClient the rpc client
+     * @param interfaceClass the interface class
      */
     public ProtobufRpcProxyBean(RpcClient rpcClient, Class<T> interfaceClass) {
         super(rpcClient, interfaceClass);

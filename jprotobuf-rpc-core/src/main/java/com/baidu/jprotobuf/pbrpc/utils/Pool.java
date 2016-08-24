@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,32 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 /**
- * Base pool class 
- * 
+ * Base pool class .
+ *
  * @author xiemalin
+ * @param <T> the generic type
  * @since 2.27
  */
 public abstract class Pool<T> {
+    
+    /** The internal pool. */
     private final GenericObjectPool<T> internalPool;
 
+    /**
+     * Instantiates a new pool.
+     *
+     * @param poolConfig the pool config
+     * @param factory the factory
+     */
     public Pool(final GenericObjectPoolConfig poolConfig, PooledObjectFactory<T> factory) {
         this.internalPool = new GenericObjectPool<T>(factory, poolConfig);
     }
 
+    /**
+     * Gets the resource.
+     *
+     * @return the resource
+     */
     @SuppressWarnings("unchecked")
     public T getResource() {
         try {
@@ -41,6 +55,11 @@ public abstract class Pool<T> {
         }
     }
 
+    /**
+     * Return resource.
+     *
+     * @param resource the resource
+     */
     public void returnResource(final T resource) {
         try {
             internalPool.returnObject(resource);
@@ -49,6 +68,11 @@ public abstract class Pool<T> {
         }
     }
 
+    /**
+     * Return broken resource.
+     *
+     * @param resource the resource
+     */
     public void returnBrokenResource(final T resource) {
         try {
             internalPool.invalidateObject(resource);
@@ -57,6 +81,9 @@ public abstract class Pool<T> {
         }
     }
 
+    /**
+     * Destroy.
+     */
     public void destroy() {
         try {
             internalPool.close();

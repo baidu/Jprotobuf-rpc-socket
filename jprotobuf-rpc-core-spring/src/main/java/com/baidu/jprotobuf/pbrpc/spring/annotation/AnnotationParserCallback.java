@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@ import com.baidu.jprotobuf.pbrpc.spring.PlaceholderResolver;
 
 /**
  * Annotation parser call back interface.
- * 
- * @see CommonAnnotationBeanPostProcessor
- * 
+ *
  * @author xiemalin
+ * @see CommonAnnotationBeanPostProcessor
  * @since 2.17
  */
 public interface AnnotationParserCallback {
@@ -55,18 +54,13 @@ public interface AnnotationParserCallback {
         ConfigurableListableBeanFactory beanFactory) throws BeansException;
 
     /**
-     * process all annotation on class type after spring containter started
-     * 
-     * @param t
-     *            annotation instance.
-     * @param bean
-     *            target bean
-     * @param beanName
-     *            target bean name
-     * @param beanFactory
-     *            spring bean factory
-     * @throws BeansException
-     *             exceptions on spring beans create error.
+     * process all annotation on class type after spring containter started.
+     *
+     * @param t            annotation instance.
+     * @param bean            target bean
+     * @param beanName            target bean name
+     * @param beanFactory            spring bean factory
+     * @throws BeansException             exceptions on spring beans create error.
      */
     void annotationAtTypeAfterStarted(Annotation t, Object bean,
         String beanName, ConfigurableListableBeanFactory beanFactory)
@@ -119,16 +113,16 @@ public interface AnnotationParserCallback {
         Method method) throws BeansException;
 
     /**
-     * get annotation type on class type
-     * 
-     * @return annotation type on class type
+     * Gets the type annotation.
+     *
+     * @return the type annotation
      */
     Class<? extends Annotation> getTypeAnnotation();
 
     /**
-     * get annotation type on class field or method
-     * 
-     * @return annotation type on class field or method
+     * Gets the method field annotation.
+     *
+     * @return the method field annotation
      */
     List<Class<? extends Annotation>> getMethodFieldAnnotation();
 
@@ -141,10 +135,9 @@ public interface AnnotationParserCallback {
     void destroy() throws Exception;
 
     /**
-     * set {@link PlaceholderResolver} instance.
-     * 
-     * @param resolver
-     *            {@link PlaceholderResolver} instance.
+     * Sets the placeholder resolver.
+     *
+     * @param resolver the new placeholder resolver
      */
     void setPlaceholderResolver(PlaceholderResolver resolver);
 

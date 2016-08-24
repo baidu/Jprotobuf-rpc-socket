@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,62 +97,79 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
  */
 public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor implements BeanClassLoaderAware,
         FactoryBean, InitializingBean, MethodInterceptor, DisposableBean, BeanNameAware {
-    /**
-     * 
-     */
+    
+    /** The Constant DEFAULT_LB_FACTOR. */
     private static final int DEFAULT_LB_FACTOR = 1;
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(LoadBalanceProxyFactoryBean.class.getName());
 
+    /** The bean class loader. */
     private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
+    /** The target beans. */
     private Map<String, Object> targetBeans;
 
+    /** The service proxy. */
     private Object serviceProxy;
 
+    /** The load balance strategy. */
     private LoadBalanceStrategy loadBalanceStrategy;
 
+    /** The fail over interceptor. */
     private FailOverInterceptor failOverInterceptor;
 
+    /** The failed factory beans. */
     private Map<String, FactoryBeanInvokeInfo> failedFactoryBeans =
             new ConcurrentHashMap<String, FactoryBeanInvokeInfo>();
 
+    /** The recover heartbeat. */
     private RecoverHeartbeat recoverHeartbeat;
 
+    /** The exe. */
     private ExecutorService exe;
 
+    /** The fail over event. */
     private FailOverEvent failOverEvent;
 
+    /** The strategy interceptor. */
     private StrategyInterceptor strategyInterceptor;
 
+    /** The heart beat. */
     private boolean heartBeat = true;
 
+    /** The recover interval. */
     private long recoverInterval = 1000L;
 
+    /** The bean name. */
     private String beanName = "";
     
+    /** The lastest exception. */
     private Throwable lastestException;
 
+    /**
+     * Sets the fail over event.
+     *
+     * @param failOverEvent the new fail over event
+     */
     public void setFailOverEvent(FailOverEvent failOverEvent) {
         this.failOverEvent = failOverEvent;
     }
 
     /**
-     * 
-     * @param targetFactoryBeans
+     * Sets the target beans.
+     *
+     * @param targetFactoryBeans the target factory beans
      */
     public void setTargetBeans(Map<String, Object> targetFactoryBeans) {
         this.targetBeans = targetFactoryBeans;
     }
 
     /**
-     * add target bean
-     * 
-     * @param key
-     * @param targetBean
+     * add target bean.
+     *
+     * @param key the key
+     * @param targetBean the target bean
      */
     public synchronized void addTargetBean(String key, Object targetBean) {
         if (this.targetBeans == null) {
@@ -162,34 +179,48 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     }
 
     /**
-     * 
-     * @param loadBalanceStrategy
+     * Sets the load balance strategy.
+     *
+     * @param loadBalanceStrategy the new load balance strategy
      */
     public void setLoadBalanceStrategy(LoadBalanceStrategy loadBalanceStrategy) {
         this.loadBalanceStrategy = loadBalanceStrategy;
     }
 
     /**
-     * @return the failOverInterceptor
+     * Gets the fail over interceptor.
+     *
+     * @return the fail over interceptor
      */
     public FailOverInterceptor getFailOverInterceptor() {
         return failOverInterceptor;
     }
 
     /**
-     * @param failOverInterceptor the failOverInterceptor to set
+     * Sets the fail over interceptor.
+     *
+     * @param failOverInterceptor the new fail over interceptor
      */
     public void setFailOverInterceptor(FailOverInterceptor failOverInterceptor) {
         this.failOverInterceptor = failOverInterceptor;
     }
 
     /**
-     * @return
+     * Checks if is fail over.
+     *
+     * @return true, if is fail over
      */
     public boolean isFailOver() {
         return failOverInterceptor != null;
     }
 
+    /**
+     * Checks if is assignable from.
+     *
+     * @param interfaces the interfaces
+     * @param clazz the clazz
+     * @return true, if is assignable from
+     */
     private boolean isAssignableFrom(List<Class> interfaces, Class clazz) {
         if (interfaces == null) {
             return true;
@@ -202,6 +233,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
     // /---- InitializingBean implement
     public void afterPropertiesSet() throws Exception {
         if (getServiceInterface() == null) {
@@ -265,6 +299,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     // /---- FactoryBean implement
 
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     */
     public Object getObject() {
         return this.serviceProxy;
     }
@@ -289,17 +326,30 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     // /--------- BeanClassLoaderAware implement
 
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.BeanClassLoaderAware#setBeanClassLoader(java.lang.ClassLoader)
+     */
     public void setBeanClassLoader(ClassLoader classLoader) {
         this.beanClassLoader = classLoader;
     }
 
     /**
-     * Return the ClassLoader that this accessor operates in, to be used for deserializing and for generating proxies.
+     * Gets the bean class loader.
+     *
+     * @return the bean class loader
      */
     protected ClassLoader getBeanClassLoader() {
         return this.beanClassLoader;
     }
 
+    /**
+     * Failed target.
+     *
+     * @param bean the bean
+     * @param invocation the invocation
+     * @param beanKey the bean key
+     * @throws Throwable the throwable
+     */
     private void failedTarget(Object bean, MethodInvocation invocation, String beanKey) throws Throwable {
         loadBalanceStrategy.removeTarget(beanKey);
         // add to failed target list
@@ -317,10 +367,10 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     }
 
     /**
-     * do strategy election
-     * 
-     * @param invocation
-     * @return
+     * do strategy election.
+     *
+     * @param invocation the invocation
+     * @return the string
      */
     private String elect(MethodInvocation invocation) {
         String key = null;
@@ -348,6 +398,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         return key;
     }
 
+    /* (non-Javadoc)
+     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+     */
     // /---- MethodInterceptor implement
     public Object invoke(MethodInvocation invocation) throws Throwable {
         int maxTry = loadBalanceStrategy.getTargets().size();
@@ -355,6 +408,14 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     }
     
+    /**
+     * Invoke with max try.
+     *
+     * @param invocation the invocation
+     * @param maxTry the max try
+     * @return the object
+     * @throws Throwable the throwable
+     */
     public Object invokeWithMaxTry(MethodInvocation invocation, int maxTry) throws Throwable {
         String beanKey = elect(invocation);
         Object bean = targetBeans.get(beanKey);
@@ -396,6 +457,12 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         throw new NullPointerException("target bean is null");
     }
 
+    /**
+     * Gets the real exception.
+     *
+     * @param t the t
+     * @return the real exception
+     */
     private Throwable getRealException(Throwable t) {
         do {
             if (t instanceof UndeclaredThrowableException) {
@@ -411,6 +478,14 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
 
     }
 
+    /**
+     * Do invoke.
+     *
+     * @param bean the bean
+     * @param invocation the invocation
+     * @return the object
+     * @throws Throwable the throwable
+     */
     // --- others
     private Object doInvoke(Object bean, MethodInvocation invocation) throws Throwable {
         Object[] args = invocation.getArguments();
@@ -418,6 +493,14 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         return m.invoke(bean, args);
     }
 
+    /**
+     * Gets the method.
+     *
+     * @param bean the bean
+     * @param invocation the invocation
+     * @return the method
+     * @throws Throwable the throwable
+     */
     private Method getMethod(Object bean, MethodInvocation invocation) throws Throwable {
         String methodName = invocation.getMethod().getName();
         if (bean == null) {
@@ -429,12 +512,19 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     }
 
     /**
-     * @return the failedFactoryBeans
+     * Gets the failed factory beans.
+     *
+     * @return the failed factory beans
      */
     public Map<String, FactoryBeanInvokeInfo> getFailedFactoryBeans() {
         return failedFactoryBeans;
     }
 
+    /**
+     * Recover factory bean.
+     *
+     * @param key the key
+     */
     public synchronized void recoverFactoryBean(String key) {
         if (failedFactoryBeans.containsKey(key)) {
             failedFactoryBeans.remove(key);
@@ -450,10 +540,18 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         }
     }
 
+    /**
+     * Checks for factory bean failed.
+     *
+     * @return true, if successful
+     */
     public synchronized boolean hasFactoryBeanFailed() {
         return !failedFactoryBeans.isEmpty();
     }
 
+    /**
+     * Execute heart beat.
+     */
     private synchronized void executeHeartBeat() {
         if (!isHeartBeat()) { // if close heart beat manually
             return;
@@ -475,11 +573,27 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         }
     }
 
+    /**
+     * The Class FactoryBeanInvokeInfo.
+     */
     public static class FactoryBeanInvokeInfo {
+        
+        /** The bean. */
         private Object bean;
+        
+        /** The m. */
         private Method m;
+        
+        /** The bean key. */
         private String beanKey;
 
+        /**
+         * Instantiates a new factory bean invoke info.
+         *
+         * @param bean the bean
+         * @param m the m
+         * @param beanKey the bean key
+         */
         public FactoryBeanInvokeInfo(Object bean, Method m, String beanKey) {
             super();
             this.bean = bean;
@@ -488,13 +602,17 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         }
 
         /**
-         * @return the factoryBean
+         * Gets the bean.
+         *
+         * @return the bean
          */
         public Object getBean() {
             return bean;
         }
 
         /**
+         * Gets the invocation.
+         *
          * @return the invocation
          */
         public Method getInvocation() {
@@ -502,13 +620,18 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         }
 
         /**
-         * @return the beanKey
+         * Gets the bean key.
+         *
+         * @return the bean key
          */
         public String getBeanKey() {
             return beanKey;
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.DisposableBean#destroy()
+     */
     // /---- DisposableBean
     public void destroy() throws Exception {
         if (recoverHeartbeat != null) {
@@ -521,35 +644,45 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     }
 
     /**
-     * @param strategyInterceptor the strategyInterceptor to set
+     * Sets the strategy interceptor.
+     *
+     * @param strategyInterceptor the new strategy interceptor
      */
     public void setStrategyInterceptor(StrategyInterceptor strategyInterceptor) {
         this.strategyInterceptor = strategyInterceptor;
     }
 
     /**
-     * @param recoverInterval the recoverInterval to set
+     * Sets the recover interval.
+     *
+     * @param recoverInterval the new recover interval
      */
     public void setRecoverInterval(long recoverInterval) {
         this.recoverInterval = recoverInterval;
     }
 
     /**
-     * @return the recoverInterval
+     * Gets the recover interval.
+     *
+     * @return the recover interval
      */
     public long getRecoverInterval() {
         return recoverInterval;
     }
 
     /**
-     * @return the heartBeat
+     * Checks if is heart beat.
+     *
+     * @return true, if is heart beat
      */
     protected boolean isHeartBeat() {
         return heartBeat;
     }
 
     /**
-     * @param heartBeat the heartBeat to set
+     * Sets the heart beat.
+     *
+     * @param heartBeat the new heart beat
      */
     public void setHeartBeat(boolean heartBeat) {
         this.heartBeat = heartBeat;
@@ -558,6 +691,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+     */
     public void setBeanName(String beanName) {
         this.beanName = beanName;
 

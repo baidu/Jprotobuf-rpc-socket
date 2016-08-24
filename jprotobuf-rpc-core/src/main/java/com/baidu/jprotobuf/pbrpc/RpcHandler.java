@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,54 +19,70 @@ package com.baidu.jprotobuf.pbrpc;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 
 /**
- * RPC handle for each request and response
- * 
+ * RPC handle for each request and response.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public interface RpcHandler {
 
     /**
-     * send data to server
-     * @param data
+     * send data to server.
+     *
+     * @param data the data
+     * @return the rpc data
      * @exception Exception in case of any exception in handle
      */
     RpcData doHandle(RpcData data) throws Exception;
 
     /**
-     * get service name
-     * @return service name
+     * Gets the service name.
+     *
+     * @return the service name
      */
     String getServiceName();
 
     /**
-     * get method name
-     * @return method name
+     * Gets the method name.
+     *
+     * @return the method name
      */
     String getMethodName();
 
     /**
-     * get service instance.
-     * @return target service instance
+     * Gets the service.
+     *
+     * @return the service
      */
     Object getService();
     
     /**
-     * @return input class or null if no parameter.
+     * Gets the input class.
+     *
+     * @return the input class
      */
     Class<?> getInputClass();
     
     /**
-     * @return output class or null if is a void return.
+     * Gets the output class.
+     *
+     * @return the output class
      */
     Class<?> getOutputClass();
     
     
     /**
-     * @return RPC description
+     * Gets the description.
+     *
+     * @return the description
      */
     String getDescription();
     
+    /**
+     * Gets the method signature.
+     *
+     * @return the method signature
+     */
     String  getMethodSignature();
 
 }

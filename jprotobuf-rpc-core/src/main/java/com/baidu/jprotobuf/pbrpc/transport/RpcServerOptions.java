@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import io.netty.handler.timeout.IdleStateEvent;
 
 import java.nio.ByteOrder;
 
+/**
+ * The Class RpcServerOptions.
+ */
 public class RpcServerOptions {
 
     /* (non-Javadoc)
@@ -69,6 +72,9 @@ public class RpcServerOptions {
 	}
 
 
+    /**
+     * Instantiates a new rpc server options.
+     */
     public RpcServerOptions() {
         
         tcpNoDelay = true;
@@ -78,29 +84,22 @@ public class RpcServerOptions {
         
     }
     
+    /** The keep alive. */
     private boolean keepAlive;
     
-    /** 字节顺序 **/
+    /**  字节顺序 *. */
     private ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
     
-    /**
-     * so linger
-     */
+    /** so linger. */
     private int soLinger = 5;
     
-    /**
-     * backlog
-     */
+    /** backlog. */
     private int backlog = 100;
     
-    /**
-     * receive buffer size
-     */
+    /** receive buffer size. */
     private int receiveBufferSize = 1024 * 64;
     
-    /**
-     * send buffer size
-     */
+    /** send buffer size. */
     private int sendBufferSize = 1024 * 64;
     
     /**
@@ -117,11 +116,10 @@ public class RpcServerOptions {
      */
     private int writerIdleTime = 60 * 30;
     
-    /**
-     * connect timeout, in milliseconds
-     */
+    /** connect timeout, in milliseconds. */
     private int connectTimeout;
     
+    /** The keep alive time. */
     private int keepAliveTime; // keepAlive时间（second）
 
     /**
@@ -129,25 +127,39 @@ public class RpcServerOptions {
      */
     private int chunkPackageTimeout = 300 * 1000;
     
+    /** The acceptor threads. */
     private int acceptorThreads = 0; // acceptor threads. default use Netty default value
+    
+    /** The work threads. */
     private int workThreads = 0; // work threads. default use Netty default value
+    
+    /** The task theads. */
     private int taskTheads = 0; // real execute task threads
     
+    /** The chunk size. */
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
     
+    /** The max size. */
     private int maxSize = Integer.MAX_VALUE;
     
+    /** The Constant POLL_EVENT_GROUP. */
     public static final int POLL_EVENT_GROUP = 0;
+    
+    /** The Constant EPOLL_EVENT_GROUP. */
     public static final int EPOLL_EVENT_GROUP = 1;
     
+    /** The io event group type. */
     private int ioEventGroupType = POLL_EVENT_GROUP; // 0=poll, 1=epoll
     
-    /**
-     * if http server port > 0 will start http server
-     */
+    /** if http server port > 0 will start http server. */
     private int httpServerPort = -1;
     
+    /**
+     * Copy from.
+     *
+     * @param options the options
+     */
     public void copyFrom(RpcServerOptions options) {
         this.chunkSize = options.chunkSize;
         this.chunkPackageTimeout = options.chunkPackageTimeout;
@@ -171,157 +183,237 @@ public class RpcServerOptions {
     
 
     /**
-     * get the chunkSize
-     * @return the chunkSize
+     * Gets the chunk size.
+     *
+     * @return the chunk size
      */
     public long getChunkSize() {
         return chunkSize;
     }
 
     /**
-     * set chunkSize value to chunkSize
-     * @param chunkSize the chunkSize to set
+     * Sets the chunk size.
+     *
+     * @param chunkSize the new chunk size
      */
     public void setChunkSize(long chunkSize) {
         this.chunkSize = chunkSize;
     }
 
+    /**
+     * Gets the keep alive time.
+     *
+     * @return the keep alive time
+     */
     public int getKeepAliveTime() {
         return keepAliveTime;
     }
 
+    /**
+     * Sets the keep alive time.
+     *
+     * @param keepAliveTime the new keep alive time
+     */
     public void setKeepAliveTime(int keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
     }
     
-    /**
-     * use TcpNoDelay or not
-     */
+    /** use TcpNoDelay or not. */
     public boolean tcpNoDelay = true;
     
+    /**
+     * Gets the send buffer size.
+     *
+     * @return the send buffer size
+     */
     public int getSendBufferSize() {
         return sendBufferSize;
     }
     
+    /**
+     * Sets the send buffer size.
+     *
+     * @param sendBufferSize the new send buffer size
+     */
     public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
     }
     
+    /**
+     * Gets the so linger.
+     *
+     * @return the so linger
+     */
     public int getSoLinger() {
         return soLinger;
     }
     
+    /**
+     * Sets the so linger.
+     *
+     * @param soLinger the new so linger
+     */
     public void setSoLinger(int soLinger) {
         this.soLinger = soLinger;
     }
     
+    /**
+     * Gets the backlog.
+     *
+     * @return the backlog
+     */
     public int getBacklog() {
         return backlog;
     }
     
+    /**
+     * Sets the backlog.
+     *
+     * @param backlog the new backlog
+     */
     public void setBacklog(int backlog) {
         this.backlog = backlog;
     }
     
+    /**
+     * Gets the receive buffer size.
+     *
+     * @return the receive buffer size
+     */
     public int getReceiveBufferSize() {
         return receiveBufferSize;
     }
     
+    /**
+     * Sets the receive buffer size.
+     *
+     * @param receiveBufferSize the new receive buffer size
+     */
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
     }
     
+    /**
+     * Gets the an {@link IdleStateEvent} whose state is {@link IdleState#READER_IDLE} will be triggered when no read was performed for the specified period of time.
+     *
+     * @return the an {@link IdleStateEvent} whose state is {@link IdleState#READER_IDLE} will be triggered when no read was performed for the specified period of time
+     */
     public int getReaderIdleTime() {
         return readerIdleTime;
     }
     
+    /**
+     * Sets the an {@link IdleStateEvent} whose state is {@link IdleState#READER_IDLE} will be triggered when no read was performed for the specified period of time.
+     *
+     * @param readerIdleTime the new an {@link IdleStateEvent} whose state is {@link IdleState#READER_IDLE} will be triggered when no read was performed for the specified period of time
+     */
     public void setReaderIdleTime(int readerIdleTime) {
         this.readerIdleTime = readerIdleTime;
     }
     
+    /**
+     * Gets the an {@link IdleStateEvent} whose state is {@link IdleState#WRITER_IDLE} will be triggered when no write was performed for the specified period of time.
+     *
+     * @return the an {@link IdleStateEvent} whose state is {@link IdleState#WRITER_IDLE} will be triggered when no write was performed for the specified period of time
+     */
     public int getWriterIdleTime() {
         return writerIdleTime;
     }
     
+    /**
+     * Sets the an {@link IdleStateEvent} whose state is {@link IdleState#WRITER_IDLE} will be triggered when no write was performed for the specified period of time.
+     *
+     * @param writerIdleTime the new an {@link IdleStateEvent} whose state is {@link IdleState#WRITER_IDLE} will be triggered when no write was performed for the specified period of time
+     */
     public void setWriterIdleTime(int writerIdleTime) {
         this.writerIdleTime = writerIdleTime;
     }
 
     /**
-     * get the tcpNoDelay
-     * @return the tcpNoDelay
+     * Checks if is use TcpNoDelay or not.
+     *
+     * @return the use TcpNoDelay or not
      */
     public boolean isTcpNoDelay() {
         return tcpNoDelay;
     }
 
     /**
-     * set tcpNoDelay value to tcpNoDelay
-     * @param tcpNoDelay the tcpNoDelay to set
+     * Sets the use TcpNoDelay or not.
+     *
+     * @param tcpNoDelay the new use TcpNoDelay or not
      */
     public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = tcpNoDelay;
     }
 
     /**
-     * get the byteOrder
-     * @return the byteOrder
+     * Gets the 字节顺序 *.
+     *
+     * @return the 字节顺序 *
      */
     public ByteOrder getByteOrder() {
         return byteOrder;
     }
 
     /**
-     * set byteOrder value to byteOrder
-     * @param byteOrder the byteOrder to set
+     * Sets the 字节顺序 *.
+     *
+     * @param byteOrder the new 字节顺序 *
      */
     public void setByteOrder(ByteOrder byteOrder) {
         this.byteOrder = byteOrder;
     }
 
     /**
-     * get the connectTimeout
-     * @return the connectTimeout
+     * Gets the connect timeout, in milliseconds.
+     *
+     * @return the connect timeout, in milliseconds
      */
     public int getConnectTimeout() {
         return connectTimeout;
     }
 
     /**
-     * set connectTimeout value to connectTimeout
-     * @param connectTimeout the connectTimeout to set
+     * Sets the connect timeout, in milliseconds.
+     *
+     * @param connectTimeout the new connect timeout, in milliseconds
      */
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
 
     /**
-     * get the keepAlive
-     * @return the keepAlive
+     * Checks if is keep alive.
+     *
+     * @return true, if is keep alive
      */
     public boolean isKeepAlive() {
         return keepAlive;
     }
 
     /**
-     * set keepAlive value to keepAlive
-     * @param keepAlive the keepAlive to set
+     * Sets the keep alive.
+     *
+     * @param keepAlive the new keep alive
      */
     public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
     }
 
     /**
-     * get the chunkPackageTimeout
-     * @return the chunkPackageTimeout
+     * Gets the time out set for chunk package wait in ms.
+     *
+     * @return the time out set for chunk package wait in ms
      */
     public int getChunkPackageTimeout() {
         return chunkPackageTimeout;
     }
 
     /**
-     * set chunkPackageTimeout value to chunkPackageTimeout
-     * @param chunkPackageTimeout the chunkPackageTimeout to set
+     * Sets the time out set for chunk package wait in ms.
+     *
+     * @param chunkPackageTimeout the new time out set for chunk package wait in ms
      */
     public void setChunkPackageTimeout(int chunkPackageTimeout) {
         this.chunkPackageTimeout = chunkPackageTimeout;
@@ -329,17 +421,19 @@ public class RpcServerOptions {
 
 
     /**
-	 * get the maxSize
-	 * @return the maxSize
-	 */
+     * Gets the max size.
+     *
+     * @return the max size
+     */
 	public int getMaxSize() {
 		return maxSize;
 	}
 
 
 	/**
-	 * set maxSize value to maxSize
-	 * @param maxSize the maxSize to set
+	 * Sets the max size.
+	 *
+	 * @param maxSize the new max size
 	 */
 	public void setMaxSize(int maxSize) {
 		this.maxSize = maxSize;
@@ -347,17 +441,19 @@ public class RpcServerOptions {
 
 
 	/**
-     * get the acceptorThreads
-     * @return the acceptorThreads
-     */
+	 * Gets the acceptor threads.
+	 *
+	 * @return the acceptor threads
+	 */
     public int getAcceptorThreads() {
         return acceptorThreads;
     }
 
 
     /**
-     * set acceptorThreads value to acceptorThreads
-     * @param acceptorThreads the acceptorThreads to set
+     * Sets the acceptor threads.
+     *
+     * @param acceptorThreads the new acceptor threads
      */
     public void setAcceptorThreads(int acceptorThreads) {
         this.acceptorThreads = acceptorThreads;
@@ -365,8 +461,9 @@ public class RpcServerOptions {
 
 
     /**
-     * get the workThreads
-     * @return the workThreads
+     * Gets the work threads.
+     *
+     * @return the work threads
      */
     public int getWorkThreads() {
         return workThreads;
@@ -374,24 +471,27 @@ public class RpcServerOptions {
 
 
     /**
-     * set workThreads value to workThreads
-     * @param workThreads the workThreads to set
+     * Sets the work threads.
+     *
+     * @param workThreads the new work threads
      */
     public void setWorkThreads(int workThreads) {
         this.workThreads = workThreads;
     }
     
     /**
-     * get the httpServerPort
-     * @return the httpServerPort
+     * Gets the if http server port > 0 will start http server.
+     *
+     * @return the if http server port > 0 will start http server
      */
     public int getHttpServerPort() {
         return httpServerPort;
     }
     
     /**
-     * set httpServerPort value to httpServerPort
-     * @param httpServerPort the httpServerPort to set
+     * Sets the if http server port > 0 will start http server.
+     *
+     * @param httpServerPort the new if http server port > 0 will start http server
      */
     public void setHttpServerPort(int httpServerPort) {
         this.httpServerPort = httpServerPort;
@@ -399,8 +499,9 @@ public class RpcServerOptions {
 
 
 	/**
-	 * get the taskTheads
-	 * @return the taskTheads
+	 * Gets the task theads.
+	 *
+	 * @return the task theads
 	 */
 	public int getTaskTheads() {
 		return taskTheads;
@@ -408,8 +509,9 @@ public class RpcServerOptions {
 
 
 	/**
-	 * set taskTheads value to taskTheads
-	 * @param taskTheads the taskTheads to set
+	 * Sets the task theads.
+	 *
+	 * @param taskTheads the new task theads
 	 */
 	public void setTaskTheads(int taskTheads) {
 		this.taskTheads = taskTheads;
@@ -417,8 +519,9 @@ public class RpcServerOptions {
 
 
     /**
-     * get the ioEventGroupType
-     * @return the ioEventGroupType
+     * Gets the io event group type.
+     *
+     * @return the io event group type
      */
     public int getIoEventGroupType() {
         return ioEventGroupType;
@@ -426,8 +529,9 @@ public class RpcServerOptions {
 
 
     /**
-     * set ioEventGroupType value to ioEventGroupType
-     * @param ioEventGroupType the ioEventGroupType to set
+     * Sets the io event group type.
+     *
+     * @param ioEventGroupType the new io event group type
      */
     public void setIoEventGroupType(int ioEventGroupType) {
         this.ioEventGroupType = ioEventGroupType;

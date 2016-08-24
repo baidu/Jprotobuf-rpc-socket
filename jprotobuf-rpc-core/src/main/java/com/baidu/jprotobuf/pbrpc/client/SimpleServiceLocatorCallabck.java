@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,24 @@ package com.baidu.jprotobuf.pbrpc.client;
 import java.net.InetSocketAddress;
 
 /**
- * Simple {@link InetSocketAddress} call back implements {@link ServiceLocatorCallback}
- * 
+ * Simple {@link InetSocketAddress} call back implements {@link ServiceLocatorCallback}.
+ *
  * @author xiemalin
  * @since 2.19
  */
 public class SimpleServiceLocatorCallabck implements ServiceLocatorCallback {
 
+    /** The address. */
     private InetSocketAddress address;
+    
+    /** The serivce si string. */
     private String serivceSiString;
 
     /**
-     * @param address
-     * @param serivceSiString
+     * Instantiates a new simple service locator callabck.
+     *
+     * @param address the address
+     * @param serivceSiString the serivce si string
      */
     public SimpleServiceLocatorCallabck(InetSocketAddress address, String serivceSiString) {
         super();

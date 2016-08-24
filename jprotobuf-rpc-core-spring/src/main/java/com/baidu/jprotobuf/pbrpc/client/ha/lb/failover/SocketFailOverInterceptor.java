@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 public class SocketFailOverInterceptor implements FailOverInterceptor {
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(SocketFailOverInterceptor.class.getName());
 
     /*
@@ -99,6 +97,12 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
         return true;
     }
 
+    /**
+     * Parses the host.
+     *
+     * @param serviceUrl the service url
+     * @return the host
+     */
     protected Host parseHost(String serviceUrl) {
         if (StringUtils.isBlank(serviceUrl)) {
             return null;
@@ -115,8 +119,15 @@ public class SocketFailOverInterceptor implements FailOverInterceptor {
 
     }
 
+    /**
+     * The Class Host.
+     */
     private static class Host {
+        
+        /** The host. */
         public String host;
+        
+        /** The port. */
         public int port;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,140 +19,140 @@ package com.baidu.jprotobuf.pbrpc.meta;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * Rpc service description info
- * 
+ * Rpc service description info.
+ *
  * @author xiemalin
  * @since 2.1
  */
 public class RpcServiceMeta {
 
-    /**
-     * rpc 服务名
-     */
+    /** rpc 服务名. */
     @Protobuf(required = true)
     private String serviceName;
     
-    /**
-     * rpc方法中
-     */
+    /** rpc方法中. */
     @Protobuf(required = true)
     private String methodName;
     
-    /**
-     * 请求参数 google protocol buffer IDL 描述说明 
-     */
+    /** 请求参数 google protocol buffer IDL 描述说明. */
     @Protobuf
     private String inputProto;
     
-    /**
-     * 请求参数对象名称
-     */
+    /** 请求参数对象名称. */
     @Protobuf 
     private String inputObjName;
     
-    /**
-     *  返回参数 google protocol buffer IDL 描述说明 
-     */
+    /**  返回参数 google protocol buffer IDL 描述说明. */
     @Protobuf
     private String outputProto;
     
-    /**
-     * 返回参数对象名称
-     */
+    /** 返回参数对象名称. */
     @Protobuf 
     private String outputObjName;
 
     /**
-     * get the serviceName
-     * @return the serviceName
+     * Gets the rpc 服务名.
+     *
+     * @return the rpc 服务名
      */
     public String getServiceName() {
         return serviceName;
     }
 
     /**
-     * set serviceName value to serviceName
-     * @param serviceName the serviceName to set
+     * Sets the rpc 服务名.
+     *
+     * @param serviceName the new rpc 服务名
      */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
 
     /**
-     * get the methodName
-     * @return the methodName
+     * Gets the rpc方法中.
+     *
+     * @return the rpc方法中
      */
     public String getMethodName() {
         return methodName;
     }
 
     /**
-     * set methodName value to methodName
-     * @param methodName the methodName to set
+     * Sets the rpc方法中.
+     *
+     * @param methodName the new rpc方法中
      */
     public void setMethodName(String methodName) {
         this.methodName = methodName;
     }
 
     /**
-     * get the inputProto
-     * @return the inputProto
+     * Gets the 请求参数 google protocol buffer IDL 描述说明.
+     *
+     * @return the 请求参数 google protocol buffer IDL 描述说明
      */
     public String getInputProto() {
         return inputProto;
     }
 
     /**
-     * set inputProto value to inputProto
-     * @param inputProto the inputProto to set
+     * Sets the 请求参数 google protocol buffer IDL 描述说明.
+     *
+     * @param inputProto the new 请求参数 google protocol buffer IDL 描述说明
      */
     public void setInputProto(String inputProto) {
         this.inputProto = inputProto;
     }
 
     /**
-     * get the outputProto
-     * @return the outputProto
+     * Gets the 返回参数 google protocol buffer IDL 描述说明.
+     *
+     * @return the 返回参数 google protocol buffer IDL 描述说明
      */
     public String getOutputProto() {
         return outputProto;
     }
 
     /**
-     * set outputProto value to outputProto
-     * @param outputProto the outputProto to set
+     * Sets the 返回参数 google protocol buffer IDL 描述说明.
+     *
+     * @param outputProto the new 返回参数 google protocol buffer IDL 描述说明
      */
     public void setOutputProto(String outputProto) {
         this.outputProto = outputProto;
     }
 
     /**
-     * get the inputObjName
-     * @return the inputObjName
+     * Gets the 请求参数对象名称.
+     *
+     * @return the 请求参数对象名称
      */
     public String getInputObjName() {
         return inputObjName;
     }
 
     /**
-     * set inputObjName value to inputObjName
-     * @param inputObjName the inputObjName to set
+     * Sets the 请求参数对象名称.
+     *
+     * @param inputObjName the new 请求参数对象名称
      */
     public void setInputObjName(String inputObjName) {
         this.inputObjName = inputObjName;
     }
 
     /**
-     * get the outputObjName
-     * @return the outputObjName
+     * Gets the 返回参数对象名称.
+     *
+     * @return the 返回参数对象名称
      */
     public String getOutputObjName() {
         return outputObjName;
     }
 
     /**
-     * set outputObjName value to outputObjName
-     * @param outputObjName the outputObjName to set
+     * Sets the 返回参数对象名称.
+     *
+     * @param outputObjName the new 返回参数对象名称
      */
     public void setOutputObjName(String outputObjName) {
         this.outputObjName = outputObjName;

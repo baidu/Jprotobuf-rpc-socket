@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,36 +52,49 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  */
 public class RpcServer extends ServerBootstrap {
 
-    /**
-     * 
-     */
+    /** The Constant DEFAULT_WAIT_STOP_INTERVAL. */
     private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
 
+    /** The Constant LOG. */
     private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
 
+    /** The stop. */
     private AtomicBoolean stop = new AtomicBoolean(false);
 
+    /** The rpc server options. */
     private RpcServerOptions rpcServerOptions;
 
+    /** The rpc server pipeline initializer. */
     private RpcServerPipelineInitializer rpcServerPipelineInitializer;
 
+    /** The boss group. */
     private EventLoopGroup bossGroup;
+    
+    /** The worker group. */
     private EventLoopGroup workerGroup;
+    
+    /** The channel. */
     private Channel channel;
 
+    /** The inet socket address. */
     private InetSocketAddress inetSocketAddress;
 
+    /** The start time. */
     private long startTime;
 
+    /** The http server. */
     private HttpServer httpServer;
 
+    /** The blockingqueue. */
     private BlockingQueue<Runnable> blockingqueue = new LinkedBlockingQueue<Runnable>();
+    
+    /** The es. */
     private ThreadPoolExecutor es;
 
     /**
-     * set interceptor value to interceptor
-     * 
-     * @param interceptor the interceptor to set
+     * Sets the interceptor.
+     *
+     * @param interceptor the new interceptor
      */
     public void setInterceptor(InvokerInterceptor interceptor) {
         if (rpcServiceRegistry != null) {
@@ -90,28 +103,33 @@ public class RpcServer extends ServerBootstrap {
     }
 
     /**
-     * get the inetSocketAddress
-     * 
-     * @return the inetSocketAddress
+     * Gets the inet socket address.
+     *
+     * @return the inet socket address
      */
     public InetSocketAddress getInetSocketAddress() {
         return inetSocketAddress;
     }
 
     /**
-     * get the es
-     * 
+     * Gets the es.
+     *
      * @return the es
      */
     public ThreadPoolExecutor getEs() {
         return es;
     }
 
-    /**
-     * rpcServiceRegistry
-     */
+    /** rpcServiceRegistry. */
     private RpcServiceRegistry rpcServiceRegistry;
 
+    /**
+     * Instantiates a new rpc server.
+     *
+     * @param serverChannelClass the server channel class
+     * @param serverOptions the server options
+     * @param rpcServiceRegistry the rpc service registry
+     */
     public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
             RpcServiceRegistry rpcServiceRegistry) {
         if (rpcServiceRegistry == null) {
@@ -157,40 +175,87 @@ public class RpcServer extends ServerBootstrap {
         this.childHandler(rpcServerPipelineInitializer);
     }
 
+    /**
+     * Instantiates a new rpc server.
+     *
+     * @param serverOptions the server options
+     */
     public RpcServer(RpcServerOptions serverOptions) {
         this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry());
     }
 
+    /**
+     * Instantiates a new rpc server.
+     *
+     * @param serverOptions the server options
+     * @param rpcServiceRegistry the rpc service registry
+     */
     public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
         this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry);
     }
 
+    /**
+     * Instantiates a new rpc server.
+     */
     public RpcServer() {
         this(new RpcServerOptions());
     }
 
+    /**
+     * Instantiates a new rpc server.
+     *
+     * @param serverChannelClass the server channel class
+     */
     public RpcServer(Class<? extends ServerChannel> serverChannelClass) {
         this(serverChannelClass, new RpcServerOptions(), new RpcServiceRegistry());
     }
 
+    /**
+     * Register service.
+     *
+     * @param service the service
+     */
     public void registerService(IDLServiceExporter service) {
         rpcServiceRegistry.registerService(service);
     }
 
+    /**
+     * Register service.
+     *
+     * @param target the target
+     */
     public void registerService(final Object target) {
         rpcServiceRegistry.registerService(target);
     }
 
+    /**
+     * Register dynamic service.
+     *
+     * @param methodSignature the method signature
+     * @param method the method
+     * @param service the service
+     * @param cls the cls
+     */
     public void registerDynamicService(String methodSignature, Method method, Object service,
             Class<? extends ServerAttachmentHandler> cls) {
         rpcServiceRegistry.doDynamicRegisterService(methodSignature, method, service, cls);
     }
 
+    /**
+     * Start.
+     *
+     * @param port the port
+     */
     public void start(int port) {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
         start(inetSocketAddress);
     }
 
+    /**
+     * Start.
+     *
+     * @param sa the sa
+     */
     public void start(final InetSocketAddress sa) {
         LOG.log(Level.INFO, "RPC starting at: " + sa);
         
@@ -211,7 +276,9 @@ public class RpcServer extends ServerBootstrap {
     }
 
     /**
-     * @param sa
+     * Inits the after bind port.
+     *
+     * @param sa the sa
      */
     protected void initAfterBindPort(final InetSocketAddress sa) {
         this.inetSocketAddress = sa;
@@ -225,6 +292,11 @@ public class RpcServer extends ServerBootstrap {
         }
     }
 
+    /**
+     * Wait for stop.
+     *
+     * @throws InterruptedException the interrupted exception
+     */
     public void waitForStop() throws InterruptedException {
         while (!stop.get()) {
             Thread.sleep(DEFAULT_WAIT_STOP_INTERVAL);
@@ -232,18 +304,34 @@ public class RpcServer extends ServerBootstrap {
         shutdown();
     }
 
+    /**
+     * Stop.
+     */
     public void stop() {
         stop.set(true);
     }
 
+    /**
+     * Gets the stop.
+     *
+     * @return the stop
+     */
     public AtomicBoolean getStop() {
         return stop;
     }
 
+    /**
+     * Checks if is stop.
+     *
+     * @return true, if is stop
+     */
     public boolean isStop() {
         return stop.get();
     }
 
+    /**
+     * Shutdown.
+     */
     public void shutdown() {
         stop();
         if (channel != null && channel.isOpen()) {
@@ -263,32 +351,37 @@ public class RpcServer extends ServerBootstrap {
 
     }
 
+    /**
+     * Sets the stop.
+     *
+     * @param stop the new stop
+     */
     public void setStop(AtomicBoolean stop) {
         this.stop = stop;
     }
 
     /**
-     * get the rpcServerOptions
-     * 
-     * @return the rpcServerOptions
+     * Gets the rpc server options.
+     *
+     * @return the rpc server options
      */
     public RpcServerOptions getRpcServerOptions() {
         return rpcServerOptions;
     }
 
     /**
-     * set rpcServerOptions value to rpcServerOptions
-     * 
-     * @param rpcServerOptions the rpcServerOptions to set
+     * Sets the rpc server options.
+     *
+     * @param rpcServerOptions the new rpc server options
      */
     public void setRpcServerOptions(RpcServerOptions rpcServerOptions) {
         this.rpcServerOptions = rpcServerOptions;
     }
 
     /**
-     * get the startTime
-     * 
-     * @return the startTime
+     * Gets the start time.
+     *
+     * @return the start time
      */
     public long getStartTime() {
         return startTime;

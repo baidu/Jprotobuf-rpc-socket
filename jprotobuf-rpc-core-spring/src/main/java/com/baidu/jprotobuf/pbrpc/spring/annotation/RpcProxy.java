@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.spring.ProtobufRpcProxyBean;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
 /**
- * Annotation publish for {@link ProtobufRpcProxyBean}
+ * Annotation publish for {@link ProtobufRpcProxyBean}.
  *
  * @author xiemalin
  * @since 2.17
@@ -39,36 +39,48 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 public @interface RpcProxy {
 
     /**
-     * RPC server port to connect
+     * RPC server port to connect.
+     *
+     * @return the string
      */
     String port();
     
     /**
      * Set the interface of the service to access. The interface must be suitable 
      * for the particular service and remoting strategy.
-     *
+     * 
      * Typically required to be able to create a suitable service proxy, 
-     * but can also be optional if the lookup returns a typed proxy. 
+     * but can also be optional if the lookup returns a typed proxy.
+     *
+     * @return the class
      */
     Class<?> serviceInterface();
     
     /**
-     * RPC server host to connect 
+     * RPC server host to connect.
+     *
+     * @return the string
      */
     String host() default "127.0.0.1";
     
     /**
      * bean name of RPC client options.  bean type must be {@link RpcClientOptions}
+     *
+     * @return the string
      */
     String rpcClientOptionsBeanName() default "";
     
     /**
-     * try to connect to server on startup
+     * try to connect to server on startup.
+     *
+     * @return true, if successful
      */
     boolean lookupStubOnStartup() default true;
     
     /**
-     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}
+     * bean name of RPC intercepter bean type must be {@link InvokerInterceptor}.
+     *
+     * @return the string
      */
     String invokerIntercepterBeanName() default "";
 }

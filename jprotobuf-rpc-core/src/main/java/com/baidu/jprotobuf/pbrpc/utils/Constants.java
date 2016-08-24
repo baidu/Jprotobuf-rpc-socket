@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ package com.baidu.jprotobuf.pbrpc.utils;
  */
 public class Constants {
 
-    /**
-     * pbrpc scheme
-     */
+    /** pbrpc scheme. */
     public static final String PBRPC_SCHEME = "pbrpc";
     
+    /** The Constant SERVICE_KEY_PREIFX. */
     public static final String SERVICE_KEY_PREIFX = "baidu-rpc:";
     
     
+    /** The Constant DYNAMIC_SERVICE_NAME. */
     public static final String DYNAMIC_SERVICE_NAME = "__DYANMICE_SERVICE__";
 }

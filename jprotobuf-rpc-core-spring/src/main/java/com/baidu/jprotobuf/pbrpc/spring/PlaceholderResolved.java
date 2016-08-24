@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package com.baidu.jprotobuf.pbrpc.spring;
 
 /**
- * Placehoader resolved call back 
- * 
+ * Placehoader resolved call back .
+ *
  * @author xiemalin
  * @since 2.17
  */
@@ -25,7 +25,8 @@ public interface PlaceholderResolved {
 
     /**
      * parsed placeholder value returned.
-     * @param placeholder
+     *
+     * @param placeholder the placeholder
      * @return parsed string
      */
     String doResolved(String placeholder);

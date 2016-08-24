@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.baidu.jprotobuf.pbrpc.intercept;
 import java.lang.reflect.Method;
 
 /**
- * RPC method invoker intercepter
+ * RPC method invoker intercepter.
  *
  * @author xiemalin
  * @since 3.4.0
@@ -26,23 +26,18 @@ import java.lang.reflect.Method;
 public interface InvokerInterceptor {
 	
 	/**
-	 * This method will call before RPC method invoke
-	 * 
-	 * @param target target invoke object
-	 * @param method method object
-	 * @param args method arguments
+	 * This method will call before RPC method invoke.
+	 *
+	 * @param methodInvocation the method invocation
 	 */
 	void beforeInvoke(MethodInvocationInfo methodInvocation);
 
 	/**
-	 * to do intercept action
-	 * 
-	 * @param target target invoke object
-	 * @param method method object
-	 * @param args method arguments
+	 * to do intercept action.
+	 *
+	 * @param methodInvocation the method invocation
 	 * @return if not null, this intercepter will active and this result will replace to real RPC return.<br>
 	 *         if return null will continue to another intercepter.
-	 * 		
 	 */
 	Object process(MethodInvocationInfo methodInvocation);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,32 +33,40 @@ import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
- * {@link RpcServiceMetaServiceProvider} service
- * 
+ * {@link RpcServiceMetaServiceProvider} service.
+ *
  * @author xiemalin
  * @since 2.1
  */
 public class RpcServiceMetaServiceProvider {
 
-    /**
-     * 
-     */
+    /** The Constant LINE_BREAK. */
     private static final String LINE_BREAK = "\n";
 
+    /** The Constant RPC_META_SERVICENAME. */
     public static final String RPC_META_SERVICENAME = "__rpc_meta_watch_service__";
 
+    /** The rpc service registry. */
     private RpcServiceRegistry rpcServiceRegistry;
 
+    /** The rpc service meta list. */
     private RpcServiceMetaList rpcServiceMetaList;
 
     /**
-     * @param rpcServiceRegistry
+     * Instantiates a new rpc service meta service provider.
+     *
+     * @param rpcServiceRegistry the rpc service registry
      */
     public RpcServiceMetaServiceProvider(RpcServiceRegistry rpcServiceRegistry) {
         super();
         this.rpcServiceRegistry = rpcServiceRegistry;
     }
 
+    /**
+     * Gets the rpc service meta info.
+     *
+     * @return the rpc service meta info
+     */
     @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
     public RpcServiceMetaList getRpcServiceMetaInfo() {
 
@@ -145,6 +153,9 @@ public class RpcServiceMetaServiceProvider {
         return rpcServiceMetaList;
     }
 
+    /**
+     * Ping.
+     */
     @ProtobufRPCService(serviceName = RPC_META_SERVICENAME)
     public void ping() {
         // here just to test service is available

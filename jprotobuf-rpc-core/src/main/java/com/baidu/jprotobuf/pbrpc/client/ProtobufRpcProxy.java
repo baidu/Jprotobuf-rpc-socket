@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,98 +49,112 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
 /**
  * Protobuf RPC proxy utility class.
- * 
+ *
  * @author xiemalin
- * @since 1.0
+ * @param <T> the generic type
  * @see ProxyFactory
+ * @since 1.0
  */
 public class ProtobufRpcProxy<T> implements InvocationHandler {
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(ProtobufRpcProxy.class.getName());
     
+    /** The Constant NULL. */
     private static final Object NULL = new Object();
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     /**
-     * key name for shared RPC channel
-     * 
+     * key name for shared RPC channel.
+     *
      * @see RpcChannel
      */
     private static final String SHARE_KEY = "___share_key";
 
+    /** The cached rpc methods. */
     private Map<String, RpcMethodInfo> cachedRpcMethods = new HashMap<String, RpcMethodInfo>();
 
     /**
      * RPC client.
      */
     private final RpcClient rpcClient;
+    
+    /** The rpc channel map. */
     private Map<String, RpcChannel> rpcChannelMap = new HashMap<String, RpcChannel>();
 
+    /** The host. */
     private String host;
+    
+    /** The port. */
     private int port;
 
+    /** The lookup stub on startup. */
     private boolean lookupStubOnStartup = true;
 
+    /** The instance. */
     private T instance;
 
+    /** The service locator callback. */
     private ServiceLocatorCallback serviceLocatorCallback;
 
+    /** The service url. */
     private String serviceUrl;
 
+    /** The interceptor. */
     private InvokerInterceptor interceptor;
 
     /**
-     * set interceptor value to interceptor
-     * 
-     * @param interceptor the interceptor to set
+     * Sets the interceptor.
+     *
+     * @param interceptor the new interceptor
      */
     public void setInterceptor(InvokerInterceptor interceptor) {
         this.interceptor = interceptor;
     }
 
     /**
-     * set serviceLocatorCallback value to serviceLocatorCallback
-     * 
-     * @param serviceLocatorCallback the serviceLocatorCallback to set
+     * Sets the service locator callback.
+     *
+     * @param serviceLocatorCallback the new service locator callback
      */
     public void setServiceLocatorCallback(ServiceLocatorCallback serviceLocatorCallback) {
         this.serviceLocatorCallback = serviceLocatorCallback;
     }
 
     /**
-     * get the lookupStubOnStartup
-     * 
-     * @return the lookupStubOnStartup
+     * Checks if is lookup stub on startup.
+     *
+     * @return the lookup stub on startup
      */
     public boolean isLookupStubOnStartup() {
         return lookupStubOnStartup;
     }
 
     /**
-     * set lookupStubOnStartup value to lookupStubOnStartup
-     * 
-     * @param lookupStubOnStartup the lookupStubOnStartup to set
+     * Sets the lookup stub on startup.
+     *
+     * @param lookupStubOnStartup the new lookup stub on startup
      */
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
 
     /**
-     * set host value to host
-     * 
-     * @param host the host to set
+     * Sets the host.
+     *
+     * @param host the new host
      */
     public void setHost(String host) {
         this.host = host;
     }
 
+    /**
+     * Gets the service signatures.
+     *
+     * @return the service signatures
+     */
     public Set<String> getServiceSignatures() {
         if (!cachedRpcMethods.isEmpty()) {
             return new HashSet<String>(cachedRpcMethods.keySet());
@@ -170,21 +184,22 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     }
 
     /**
-     * set port value to port
-     * 
-     * @param port the port to set
+     * Sets the port.
+     *
+     * @param port the new port
      */
     public void setPort(int port) {
         this.port = port;
     }
 
-    /**
-     * target interface class
-     */
+    /** target interface class. */
     private final Class<T> interfaceClass;
 
     /**
-     * @param rpcClient
+     * Instantiates a new protobuf rpc proxy.
+     *
+     * @param rpcClient the rpc client
+     * @param interfaceClass the interface class
      */
     public ProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         this.interfaceClass = interfaceClass;
@@ -197,10 +212,20 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         this.rpcClient = rpcClient;
     }
     
+    /**
+     * Gets the methds.
+     *
+     * @return the methds
+     */
     protected  Method[] getMethds() {
         return interfaceClass.getMethods();
     }
 
+    /**
+     * Proxy.
+     *
+     * @return the t
+     */
     public synchronized T proxy() {
 
         if (instance != null) {
@@ -283,11 +308,22 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         return instance;
     }
 
+    /**
+     * Builds the request data package.
+     *
+     * @param rpcMethodInfo the rpc method info
+     * @param args the args
+     * @return the rpc data package
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
         return rpcDataPackage;
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         Collection<RpcChannel> rpcChannels = rpcChannelMap.values();
         for (RpcChannel rpcChann : rpcChannels) {
@@ -301,6 +337,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     }
     
     
+	/**
+	 * Process equals hash code to string method.
+	 *
+	 * @param method the method
+	 * @param args the args
+	 * @return the object
+	 */
 	private Object processEqualsHashCodeToStringMethod(Method method, final Object[] args) {
 		String name = method.getName();
 		
@@ -321,6 +364,12 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 	}
 	
 	
+	/**
+	 * Gets the protobuf rpc annotation.
+	 *
+	 * @param method the method
+	 * @return the protobuf rpc annotation
+	 */
 	protected ProtobufRPC getProtobufRPCAnnotation(Method method) {
 	    ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
 	    return protobufPRC;
@@ -469,8 +518,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     }
 
     /**
-     * do wait {@link BlockingRpcCallback} return
-     * 
+     * do wait {@link BlockingRpcCallback} return.
+     *
      * @param method java method object
      * @param args method arguments
      * @param serviceName service name

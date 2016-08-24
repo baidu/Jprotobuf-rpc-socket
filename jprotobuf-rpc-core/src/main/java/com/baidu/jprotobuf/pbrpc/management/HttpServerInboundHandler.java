@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,22 +46,26 @@ import io.netty.handler.codec.http.HttpRequest;
 @Sharable
 public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
 
-    /**
-     * 
-     */
+    /** The Constant DEFAULT_URI. */
     private static final String DEFAULT_URI = "/";
 
-    /**
-     * 
-     */
+    /** The Constant STATUS_URI. */
     private static final String STATUS_URI = "/status";
 
+    /** The request. */
     private HttpRequest request;
 
+    /** The response mapping. */
     private Map<String, Object> responseMapping;
 
+    /** The server status. */
     private ServerStatus serverStatus;
 
+    /**
+     * Instantiates a new http server inbound handler.
+     *
+     * @param rpcServer the rpc server
+     */
     public HttpServerInboundHandler(RpcServer rpcServer) {
         super();
         responseMapping = new HashMap<String, Object>();
@@ -95,6 +99,13 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
         }
     }
     
+    /**
+     * Write response.
+     *
+     * @param ctx the ctx
+     * @param content the content
+     * @throws Exception the exception
+     */
     private void writeResponse(ChannelHandlerContext ctx, String content) throws Exception {
         FullHttpResponse response =
                 new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(content.getBytes("UTF-8")));
@@ -108,18 +119,24 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
         
     }
 
+    /* (non-Javadoc)
+     * @see io.netty.channel.ChannelInboundHandlerAdapter#channelReadComplete(io.netty.channel.ChannelHandlerContext)
+     */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
     }
 
+    /* (non-Javadoc)
+     * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext, java.lang.Throwable)
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         ctx.close();
     }
 
     /**
-     * 
+     * Close.
      */
     public void close() {
         if (serverStatus != null) {

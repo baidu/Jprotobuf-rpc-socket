@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2014 the original author or authors.
+ * Copyright 2002-2007 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,63 +23,56 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * 
- * Chunk模式本质上是将一个大的数据流拆分成一个个小的Chunk包按序进行发送
- * 
+ * Chunk模式本质上是将一个大的数据流拆分成一个个小的Chunk包按序进行发送.
+ *
  * @author xiemalin
- * @since 1.0
  * @see RpcMeta
+ * @since 1.0
  */
 public class ChunkInfo implements Readable, Writerable {
 
+    /** The Constant CODEC. */
     private static final Codec<ChunkInfo> CODEC = ProtobufProxy.create(ChunkInfo.class);
 
-    /**
-     * 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查
-     */
+    /** 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查. */
     @Protobuf(required = true)
     private Long streamId;
 
-    /**
-     * 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br>
-     * 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证
-     */
+    /** 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br> 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证. */
     @Protobuf(required = true)
     private long chunkId = -1;
 
     /**
-     * get the streamId
-     * 
-     * @return the streamId
+     * Gets the 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查.
+     *
+     * @return the 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查
      */
     public Long getStreamId() {
         return streamId;
     }
 
     /**
-     * set streamId value to streamId
-     * 
-     * @param streamId
-     *            the streamId to set
+     * Sets the 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查.
+     *
+     * @param streamId the new 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检查
      */
     public void setStreamId(Long streamId) {
         this.streamId = streamId;
     }
 
     /**
-     * get the chunkId
-     * 
-     * @return the chunkId
+     * Gets the 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br> 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证.
+     *
+     * @return the 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br> 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证
      */
     public long getChunkId() {
         return chunkId;
     }
 
     /**
-     * set chunkId value to chunkId
-     * 
-     * @param chunkId
-     *            the chunkId to set
+     * Sets the 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br> 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证.
+     *
+     * @param chunkId the new 从0开始严格递增。发送方需保证按序发送Chunk包。数据流的最后一个包chunk_id为-1。<br> 由于Protobuf RPC基于TCP协议，因此包之间的顺序可以保证
      */
     public void setChunkId(long chunkId) {
         this.chunkId = chunkId;
@@ -117,7 +110,9 @@ public class ChunkInfo implements Readable, Writerable {
     }
 
     /**
-     * @return
+     * Copy.
+     *
+     * @return the chunk info
      */
     public ChunkInfo copy() {
         ChunkInfo chunkInfo = new ChunkInfo();
