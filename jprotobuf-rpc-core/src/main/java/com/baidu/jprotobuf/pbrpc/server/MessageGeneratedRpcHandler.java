@@ -89,41 +89,49 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
             retData.setAttachment(responseAttachment);
         }
 
-		long time = System.currentTimeMillis();
-		// check intercepter
-		if (getInterceptor() != null) {
-			MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
-			getInterceptor().beforeInvoke(methodInvocationInfo);
+        long time = System.currentTimeMillis();
 
-            ret = getInterceptor().process(methodInvocationInfo);
-            if (ret != null) {
-                PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
-                        + "' time took:" + (System.currentTimeMillis() - time) + " ms");
+        try {
+            // check intercepter
+            if (getInterceptor() != null) {
+                MethodInvocationInfo methodInvocationInfo =
+                        new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+                getInterceptor().beforeInvoke(methodInvocationInfo);
 
-                if (ret instanceof GeneratedMessage) {
-                    byte[] response = ((GeneratedMessage) ret).toByteArray();
-                    retData.setData(response);
+                ret = getInterceptor().process(methodInvocationInfo);
+                if (ret != null) {
+                    PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
+                            + "' time took:" + (System.currentTimeMillis() - time) + " ms");
+
+                    if (ret instanceof GeneratedMessage) {
+                        byte[] response = ((GeneratedMessage) ret).toByteArray();
+                        retData.setData(response);
+                    }
+
+                    return retData;
                 }
+            }
 
-				return retData;
-			}
-		}
+            ret = getMethod().invoke(getService(), param);
+            long took = (System.currentTimeMillis() - time);
+            PERFORMANCE_LOGGER
+                    .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
 
-        ret = getMethod().invoke(getService(), param);
-        long took = (System.currentTimeMillis() - time);
-        PERFORMANCE_LOGGER
-                .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
+            if (ret == null) {
+                return retData;
+            }
 
-        if (ret == null) {
+            if (ret != null && ret instanceof GeneratedMessage) {
+                byte[] response = ((GeneratedMessage) ret).toByteArray();
+                retData.setData(response);
+            }
+
             return retData;
+        } finally {
+            if (getInterceptor() != null) {
+                getInterceptor().afterProcess();
+            }
         }
-
-        if (ret != null && ret instanceof GeneratedMessage) {
-            byte[] response = ((GeneratedMessage) ret).toByteArray();
-            retData.setData(response);
-        }
-
-        return retData;
     }
 
 }

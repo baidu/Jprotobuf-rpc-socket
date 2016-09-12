@@ -59,7 +59,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(ProtobufRpcProxy.class.getName());
-    
+
     /** The Constant NULL. */
     private static final Object NULL = new Object();
 
@@ -80,13 +80,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      * RPC client.
      */
     private final RpcClient rpcClient;
-    
+
     /** The rpc channel map. */
     private Map<String, RpcChannel> rpcChannelMap = new HashMap<String, RpcChannel>();
 
     /** The host. */
     private String host;
-    
+
     /** The port. */
     private int port;
 
@@ -211,13 +211,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
         this.rpcClient = rpcClient;
     }
-    
+
     /**
      * Gets the methds.
      *
      * @return the methds
      */
-    protected  Method[] getMethds() {
+    protected Method[] getMethds() {
         return interfaceClass.getMethods();
     }
 
@@ -233,7 +233,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
 
         // to parse interface
-        Method[] methods =  getMethds();
+        Method[] methods = getMethds();
         for (Method method : methods) {
             ProtobufRPC protobufPRC = getProtobufRPCAnnotation(method);
             if (protobufPRC != null) {
@@ -335,66 +335,62 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
 
     }
-    
-    
-	/**
-	 * Process equals hash code to string method.
-	 *
-	 * @param method the method
-	 * @param args the args
-	 * @return the object
-	 */
-	private Object processEqualsHashCodeToStringMethod(Method method, final Object[] args) {
-		String name = method.getName();
-		
-		Object[] parameters = args;
-		if (parameters == null) {
-			parameters = new Object[0];
-		}
-		
-		if ("toString".equals(name) && parameters.length == 0) {
-			return serviceUrl;
-		} else if ("hashCode".equals(name) && parameters.length == 0) {
-			return serviceUrl.hashCode();
-		} else if ("equals".equals(name) && parameters.length == 1) {
-			return this.equals(parameters[0]);
-		}
-		
-		return NULL;
-	}
-	
-	
-	/**
-	 * Gets the protobuf rpc annotation.
-	 *
-	 * @param method the method
-	 * @return the protobuf rpc annotation
-	 */
-	protected ProtobufRPC getProtobufRPCAnnotation(Method method) {
-	    ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
-	    return protobufPRC;
-	}
-	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-	 * java.lang.reflect.Method, java.lang.Object[])
-	 */
-	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-		
-		String mName = method.getName();
-		if ("getServiceUrl".equals(mName)) {
+    /**
+     * Process equals hash code to string method.
+     *
+     * @param method the method
+     * @param args the args
+     * @return the object
+     */
+    private Object processEqualsHashCodeToStringMethod(Method method, final Object[] args) {
+        String name = method.getName();
 
-			// return directly from local due to call ServiceUrlAccessible
-			return serviceUrl;
-		}
-		
-		Object result = processEqualsHashCodeToStringMethod(method, args);
-		if (result != NULL) {
-			return result;
-		}
+        Object[] parameters = args;
+        if (parameters == null) {
+            parameters = new Object[0];
+        }
+
+        if ("toString".equals(name) && parameters.length == 0) {
+            return serviceUrl;
+        } else if ("hashCode".equals(name) && parameters.length == 0) {
+            return serviceUrl.hashCode();
+        } else if ("equals".equals(name) && parameters.length == 1) {
+            return this.equals(parameters[0]);
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Gets the protobuf rpc annotation.
+     *
+     * @param method the method
+     * @return the protobuf rpc annotation
+     */
+    protected ProtobufRPC getProtobufRPCAnnotation(Method method) {
+        ProtobufRPC protobufPRC = method.getAnnotation(ProtobufRPC.class);
+        return protobufPRC;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
+     */
+    public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+
+        String mName = method.getName();
+        if ("getServiceUrl".equals(mName)) {
+
+            // return directly from local due to call ServiceUrlAccessible
+            return serviceUrl;
+        }
+
+        Object result = processEqualsHashCodeToStringMethod(method, args);
+        if (result != NULL) {
+            return result;
+        }
 
         final long time = System.currentTimeMillis();
 
@@ -431,90 +427,96 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             channelKey = SHARE_KEY;
         }
 
-        // check intercepter
-        if (interceptor != null) {
-			
-			byte[] extraParams = rpcDataPackage.getRpcMeta().getRequest().getExtraParam();
-			MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(proxy, args, method, extraParams);
-            interceptor.beforeInvoke(methodInvocationInfo);
+        try {
+            // check intercepter
+            if (interceptor != null) {
 
-            Object ret = interceptor.process(methodInvocationInfo);
-            if (ret != null) {
-                PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + method.getName() + "' time took:"
-                        + (System.currentTimeMillis() - time) + " ms");
-                return ret;
+                byte[] extraParams = rpcDataPackage.getRpcMeta().getRequest().getExtraParam();
+                MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(proxy, args, method, extraParams);
+                interceptor.beforeInvoke(methodInvocationInfo);
+
+                Object ret = interceptor.process(methodInvocationInfo);
+                if (ret != null) {
+                    PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + method.getName()
+                            + "' time took:" + (System.currentTimeMillis() - time) + " ms");
+                    return ret;
+                }
+
+                rpcDataPackage.extraParams(methodInvocationInfo.getExtraParams());
             }
-            
-            rpcDataPackage.extraParams(methodInvocationInfo.getExtraParams());
-        }
 
-        final RpcChannel rpcChannel = rpcChannelMap.get(channelKey);
-        if (rpcChannel == null) {
-            throw new RuntimeException("No rpcChannel bind with serviceSignature '" + channelKey + "'");
-        }
-
-        final Connection connection = rpcChannel.getConnection();
-
-        final BlockingRpcCallback callback = new BlockingRpcCallback(new BlockingRpcCallback.CallbackDone() {
-
-            @Override
-            public void done() {
-                if (rpcChannel != null) {
-                    rpcChannel.releaseConnection(connection);
-                }
+            final RpcChannel rpcChannel = rpcChannelMap.get(channelKey);
+            if (rpcChannel == null) {
+                throw new RuntimeException("No rpcChannel bind with serviceSignature '" + channelKey + "'");
             }
-        });
 
-        rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
+            final Connection connection = rpcChannel.getConnection();
 
-        final String m = methodName;
-        if (method.getReturnType().isAssignableFrom(Future.class)) {
-            // if use non-blocking call
-            Future<Object> f = new Future<Object>() {
+            final BlockingRpcCallback callback = new BlockingRpcCallback(new BlockingRpcCallback.CallbackDone() {
 
                 @Override
-                public boolean cancel(boolean mayInterruptIfRunning) {
-                    // can not cancel
-                    return false;
-                }
-
-                @Override
-                public boolean isCancelled() {
-                    return false;
-                }
-
-                @Override
-                public boolean isDone() {
-                    return callback.isDone();
-                }
-
-                @Override
-                public Object get() throws InterruptedException, ExecutionException {
-                    try {
-                        Object o = doWaitCallback(method, args, serviceName, m, rpcMethodInfo, callback);
-                        PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
-                                + (System.currentTimeMillis() - time) + " ms");
-                        return o;
-                    } catch (Exception e) {
-                        throw new ExecutionException(e.getMessage(), e);
+                public void done() {
+                    if (rpcChannel != null) {
+                        rpcChannel.releaseConnection(connection);
                     }
                 }
+            });
 
-                @Override
-                public Object get(long timeout, TimeUnit unit)
-                        throws InterruptedException, ExecutionException, TimeoutException {
-                    return get();
-                }
-            };
+            rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
 
-            return f;
+            final String m = methodName;
+            if (method.getReturnType().isAssignableFrom(Future.class)) {
+                // if use non-blocking call
+                Future<Object> f = new Future<Object>() {
+
+                    @Override
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                        // can not cancel
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isCancelled() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isDone() {
+                        return callback.isDone();
+                    }
+
+                    @Override
+                    public Object get() throws InterruptedException, ExecutionException {
+                        try {
+                            Object o = doWaitCallback(method, args, serviceName, m, rpcMethodInfo, callback);
+                            PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
+                                    + (System.currentTimeMillis() - time) + " ms");
+                            return o;
+                        } catch (Exception e) {
+                            throw new ExecutionException(e.getMessage(), e);
+                        }
+                    }
+
+                    @Override
+                    public Object get(long timeout, TimeUnit unit)
+                            throws InterruptedException, ExecutionException, TimeoutException {
+                        return get();
+                    }
+                };
+
+                return f;
+            }
+
+            Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback);
+
+            PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
+                    + (System.currentTimeMillis() - time) + " ms");
+            return o;
+        } finally {
+            if (interceptor != null) {
+                interceptor.afterProcess();
+            }
         }
-
-        Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback);
-
-        PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
-                + (System.currentTimeMillis() - time) + " ms");
-        return o;
     }
 
     /**

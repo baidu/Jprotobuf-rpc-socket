@@ -17,10 +17,7 @@
 package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.logging.Logger;
-
-import org.springframework.util.SerializationUtils;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
@@ -37,102 +34,107 @@ import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
-	
-	/** Logger for this class. */
-	private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
-	/** The input codec. */
-	private Codec inputCodec;
-	
-	/** The output codec. */
-	private Codec outputCodec;
+    /** Logger for this class. */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
-	/** The service signature. */
-	private String serviceSignature;
+    /** The input codec. */
+    private Codec inputCodec;
 
+    /** The output codec. */
+    private Codec outputCodec;
 
-	/**
-	 * Instantiates a new annotation rpc handler.
-	 *
-	 * @param method the method
-	 * @param service the service
-	 * @param protobufPRCService the protobuf prc service
-	 */
-	public AnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
-		super(method, service, protobufPRCService);
-		if (getInputClass() != null) {
-			inputCodec = ProtobufProxy.create(getInputClass());
-		}
-		if (getOutputClass() != null) {
-			outputCodec = ProtobufProxy.create(getOutputClass());
-		}
+    /** The service signature. */
+    private String serviceSignature;
 
-		serviceSignature = ServiceSignatureUtils.makeSignature(getServiceName(), getMethodName());
+    /**
+     * Instantiates a new annotation rpc handler.
+     *
+     * @param method the method
+     * @param service the service
+     * @param protobufPRCService the protobuf prc service
+     */
+    public AnnotationRpcHandler(Method method, Object service, ProtobufRPCService protobufPRCService) {
+        super(method, service, protobufPRCService);
+        if (getInputClass() != null) {
+            inputCodec = ProtobufProxy.create(getInputClass());
+        }
+        if (getOutputClass() != null) {
+            outputCodec = ProtobufProxy.create(getOutputClass());
+        }
 
-	}
+        serviceSignature = ServiceSignatureUtils.makeSignature(getServiceName(), getMethodName());
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(byte[])
-	 */
-	protected RpcData doRealHandle(RpcData data) throws Exception {
-		Object input = null;
-		Object[] param;
-		Object ret = null;
-		if (data.getData() != null && inputCodec != null) {
-			input = inputCodec.decode(data.getData());
-			param = new Object[] { input };
-		} else {
-			param = new Object[0];
-		}
+    }
 
-		RpcData retData = new RpcData();
-		// process attachment
-		if (getAttachmentHandler() != null) {
-			byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
-					getMethodName(), param);
-			retData.setAttachment(responseAttachment);
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(byte[])
+     */
+    protected RpcData doRealHandle(RpcData data) throws Exception {
+        Object input = null;
+        Object[] param;
+        Object ret = null;
+        if (data.getData() != null && inputCodec != null) {
+            input = inputCodec.decode(data.getData());
+            param = new Object[] { input };
+        } else {
+            param = new Object[0];
+        }
 
-		long time = System.currentTimeMillis();
+        RpcData retData = new RpcData();
+        // process attachment
+        if (getAttachmentHandler() != null) {
+            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
+                    getMethodName(), param);
+            retData.setAttachment(responseAttachment);
+        }
 
-		// check intercepter
-		if (getInterceptor() != null) {
-			MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
-			getInterceptor().beforeInvoke(methodInvocationInfo);
-			
-			ret = getInterceptor().process(methodInvocationInfo);
-			if (ret != null) {
-				PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
-						+ "' time took:" + (System.currentTimeMillis() - time) + " ms");
+        long time = System.currentTimeMillis();
+        try {
+            // check intercepter
+            if (getInterceptor() != null) {
+                MethodInvocationInfo methodInvocationInfo =
+                        new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+                getInterceptor().beforeInvoke(methodInvocationInfo);
 
-				if (outputCodec != null) {
-					byte[] response = outputCodec.encode(ret);
-					retData.setData(response);
-				}
+                ret = getInterceptor().process(methodInvocationInfo);
+                if (ret != null) {
+                    PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
+                            + "' time took:" + (System.currentTimeMillis() - time) + " ms");
 
-				return retData;
-			}
-		}
+                    if (outputCodec != null) {
+                        byte[] response = outputCodec.encode(ret);
+                        retData.setData(response);
+                    }
 
-		ret = getMethod().invoke(getService(), param);
-		long took = (System.currentTimeMillis() - time);
-		PERFORMANCE_LOGGER
-				.fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
+                    return retData;
+                }
+            }
 
-		ServerStatus.incr(serviceSignature, took);
+            ret = getMethod().invoke(getService(), param);
+            long took = (System.currentTimeMillis() - time);
+            PERFORMANCE_LOGGER
+                    .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
 
-		if (ret == null) {
-			return retData;
-		}
+            ServerStatus.incr(serviceSignature, took);
 
-		if (outputCodec != null) {
-			byte[] response = outputCodec.encode(ret);
-			retData.setData(response);
-		}
+            if (ret == null) {
+                return retData;
+            }
 
-		return retData;
-	}
+            if (outputCodec != null) {
+                byte[] response = outputCodec.encode(ret);
+                retData.setData(response);
+            }
+
+            return retData;
+        } finally {
+            if (getInterceptor() != null) {
+                getInterceptor().afterProcess();
+            }
+        }
+    }
 
 }
