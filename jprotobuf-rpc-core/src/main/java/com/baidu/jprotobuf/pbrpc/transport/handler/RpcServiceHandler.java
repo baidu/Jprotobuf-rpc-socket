@@ -213,6 +213,8 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 			} finally {
 				LOG.fine("RPC server invoke method '" + methodName + "' time took:"
 						+ (System.currentTimeMillis() - time) + " ms");
+				
+				LogIdThreadLocalHolder.clearLogId();
 			}
 		}
 

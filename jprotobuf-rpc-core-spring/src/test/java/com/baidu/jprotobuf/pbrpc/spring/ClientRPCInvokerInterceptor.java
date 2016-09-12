@@ -66,4 +66,12 @@ public class ClientRPCInvokerInterceptor implements InvokerInterceptor {
 		return null;
 	}
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor#afterProcess()
+     */
+    @Override
+    public void afterProcess() {
+        
+    }
+
 }

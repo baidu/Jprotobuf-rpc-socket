@@ -15,8 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.intercept;
 
-import java.lang.reflect.Method;
-
 /**
  * RPC method invoker intercepter.
  *
@@ -40,4 +38,10 @@ public interface InvokerInterceptor {
 	 *         if return null will continue to another intercepter.
 	 */
 	Object process(MethodInvocationInfo methodInvocation);
+	
+	
+	/**
+	 * to call after process called. here need to clear some garbage here
+	 */
+	void afterProcess();
 }

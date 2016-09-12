@@ -72,4 +72,18 @@ public class ChainedInvokerInterceptor implements InvokerInterceptor {
 		return result;
 	}
 
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor#afterProcess()
+     */
+    @Override
+    public void afterProcess() {
+        if (interceptors == null) {
+            return;
+        }
+
+        for (InvokerInterceptor interceptor : interceptors) {
+            interceptor.afterProcess();
+        }
+    }
+
 }

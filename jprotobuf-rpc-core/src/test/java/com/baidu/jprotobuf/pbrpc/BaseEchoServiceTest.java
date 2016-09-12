@@ -68,6 +68,11 @@ public abstract class BaseEchoServiceTest extends BaseTest {
                 Assert.assertNotNull(methodInvocation.getMethod());
                 
             }
+
+            @Override
+            public void afterProcess() {
+                
+            }
 		});
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
@@ -94,6 +99,11 @@ public abstract class BaseEchoServiceTest extends BaseTest {
             @Override
             public void beforeInvoke(MethodInvocationInfo methodInvocation) {
                 Assert.assertNotNull(methodInvocation.getMethod());
+                
+            }
+
+            @Override
+            public void afterProcess() {
                 
             }
 		});

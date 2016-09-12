@@ -15,8 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.spring;
 
-import java.lang.reflect.Method;
-
 import org.springframework.util.Assert;
 
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
@@ -71,5 +69,13 @@ public class ServerRPCInvokerInterceptor implements InvokerInterceptor {
 		Assert.notNull(methodInvocation.getMethod());
 		return null;
 	}
+
+    /* (non-Javadoc)
+     * @see com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor#afterProcess()
+     */
+    @Override
+    public void afterProcess() {
+        
+    }
 
 }
