@@ -72,5 +72,9 @@ public class BeanValidatorInvokerInterceptor implements InvokerInterceptor {
 	public Object process(MethodInvocationInfo methodInvocationInfo) {
 		return null;
 	}
+	
+	public void afterProcess() {
+	    
+	}
 
 }
