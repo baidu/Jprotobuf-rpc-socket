@@ -102,7 +102,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		ChannelPipeline channelPipe = ch.pipeline();
 		// receive request data
 		channelPipe.addLast(RPC_CHANNEL_STATE_AWARE_HANDLER,
-				new IdleStateHandler(this.rpcServerOptions.getKeepAliveTime(), this.rpcServerOptions.getKeepAliveTime(),
+				new IdleStateHandler(this.rpcServerOptions.getReaderIdleTime(), this.rpcServerOptions.getWriterIdleTime(),
 						this.rpcServerOptions.getKeepAliveTime()));
 
 		channelPipe.addLast(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());

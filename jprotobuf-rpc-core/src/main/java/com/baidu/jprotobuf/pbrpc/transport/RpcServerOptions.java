@@ -107,13 +107,13 @@ public class RpcServerOptions {
      * an {@link IdleStateEvent} whose state is {@link IdleState#READER_IDLE} will be triggered when no read was
      * performed for the specified period of time. Specify {@code 0} to disable.
      */
-    private int readerIdleTime = 60 * 30;
+    private int readerIdleTime = 60;
 
     /**
      * an {@link IdleStateEvent} whose state is {@link IdleState#WRITER_IDLE} will be triggered when no write was
      * performed for the specified period of time. Specify {@code 0} to disable.
      */
-    private int writerIdleTime = 60 * 30;
+    private int writerIdleTime = 60;
 
     /** connect timeout, in milliseconds. */
     private int connectTimeout;

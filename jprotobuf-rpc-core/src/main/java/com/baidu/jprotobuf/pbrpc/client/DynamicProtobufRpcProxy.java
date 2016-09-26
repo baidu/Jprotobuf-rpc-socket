@@ -44,6 +44,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
+import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 
 /**
  * 增加动态代理功能，支持动态RPC调用能力. 相比较 {@link ProtobufRpcProxy}实现，无需要提供接口定义。
@@ -152,6 +153,25 @@ public class DynamicProtobufRpcProxy {
     public Object invoke(final String serviceSignature, Object proxy, final Method method, final Object[] args,
             final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls) throws Throwable {
 
+        return invoke(serviceSignature, Constants.DYNAMIC_SERVICE_NAME, proxy, method, args, config, cls);
+    }
+
+    /**
+     * Invoke.
+     *
+     * @param serviceSignature the service signature
+     * @param proxy the proxy
+     * @param method the method
+     * @param args the args
+     * @param config the config
+     * @param cls the cls
+     * @return the object
+     * @throws Throwable the throwable
+     */
+    public Object invoke(final String serviceName, final String methodName, Object proxy, final Method method,
+            final Object[] args, final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls)
+                    throws Throwable {
+        String serviceSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         Object result = processEqualsHashCodeToStringMethod(serviceSignature, method, args);
         if (result != NULL) {
             return result;
@@ -169,7 +189,7 @@ public class DynamicProtobufRpcProxy {
 
                     @Override
                     public String serviceName() {
-                        return Constants.DYNAMIC_SERVICE_NAME;
+                        return serviceName;
                     }
 
                     @Override
@@ -179,7 +199,7 @@ public class DynamicProtobufRpcProxy {
 
                     @Override
                     public String methodName() {
-                        return serviceSignature;
+                        return methodName;
                     }
 
                     @Override
@@ -227,10 +247,7 @@ public class DynamicProtobufRpcProxy {
             }
 
         }
-        try {
-            return doInvoke(serviceSignature, rpcChannel, proxy, rpcMethodInfo, method, args);
-        } finally {
-        }
+        return doInvoke(serviceSignature, rpcChannel, proxy, rpcMethodInfo, method, args);
     }
 
     /**

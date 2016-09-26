@@ -240,6 +240,19 @@ public class RpcServer extends ServerBootstrap {
             Class<? extends ServerAttachmentHandler> cls) {
         rpcServiceRegistry.doDynamicRegisterService(methodSignature, method, service, cls);
     }
+    
+    /**
+     * Register dynamic service.
+     *
+     * @param methodSignature the method signature
+     * @param method the method
+     * @param service the service
+     * @param cls the cls
+     */
+    public void registerDynamicService(String serviceName, String methodName, Method method, Object service,
+            Class<? extends ServerAttachmentHandler> cls) {
+        rpcServiceRegistry.doDynamicRegisterService(serviceName, methodName, method, service, cls);
+    }
 
     /**
      * Start.

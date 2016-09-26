@@ -189,6 +189,48 @@ public class RpcServiceRegistry {
     }
 
     /**
+     * Do dynamic register service.
+     *
+     * @param serviceName the service name
+     * @param methodName the method name
+     * @param method the method
+     * @param service the service
+     * @param cls the cls
+     */
+    public void doDynamicRegisterService(final String serviceName, final String methodName, Method method,
+            Object service, final Class<? extends ServerAttachmentHandler> cls) {
+        ProtobufRPCService protobufPRCService = new ProtobufRPCService() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return ProtobufRPCService.class;
+            }
+
+            @Override
+            public String serviceName() {
+                return serviceName;
+            }
+
+            @Override
+            public String methodName() {
+                return methodName;
+            }
+
+            @Override
+            public String description() {
+                return "";
+            }
+
+            @Override
+            public Class<? extends ServerAttachmentHandler> attachmentHandler() {
+                return cls;
+            }
+        };
+
+        doRegiterService(method, service, protobufPRCService);
+    }
+
+    /**
      * Do regiter service.
      *
      * @param method the method
