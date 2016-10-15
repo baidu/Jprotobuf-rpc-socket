@@ -153,7 +153,7 @@ public class DynamicProtobufRpcProxy {
     public Object invoke(final String serviceSignature, Object proxy, final Method method, final Object[] args,
             final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls) throws Throwable {
 
-        return invoke(serviceSignature, Constants.DYNAMIC_SERVICE_NAME, proxy, method, args, config, cls);
+        return invoke(Constants.DYNAMIC_SERVICE_NAME, serviceSignature, proxy, method, args, config, cls);
     }
 
     /**
