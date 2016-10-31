@@ -17,7 +17,7 @@
 
 	<name>jprotobuf-rpc-socket</name>
 	<description>RPC implements </description>
-	<url>https://github.com/jhunters/jprotobuf/</url>
+	<url>https://github.com/jhunters/jprotobuf/</url> 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
