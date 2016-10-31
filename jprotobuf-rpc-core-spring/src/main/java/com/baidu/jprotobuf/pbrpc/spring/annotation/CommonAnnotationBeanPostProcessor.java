@@ -38,7 +38,6 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
@@ -71,10 +70,10 @@ import com.baidu.jprotobuf.pbrpc.spring.PropertyPlaceholderConfigurerTool;
  * @see AnnotationParserCallback
  * @since 2.17
  */
-public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
-        MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware, DisposableBean, InitializingBean,
-        ApplicationListener<ApplicationEvent> {
-    
+public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
+        implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware, DisposableBean,
+        InitializingBean, ApplicationListener<ApplicationEvent> {
+
     /** log this class. */
     protected static final Log LOGGER = LogFactory.getLog(AutowiredAnnotationBeanPostProcessor.class);
 
@@ -134,15 +133,20 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
         this.order = order;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.core.Ordered#getOrder()
      */
     public int getOrder() {
         return this.order;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
      */
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         if (!(beanFactory instanceof ConfigurableListableBeanFactory)) {
@@ -239,8 +243,8 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * @param annotion marked annotation type
      * @return all fields and methods matched target annotation type from specified class
      */
-    private InjectionMetadata
-            findAnnotationMetadata(final Class clazz, final List<Class<? extends Annotation>> annotion) {
+    private InjectionMetadata findAnnotationMetadata(final Class clazz,
+            final List<Class<? extends Annotation>> annotion) {
         // Quick check on the concurrent map first, with minimal locking.
         InjectionMetadata metadata = this.injectionMetadataCache.get(clazz);
         if (metadata == null) {
@@ -278,8 +282,8 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
                             throw new IllegalStateException("Autowired annotation is not supported on static methods");
                         }
                         if (method.getParameterTypes().length == 0) {
-                            throw new IllegalStateException("Autowired annotation requires at least one argument: "
-                                    + method);
+                            throw new IllegalStateException(
+                                    "Autowired annotation requires at least one argument: " + method);
                         }
                         PropertyDescriptor pd = BeanUtils.findPropertyForMethod(method);
                         elements.add(new AutowiredMethodElement(method, annotation, pd));
@@ -332,8 +336,11 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
             this.annotation = annotation;
         }
 
-        /* (non-Javadoc)
-         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object,
+         * java.lang.String, org.springframework.beans.PropertyValues)
          */
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
@@ -358,7 +365,7 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * Class representing injection information about an annotated method.
      */
     private class AutowiredMethodElement extends InjectionMetadata.InjectedElement {
-        
+
         /** target annotation type. */
         private final Annotation annotation;
 
@@ -374,8 +381,11 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
             this.annotation = annotation;
         }
 
-        /* (non-Javadoc)
-         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object, java.lang.String, org.springframework.beans.PropertyValues)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.springframework.beans.factory.annotation.InjectionMetadata.InjectedElement#inject(java.lang.Object,
+         * java.lang.String, org.springframework.beans.PropertyValues)
          */
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
@@ -443,9 +453,8 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(getCallback(), "property 'callbck' must be set");
 
-        propertyResource =
-                PropertyPlaceholderConfigurerTool
-                        .getRegisteredPropertyResourceConfigurer((ConfigurableListableBeanFactory) beanFactory);
+        propertyResource = PropertyPlaceholderConfigurerTool
+                .getRegisteredPropertyResourceConfigurer((ConfigurableListableBeanFactory) beanFactory);
         if (resolver == null) {
             resolver = PropertyPlaceholderConfigurerTool.createPlaceholderParser(propertyResource);
         }
@@ -488,10 +497,10 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
      * @since 1.0.0.0
      */
     private static class BeanInfo {
-        
+
         /** bean name. */
         private String name;
-        
+
         /** annotation type. */
         private Annotation annotation;
 

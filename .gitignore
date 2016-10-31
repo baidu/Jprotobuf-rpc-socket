@@ -125,3 +125,4 @@ release.properties
 .checkstyle
 *.classpath
 .project
+/jprotobuf-rpc-ext-dtc/

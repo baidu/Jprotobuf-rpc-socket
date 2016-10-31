@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<bean id="echoService" class="com.baidu.jprotobuf.pbrpc.EchoServiceImpl"></bean>
+
+
+	<bean class="com.baidu.jprotobuf.pbrpc.spring.RpcServiceExporter">
+		<property name="servicePort" value="1031"></property>
+		<property name="registerServices">
+			<list>
+				<ref local="echoService" />
+			</list>
+		</property>
+		<property name="connectTimeout" value="1000"></property>
+		<property name="httpServerPort" value="8866"></property>
+	</bean>
+
+
+	<bean id="echoServiceProxy" class="com.baidu.jprotobuf.pbrpc.spring.RpcProxyFactoryBean">
+		<property name="serviceInterface" value="com.baidu.jprotobuf.pbrpc.EchoService"></property>
+		<property name="port" value="1031"></property>
+	</bean>
+	
+<!-- 	<bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter">
+		<property name="servicePort" value="1031"></property>
+		<property name="path" value="D://my.proto"></property>
+	</bean> -->
+	
+</beans>

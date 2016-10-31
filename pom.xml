@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>3.4.5</version>
+	<version>3.5.0</version>
 	<packaging>pom</packaging>
 
 	<name>jprotobuf-rpc-socket</name>
@@ -66,6 +66,8 @@
 	<modules>
 		<module>jprotobuf-rpc-core-test</module>
 		<module>jprotobuf-rpc-core</module>
+ 		<module>jprotobuf-rpc-core-spring-base</module>
+ 		<module>jprotobuf-rpc-core-spring2</module>
  		<module>jprotobuf-rpc-core-spring</module>
 		<module>jprotobuf-rpc-registry-redis</module>
 		<module>jprotobuf-rpc-registry-bns</module>

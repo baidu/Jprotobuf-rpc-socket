@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<context:component-scan base-package="com.baidu.jprotobuf.pbrpc.spring">
+	</context:component-scan>
+
+<!-- 	<bean id="beanValidatorInvokerInceptor"
+		class="com.baidu.jprotobuf.pbrpc.ext.validator.BeanValidatorInvokerInterceptor">
+	</bean> -->
+
+	<bean id="clientInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
+		<property name="from"
+			value="from CommonAnnotationBeanPostProcessor setting"></property>
+	</bean>
+
+	<bean id="annoClientInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
+		<property name="from" value="from @RpcProxy  setting"></property>
+	</bean>
+
+	<bean id="failedAnnoClientInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
+		<property name="from" value="from @RpcProxy  setting"></property>
+		<property name="failed" value="true"></property>
+	</bean>
+
+	<bean id="annoHaClientInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ClientRPCInvokerInterceptor">
+		<property name="from" value="from @HaRpcProxy  setting"></property>
+	</bean>
+
+	<bean id="serverInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ServerRPCInvokerInterceptor">
+		<property name="from"
+			value="from CommonAnnotationBeanPostProcessor setting"></property>
+	</bean>
+
+	<bean id="annoServerInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ServerRPCInvokerInterceptor">
+		<property name="from" value="from @RpcExporter setting"></property>
+	</bean>
+
+	<bean id="failedAnnoServerInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.spring.ServerRPCInvokerInterceptor">
+		<property name="from" value="from @RpcExporter setting"></property>
+		<property name="failed" value="true"></property>
+	</bean>
+
+
+	<bean
+		class="com.baidu.jprotobuf.pbrpc.spring.annotation.CommonAnnotationBeanPostProcessor">
+		<property name="callback">
+			<bean
+				class="com.baidu.jprotobuf.pbrpc.spring.annotation.ProtobufRpcAnnotationResolver">
+				<property name="failOverInterceptor" ref="timeoutIngoredSocketFailOverInterceptor"></property>
+				<property name="clientInterceptor" ref="clientInterceptor"></property>
+				<property name="serverInterceptor" ref="serverInterceptor"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="timeoutIngoredSocketFailOverInterceptor"
+		class="com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.TimeoutIngoredSocketFailOverInterceptor">
+	</bean>
+
+	<bean id="namingService" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
+		<constructor-arg>
+			<value>localhost:1031;localhost:1032;localhost:1033</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="rpcServerOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions">
+		<property name="acceptorThreads" value="1"></property>
+		<property name="workThreads" value="20"></property>
+		<property name="httpServerPort" value="8866"></property>
+	</bean>
+
+	<bean id="rpcClientOptions" class="com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions">
+		<property name="threadPoolSize" value="20"></property>
+		<property name="maxIdleSize" value="10"></property>
+		<property name="minIdleSize" value="1"></property>
+	</bean>
+
+	<bean id="namingServiceOfPartialFailed" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
+		<constructor-arg>
+			<value>localhost:1035;localhost:1029;localhost:1031</value>
+		</constructor-arg>
+	</bean>
+
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.RpcRequestMeta"></bean>
+	<bean class="com.baidu.jprotobuf.pbrpc.data.ChunkInfo"></bean>
+
+	<!-- <bean class="com.baidu.jprotobuf.pbrpc.spring.meta.RpcMetaExporter"> 
+		<property name="servicePort" value="1031"></property> <property name="path" 
+		value="D://my.proto"></property> </bean> -->
+
+	<bean
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*AOP</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>myInterceptor</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="myInterceptor" class="com.baidu.jprotobuf.pbrpc.spring.MyInterceptor"></bean>
+
+
+</beans>
