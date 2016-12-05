@@ -84,8 +84,8 @@ public class HttpServer extends ServerBootstrap {
 			@Override
 			public void initChannel(SocketChannel ch) throws Exception {
 					ch.pipeline()
-							.addLast("IDLE_HANDLER", new IdleStateHandler(rpcServer.getRpcServerOptions().getKeepAliveTime(),
-									rpcServer.getRpcServerOptions().getKeepAliveTime(),
+							.addLast("IDLE_HANDLER", new IdleStateHandler(rpcServer.getRpcServerOptions().getReaderIdleTime(),
+									rpcServer.getRpcServerOptions().getWriterIdleTime(),
 									rpcServer.getRpcServerOptions().getKeepAliveTime()));
 
 					// server端发送的是httpResponse，所以要使用HttpResponseEncoder进行编码

@@ -115,11 +115,11 @@ public class RpcServerOptions {
      */
     private int writerIdleTime = 60;
 
+    /** The keep alive time.  all idle time in seconds */
+    private int keepAliveTime; // keepAlive时间（second）
+    
     /** connect timeout, in milliseconds. */
     private int connectTimeout;
-
-    /** The keep alive time. */
-    private int keepAliveTime; // keepAlive时间（second）
 
     /**
      * time out set for chunk package wait in ms.
