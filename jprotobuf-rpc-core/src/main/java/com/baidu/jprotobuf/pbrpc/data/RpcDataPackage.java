@@ -575,7 +575,8 @@ public class RpcDataPackage implements Readable, Writerable {
                 baos.write(attachment);
             }
 
-            return baos.toByteArray();
+            byte[] ret = baos.toByteArray();
+            return ret;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
