@@ -70,6 +70,7 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter {
         super();
         responseMapping = new HashMap<String, Object>();
         serverStatus = new ServerStatus(rpcServer);
+        ServerStatus.Enabled();
         responseMapping.put(STATUS_URI, serverStatus);
     }
 

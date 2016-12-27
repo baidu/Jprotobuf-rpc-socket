@@ -69,6 +69,8 @@ public class ServerStatus {
     
     /** The close. */
     private transient boolean close = false;
+    
+    private static transient boolean enabled = false;
 
     /** The Constant REQUEST_COUNTS. */
     public static final ConcurrentHashMap<String, AtomicLong> REQUEST_COUNTS =
@@ -80,6 +82,10 @@ public class ServerStatus {
     /** The es. */
     private static ExecutorService es;
 
+    public static void Enabled() {
+        enabled = true;
+    }
+    
     /**
      * Incr.
      *
@@ -87,6 +93,9 @@ public class ServerStatus {
      * @param timetook the timetook
      */
     public static void incr(String serviceSignature, long timetook) {
+        if (!enabled) {
+            return;
+        }
         
         ASYNC_REQUEST.add(new RequestInfo(timetook, serviceSignature));
     }
