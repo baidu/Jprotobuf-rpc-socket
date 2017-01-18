@@ -29,23 +29,32 @@ public class ClientMain {
     public static void main(String[] args) {
         
         RpcClientOptions options = new RpcClientOptions();
-        options.setThreadPoolSize(5);
+        options.setThreadPoolSize(10);
         options.setMaxIdleSize(10);
+        options.setMinIdleSize(10);
         options.setMaxWait(1000);
+        options.setShortConnection(false
+                
+                );
         
         RpcClient rpcClient = new RpcClient(options);
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
-        pbrpcProxy.setPort(1031);
-        pbrpcProxy.setHost("localhost");
-        EchoService echoService = pbrpcProxy.proxy();
+        pbrpcProxy.setPort(Integer.valueOf(args[0]));
+        pbrpcProxy.setHost("localhost"); //cp01-rd-crm-cdc-db14.cp01.baidu.com
+        EchoService echoService = pbrpcProxy.proxy
+                ();
 
         EchoInfo echoInfo = new EchoInfo();
-        
-        for (int i = 0; i < 10L; i++) {
-        	echoInfo.setMessage("hello" + i);
-            System.out.println(echoService.echo(echoInfo).getMessage());
+        EchoInfo echo = echoService.echo(echoInfo);
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+        	echoInfo.setMessage("hi" + i);
+        	
+        	echo = echoService.echo(echoInfo);
+        	
+            System.out.println(echo.getMessage());
         }
-        
+        System.out.println(System.currentTimeMillis() - time);
         pbrpcProxy.close();
         rpcClient.shutdown();
     }
