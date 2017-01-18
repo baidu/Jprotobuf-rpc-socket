@@ -16,12 +16,11 @@
 
 package com.baidu.jprotobuf.pbrpc.proto;
 
-import junit.framework.Assert;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
+
+import junit.framework.Assert;
 
 /**
  * 

@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>3.5.1</version>
+	<version>3.5.3</version>
 	<packaging>pom</packaging>
 
 	<name>jprotobuf-rpc-socket</name>
@@ -26,8 +26,8 @@
 		<junit.version>4.10</junit.version>
 		
 		<!-- Common libs -->
-		<jprotobuf.version>1.9.4</jprotobuf.version>
-		<jprotobuf-rpc-common.version>1.5</jprotobuf-rpc-common.version>
+		<jprotobuf.version>1.0.0</jprotobuf.version>
+		<jprotobuf-rpc-common.version>1.8</jprotobuf-rpc-common.version> 
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.27.Final</netty-all.version>
 		<snappy-java.version>1.1.1.6</snappy-java.version>
@@ -84,7 +84,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
-			<artifactId>jprotobuf</artifactId>
+			<artifactId>jprotobuf-jre</artifactId> 
 			<version>${jprotobuf.version}</version>
 			<scope>compile</scope>
 		</dependency>

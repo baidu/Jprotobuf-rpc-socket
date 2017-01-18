@@ -82,6 +82,13 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
         }
 
         RpcData retData = new RpcData();
+        
+        // process authentication data handler
+        if (getAuthenticationHandler() != null) {
+            getAuthenticationHandler().handle(data.getAuthenticationData(), getServiceName(),
+                    getMethodName(), param);
+        }
+        
         // process attachment
         if (getAttachmentHandler() != null) {
             byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),

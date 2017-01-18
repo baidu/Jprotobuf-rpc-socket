@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.AuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
@@ -38,22 +39,22 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * @since 1.0
  */
 public class RpcDataPackage implements Readable, Writerable {
-    
+
     /** The log. */
     private static Logger LOG = Logger.getLogger(RpcDataPackage.class.getName());
 
     /** The head. */
     private RpcHeadMeta head;
-    
+
     /** The rpc meta. */
     private RpcMeta rpcMeta;
-    
+
     /** The data. */
     private byte[] data;
-    
+
     /** The attachment. */
     private byte[] attachment;
-    
+
     /** The time stamp. */
     private long timeStamp;
 
@@ -125,7 +126,7 @@ public class RpcDataPackage implements Readable, Writerable {
      * To split current {@link RpcDataPackage} by chunkSize. if chunkSize great than data length will not do split.<br>
      * {@link List} return will never be {@code null} or empty.
      * 
-     * @param chunkSize target size to split 
+     * @param chunkSize target size to split
      * @return {@link List} of {@link RpcDataPackage} after split
      */
     public List<RpcDataPackage> chunk(long chunkSize) {
@@ -554,7 +555,7 @@ public class RpcDataPackage implements Readable, Writerable {
         totolSize += rpcMetaSize;
         head.setMetaSize(rpcMetaSize);
         head.setMessageSize(totolSize); // set message body size
-        
+
         // total size should add head size
         totolSize = totolSize + RpcHeadMeta.SIZE;
         try {
@@ -652,7 +653,7 @@ public class RpcDataPackage implements Readable, Writerable {
                 dataPackage.data(data);
             }
         }
-        
+
         // set logid
         // if logid exsit under thread local holder
         Long elogId = LogIdThreadLocalHolder.getLogId();
@@ -663,7 +664,8 @@ public class RpcDataPackage implements Readable, Writerable {
         } else {
             LogIDGenerator logIDGenerator = methodInfo.getLogIDGenerator();
             if (logIDGenerator != null) {
-                long logId = logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
+                long logId =
+                        logIDGenerator.generate(methodInfo.getServiceName(), methodInfo.getMethod().getName(), args);
                 dataPackage.logId(logId);
             }
         }
@@ -671,12 +673,23 @@ public class RpcDataPackage implements Readable, Writerable {
         // set attachment
         ClientAttachmentHandler attachmentHandler = methodInfo.getClientAttachmentHandler();
         if (attachmentHandler != null) {
-            byte[] attachment = attachmentHandler.handleRequest(methodInfo.getServiceName(), methodInfo.getMethod()
-                    .getName(), args);
+            byte[] attachment = attachmentHandler.handleRequest(methodInfo.getServiceName(),
+                    methodInfo.getMethod().getName(), args);
             if (attachment != null) {
                 dataPackage.attachment(attachment);
             }
         }
+
+        // set authentication data
+        AuthenticationDataHandler authenticationDataHandler = methodInfo.getAuthenticationDataHandler();
+        if (authenticationDataHandler != null) {
+            byte[] authenticationData = authenticationDataHandler.create(methodInfo.getServiceName(),
+                    methodInfo.getMethod().getName(), args);
+            if (authenticationData != null) {
+                dataPackage.authenticationData(authenticationData);
+            }
+        }
+
         return dataPackage;
     }
 

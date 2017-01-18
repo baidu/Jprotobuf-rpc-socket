@@ -81,7 +81,7 @@ public class RpcClientOptions {
     // in MILLISECONDS unit
     private int onceTalkTimeout = 1000;
     
-    /** The max size. */
+    /** The max byte size to send and receive from buffer. */
     private int maxSize = Integer.MAX_VALUE;
     
     /** The Constant POLL_EVENT_GROUP. */
@@ -539,7 +539,7 @@ public class RpcClientOptions {
 	}
 
 	/**
-	 * Sets the max size.
+	 * Sets the max buffer size receive.
 	 *
 	 * @param maxSize the new max size
 	 */

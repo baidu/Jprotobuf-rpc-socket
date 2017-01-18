@@ -20,10 +20,12 @@ import java.lang.reflect.Method;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.DummyServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.LogIDHolder;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.ServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
@@ -72,6 +74,8 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
     
 	/** The interceptor. */
 	private InvokerInterceptor interceptor;
+
+    private ServerAuthenticationDataHandler authenticationHandler;
 
 	/**
 	 * Sets the interceptor.
@@ -169,8 +173,19 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             try {
                 attachmentHandler = attachmentHandlerClass.newInstance();
             } catch (Exception e) {
-                throw new IllegalAccessError("Can not initialize 'logIDGenerator' of class '"
+                throw new IllegalAccessError("Can not initialize 'ServerAttachmentHandler' of class '"
                         + attachmentHandlerClass.getName() + "'");
+            }
+        }
+        
+        // process authentication data handler
+        Class<? extends ServerAuthenticationDataHandler> authClass = protobufPRCService.authenticationDataHandler();
+        if (authClass != DummyServerAuthenticationDataHandler.class) {
+            try {
+                authenticationHandler = authClass.newInstance();
+            } catch (Exception e) {
+                throw new IllegalAccessError("Can not initialize 'ServerAuthenticationDataHandler' of class '"
+                        + authClass.getName() + "'");
             }
         }
         
@@ -243,6 +258,15 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
      */
     public ServerAttachmentHandler getAttachmentHandler() {
         return attachmentHandler;
+    }
+    
+
+    /**
+     * get the authenticationHandler
+     * @return the authenticationHandler
+     */
+    public ServerAuthenticationDataHandler getAuthenticationHandler() {
+        return authenticationHandler;
     }
 
     /* (non-Javadoc)

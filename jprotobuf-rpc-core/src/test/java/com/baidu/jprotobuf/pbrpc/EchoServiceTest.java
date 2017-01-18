@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
+import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 import junit.framework.Assert;
 
@@ -37,113 +38,123 @@ import junit.framework.Assert;
 
 public class EchoServiceTest extends BaseEchoServiceTest {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
-	 */
-	@Override
-	protected RpcServerOptions getRpcServerOptions() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.jprotobuf.pbrpc.BaseEchoServiceTest#getRpcServerOptions()
+     */
+    @Override
+    protected RpcServerOptions getRpcServerOptions() {
 
-		RpcServerOptions rpcServerOptions = new RpcServerOptions();
-		rpcServerOptions.setHttpServerPort(8866);
-		rpcServerOptions.setIoEventGroupType(RpcServerOptions.POLL_EVENT_GROUP);
+        RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setHttpServerPort(8866);
+        rpcServerOptions.setIoEventGroupType(RpcServerOptions.POLL_EVENT_GROUP);
 
-		return rpcServerOptions;
-	}
+        return rpcServerOptions;
+    }
 
-	/**
-	 * test client auto recover connection from server.
-	 */
-	@Test
-	public void testAutoRecoverConnection() {
+    /**
+     * test client auto recover connection from server.
+     */
+    @Test
+    public void testAutoRecoverConnection() {
 
-		EchoInfo echoInfo = getEchoInfo();
+        EchoInfo echoInfo = getEchoInfo();
 
-		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
 
-		EchoInfo response = echoService.echo(echoInfo);
-		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+        EchoInfo response = echoService.echo(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
 
-		// here stop server
-		stopServer();
+        // here stop server
+        stopServer();
 
-		try {
-			echoService.echo(echoInfo);
-			Assert.fail("should be connect server failed.");
-		} catch (Exception e) {
-			Assert.assertNotNull(e);
-		}
+        SleepUtils.dummySleep(3000);
 
-		startServer();
+        try {
+            echoService.echo(echoInfo);
+            Assert.fail("should be connect server failed.");
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
 
-		response = echoService.echo(echoInfo);
-		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-	}
+        startServer();
 
-	/**
-	 * @return
-	 */
-	private EchoInfo getEchoInfo() {
-		String message = "xiemalin";
-		// test success
-		EchoInfo echoInfo = new EchoInfo();
-		echoInfo.setMessage(message);
-		return echoInfo;
-	}
+        response = echoService.echo(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+    }
 
-	@Test
-	public void testAttachment() {
+    /**
+     * @return
+     */
+    private EchoInfo getEchoInfo() {
+        String message = "xiemalin";
+        // test success
+        EchoInfo echoInfo = new EchoInfo();
+        echoInfo.setMessage(message);
+        return echoInfo;
+    }
 
-		EchoInfo echoInfo = getEchoInfo();
+    @Test
+    public void testAttachment() {
 
-		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+        EchoInfo echoInfo = getEchoInfo();
 
-		EchoInfo response = echoService.echoWithAttachement(echoInfo);
-		Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-	}
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
 
-	@Test
-	public void testGzip() {
-		EchoInfo echoInfo = getEchoInfo();
+        EchoInfo response = echoService.echoWithAttachement(echoInfo);
+        Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+    }
 
-		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+    @Test
+    public void testGzip() {
+        EchoInfo echoInfo = getEchoInfo();
 
-		EchoInfo response = echoService.echoGzip(echoInfo);
-		Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
-	}
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
 
-	@Test
-	public void testSnappy() {
-		EchoInfo echoInfo = getEchoInfo();
+        EchoInfo response = echoService.echoGzip(echoInfo);
+        Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
+    }
 
-		EchoServiceImpl ecohImpl = new EchoServiceImpl();
+    @Test
+    public void testSnappy() {
+        EchoInfo echoInfo = getEchoInfo();
 
-		EchoInfo response = echoService.echoSnappy(echoInfo);
-		Assert.assertEquals(ecohImpl.dealWithSnappyEnable(echoInfo).getMessage(), response.getMessage());
-	}
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
 
-	@Test
-	public void testAyncCall() {
-		EchoInfo echoInfo = getEchoInfo();
+        EchoInfo response = echoService.echoSnappy(echoInfo);
+        Assert.assertEquals(ecohImpl.dealWithSnappyEnable(echoInfo).getMessage(), response.getMessage());
+    }
 
-		EchoServiceImpl ecohImpl = new EchoServiceImpl();
-		
-		Future<EchoInfo> echoAsync = echoService.echoAsync(echoInfo);
-		
-		try {
-			EchoInfo response = echoAsync.get();
-			Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
-		} catch (InterruptedException e) {
-			Assert.fail(e.getMessage());
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			Assert.fail(e.getMessage());
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
+    @Test
+    public void testAuthenticationData() {
+        EchoInfo echoInfo = getEchoInfo();
+
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+        EchoInfo response = echoService.echoAuthenticateData(echoInfo);
+        Assert.assertEquals(ecohImpl.dealWithAuthenticationDataEnable(echoInfo).getMessage(), response.getMessage());
+    }
+
+    @Test
+    public void testAyncCall() {
+        EchoInfo echoInfo = getEchoInfo();
+
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+        Future<EchoInfo> echoAsync = echoService.echoAsync(echoInfo);
+
+        try {
+            EchoInfo response = echoAsync.get();
+            Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            Assert.fail(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
 
 }

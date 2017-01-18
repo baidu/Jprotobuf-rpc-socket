@@ -82,6 +82,11 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
         } else {
             param = new Object[0];
         }
+        // process authentication data handler
+        if (getAuthenticationHandler() != null) {
+            getAuthenticationHandler().handle(data.getAuthenticationData(), getServiceName(),
+                    getMethodName(), param);
+        }
 
         RpcData retData = new RpcData();
         // process attachment

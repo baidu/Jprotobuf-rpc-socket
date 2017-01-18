@@ -30,8 +30,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.jprotobuf.pbrpc.AuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.CompressType;
+import com.baidu.jprotobuf.pbrpc.DummyAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.DummyLogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
@@ -155,6 +157,13 @@ public class DynamicProtobufRpcProxy {
 
         return invoke(Constants.DYNAMIC_SERVICE_NAME, serviceSignature, proxy, method, args, config, cls);
     }
+    
+    public Object invoke(final String serviceName, final String methodName, Object proxy, final Method method,
+            final Object[] args, final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls)
+                    throws Throwable {
+        return invoke(serviceName, methodName, proxy, method, args, config, cls, DummyAuthenticationDataHandler.class,
+                DummyLogIDGenerator.class);
+    }
 
     /**
      * Invoke.
@@ -169,7 +178,9 @@ public class DynamicProtobufRpcProxy {
      * @throws Throwable the throwable
      */
     public Object invoke(final String serviceName, final String methodName, Object proxy, final Method method,
-            final Object[] args, final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls)
+            final Object[] args, final Map<String, String> config, final Class<? extends ClientAttachmentHandler> cls,
+            final Class<? extends AuthenticationDataHandler> authenticationDataHandlerCls,
+            final Class<? extends LogIDGenerator> logIdGenerateorCls)
                     throws Throwable {
         String serviceSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
         Object result = processEqualsHashCodeToStringMethod(serviceSignature, method, args);
@@ -204,7 +215,7 @@ public class DynamicProtobufRpcProxy {
 
                     @Override
                     public Class<? extends LogIDGenerator> logIDGenerator() {
-                        return DummyLogIDGenerator.class;
+                        return logIdGenerateorCls;
                     }
 
                     @Override
@@ -215,6 +226,11 @@ public class DynamicProtobufRpcProxy {
                     @Override
                     public Class<? extends ClientAttachmentHandler> attachmentHandler() {
                         return cls;
+                    }
+
+                    @Override
+                    public Class<? extends AuthenticationDataHandler> authenticationDataHandler() {
+                        return authenticationDataHandlerCls;
                     }
                 };
 

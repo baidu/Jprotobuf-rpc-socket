@@ -24,9 +24,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.DummyServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.ServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMetaServiceProvider;
@@ -157,35 +159,13 @@ public class RpcServiceRegistry {
      */
     public void doDynamicRegisterService(final String methodSignature, Method method, Object service,
             final Class<? extends ServerAttachmentHandler> cls) {
-        ProtobufRPCService protobufPRCService = new ProtobufRPCService() {
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return ProtobufRPCService.class;
-            }
-
-            @Override
-            public String serviceName() {
-                return Constants.DYNAMIC_SERVICE_NAME;
-            }
-
-            @Override
-            public String methodName() {
-                return methodSignature;
-            }
-
-            @Override
-            public String description() {
-                return "";
-            }
-
-            @Override
-            public Class<? extends ServerAttachmentHandler> attachmentHandler() {
-                return cls;
-            }
-        };
-
-        doRegiterService(method, service, protobufPRCService);
+        doDynamicRegisterService(Constants.DYNAMIC_SERVICE_NAME, methodSignature, method, service, cls);
+    }
+    
+    public void doDynamicRegisterService(final String serviceName, final String methodName, Method method,
+            Object service, final Class<? extends ServerAttachmentHandler> cls) {
+        doDynamicRegisterService(serviceName, methodName, method, 
+                service, cls, DummyServerAuthenticationDataHandler.class);
     }
 
     /**
@@ -198,7 +178,8 @@ public class RpcServiceRegistry {
      * @param cls the cls
      */
     public void doDynamicRegisterService(final String serviceName, final String methodName, Method method,
-            Object service, final Class<? extends ServerAttachmentHandler> cls) {
+            Object service, final Class<? extends ServerAttachmentHandler> cls, 
+            final Class<? extends ServerAuthenticationDataHandler> authentiationDataCls) {
         ProtobufRPCService protobufPRCService = new ProtobufRPCService() {
 
             @Override
@@ -224,6 +205,11 @@ public class RpcServiceRegistry {
             @Override
             public Class<? extends ServerAttachmentHandler> attachmentHandler() {
                 return cls;
+            }
+
+            @Override
+            public Class<? extends ServerAuthenticationDataHandler> authenticationDataHandler() {
+                return authentiationDataCls;
             }
         };
 

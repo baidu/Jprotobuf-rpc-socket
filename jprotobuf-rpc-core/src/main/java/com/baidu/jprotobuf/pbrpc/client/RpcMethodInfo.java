@@ -19,7 +19,10 @@ package com.baidu.jprotobuf.pbrpc.client;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import com.baidu.jprotobuf.pbrpc.AuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
+import com.baidu.jprotobuf.pbrpc.DummyAuthenticationDataHandler;
+import com.baidu.jprotobuf.pbrpc.ServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.DummyClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.DummyLogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
@@ -63,6 +66,8 @@ public abstract class RpcMethodInfo {
     
     /** The client attachment handler. */
     private ClientAttachmentHandler clientAttachmentHandler;
+    /** The authentication data handler. */
+    private AuthenticationDataHandler authenticationDataHandler;
 
     /**
      * Input encode.
@@ -153,10 +158,21 @@ public abstract class RpcMethodInfo {
             try {
                 clientAttachmentHandler = attachmentHandlerClass.newInstance();
             } catch (Exception e) {
-                throw new IllegalAccessError("Can not initialize 'logIDGenerator' of class '"
+                throw new IllegalAccessError("Can not initialize 'ClientAttachmentHandler' of class '"
                         + attachmentHandlerClass.getName() + "'");
             }
         }
+        
+        Class<? extends AuthenticationDataHandler> authenticationDataHandlerCls = protobufPRC.authenticationDataHandler();
+        if (authenticationDataHandlerCls != DummyAuthenticationDataHandler.class) {
+            try {
+                authenticationDataHandler = authenticationDataHandlerCls.newInstance();
+            } catch (Exception e) {
+                throw new IllegalAccessError("Can not initialize 'AuthenticationDataHandler' of class '"
+                        + authenticationDataHandlerCls.getName() + "'");
+            }
+        }
+        
 
     }
 
@@ -268,4 +284,13 @@ public abstract class RpcMethodInfo {
         return protobufPRC;
     }
 
+    /**
+     * get the authenticationDataHandler
+     * @return the authenticationDataHandler
+     */
+    public AuthenticationDataHandler getAuthenticationDataHandler() {
+        return authenticationDataHandler;
+    }
+
+    
 }
