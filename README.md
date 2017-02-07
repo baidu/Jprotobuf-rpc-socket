@@ -16,6 +16,7 @@ Features:<br>
 
 关联项目：
 [https://github.com/jhunters/jprotobuf](https://github.com/jhunters/jprotobuf "https://github.com/jhunters/jprotobuf")
+golang 协议实现: https://github.com/baidu-golang/baidurpc(https://github.com/baidu-golang/baidurpc "https://github.com/baidu-golang/baidurpc")
 
 ## 协议规范 ##
 [https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket/wiki/RPC%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83 "协议规范")
