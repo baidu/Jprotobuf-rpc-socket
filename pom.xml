@@ -19,14 +19,14 @@
 	<description>RPC implements </description>
 	<url>https://github.com/jhunters/jprotobuf/</url> 
 
-	<properties>
+	<properties> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<java.version>1.6</java.version>
 		<junit.version>4.10</junit.version>
 		
 		<!-- Common libs -->
-		<jprotobuf.version>1.0.0</jprotobuf.version>
+		<jprotobuf.version>1.10.2</jprotobuf.version>
 		<jprotobuf-rpc-common.version>1.8</jprotobuf-rpc-common.version> 
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.27.Final</netty-all.version>
@@ -84,11 +84,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
-			<artifactId>jprotobuf-jre</artifactId> 
+			<artifactId>jprotobuf</artifactId> 
 			<version>${jprotobuf.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<dependency> 
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf-rpc-common</artifactId>
 			<version>${jprotobuf-rpc-common.version}</version>
