@@ -149,6 +149,15 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 		@Override
 		public void run() {
 			long time = System.currentTimeMillis();
+			
+			Integer errorCode = dataPackage.getRpcMeta().getResponse().getErrorCode();
+			if (errorCode != null && errorCode > 0 ) {
+			    dataPackage.data(null);
+			    dataPackage.attachment(null);
+			    ctx.writeAndFlush(dataPackage);
+			    return;
+			}
+			
 
 			RpcMeta rpcMeta = dataPackage.getRpcMeta();
 			String serviceName = rpcMeta.getRequest().getSerivceName();

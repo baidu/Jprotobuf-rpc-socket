@@ -16,18 +16,17 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.handler.codec.MessageToMessageDecoder;
-
 import java.util.List;
 
-import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.compress.Compress;
 import com.baidu.jprotobuf.pbrpc.compress.GZipCompress;
 import com.baidu.jprotobuf.pbrpc.compress.SnappyCompress;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
+
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageDecoder;
 
 /**
  * Do data compress handler.
@@ -36,43 +35,41 @@ import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
  * @since 1.4
  */
 @Sharable
-public class RpcDataPackageUnCompressHandler extends
-		MessageToMessageDecoder<RpcDataPackage> {
+public class RpcDataPackageUnCompressHandler extends MessageToMessageDecoder<RpcDataPackage> {
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see io.netty.handler.codec.MessageToMessageDecoder#decode(io.netty.channel.ChannelHandlerContext,
+     * java.lang.Object, java.util.List)
+     */
+    @Override
+    protected void decode(ChannelHandlerContext ctx, RpcDataPackage msg, List<Object> out) throws Exception {
 
-	/* (non-Javadoc)
-	 * @see io.netty.handler.codec.MessageToMessageDecoder#decode(io.netty.channel.ChannelHandlerContext, java.lang.Object, java.util.List)
-	 */
-	@Override
-	protected void decode(ChannelHandlerContext ctx, RpcDataPackage msg,
-			List<Object> out) throws Exception {
+        // if select compress type should do compress here
+        RpcDataPackage dataPackage = (RpcDataPackage) msg;
 
-		// if select compress type should do compress here
-		RpcDataPackage dataPackage = (RpcDataPackage) msg;
+        try {
+            // check if do compress
+            Integer compressType = dataPackage.getRpcMeta().getCompressType();
+            Compress compress = null;
+            if (compressType == RpcMeta.COMPERESS_GZIP) {
+                compress = new GZipCompress();
+            } else if (compressType == RpcMeta.COMPRESS_SNAPPY) {
+                compress = new SnappyCompress();
+            }
 
-		try {
-			// check if do compress
-			Integer compressType = dataPackage.getRpcMeta().getCompressType();
-			Compress compress = null;
-			if (compressType == RpcMeta.COMPERESS_GZIP) {
-				compress = new GZipCompress();
-			} else if (compressType == RpcMeta.COMPRESS_SNAPPY) {
-			    compress = new SnappyCompress();
-			}
+            if (compress != null) {
+                byte[] data = dataPackage.getData();
+                data = compress.unCompress(data);
+                dataPackage.data(data);
+            }
+        } catch (Exception e) {
+            dataPackage.errorCode(ErrorCodes.ST_ERROR_COMPRESS);
+            dataPackage.errorText("Data uncompress failed due to " + e.getMessage());
+        }
+        out.add(dataPackage);
 
-			if (compress != null) {
-				byte[] data = dataPackage.getData();
-				data = compress.unCompress(data);
-				dataPackage.data(data);
-			}
-			out.add(dataPackage);
-		} catch (Exception e) {
-			ErrorDataException exception = new ErrorDataException(
-					e.getMessage(), e);
-			exception.setRpcDataPackage(dataPackage);
-			exception.setErrorCode(ErrorCodes.ST_ERROR_COMPRESS);
-			throw exception;
-		}
-
-	}
+    }
 
 }
