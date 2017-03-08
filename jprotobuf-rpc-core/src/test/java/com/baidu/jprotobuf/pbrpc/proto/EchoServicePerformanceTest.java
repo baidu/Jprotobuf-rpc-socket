@@ -43,7 +43,6 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
  * @author xiemalin
  * @since 1.0
  */
-@Ignore
 public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     RpcServer rpcServer;

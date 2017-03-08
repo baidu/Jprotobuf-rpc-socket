@@ -16,7 +16,6 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-
 /**
  * RPC client properties.
  * 
@@ -564,6 +563,7 @@ public class RpcClientOptions {
     public void setIoEventGroupType(int ioEventGroupType) {
         this.ioEventGroupType = ioEventGroupType;
     }
+    
     
     
 }
