@@ -33,21 +33,19 @@ public class ClientMain {
         options.setMaxIdleSize(10);
         options.setMinIdleSize(10);
         options.setMaxWait(1000);
-        options.setShortConnection(false
-                
-                );
+        options.setShortConnection(false);
         
         RpcClient rpcClient = new RpcClient(options);
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(Integer.valueOf(args[0]));
-        pbrpcProxy.setHost("localhost"); //cp01-rd-crm-cdc-db14.cp01.baidu.com
+        pbrpcProxy.setHost("localhost"); 
         EchoService echoService = pbrpcProxy.proxy
                 ();
 
         EchoInfo echoInfo = new EchoInfo();
         EchoInfo echo = echoService.echo(echoInfo);
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1; i++) {
         	echoInfo.setMessage("hi" + i);
         	
         	echo = echoService.echo(echoInfo);
