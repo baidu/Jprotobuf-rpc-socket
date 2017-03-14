@@ -76,8 +76,10 @@ public class AnnotationRpcHandler extends AbstractAnnotationRpcHandler {
         Object input = null;
         Object[] param;
         Object ret = null;
-        if (data.getData() != null && inputCodec != null) {
-            input = inputCodec.decode(data.getData());
+        if (inputCodec != null) {
+            if (data.getData() != null) {
+                input = inputCodec.decode(data.getData());
+            }
             param = new Object[] { input };
         } else {
             param = new Object[0];
