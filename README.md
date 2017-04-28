@@ -1,3 +1,6 @@
+项目已经迁移至: <br>
+[https://github.com/baidu/Jprotobuf-rpc-socket](https://github.com/baidu/Jprotobuf-rpc-socket "https://github.com/baidu/Jprotobuf-rpc-socket")
+
 Jprotobuf-rpc-socket
 ====================
 
