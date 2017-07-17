@@ -147,7 +147,7 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
      * @see com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy#elect()
      */
     public synchronized String elect() {
-        if (targets == null) {
+        if (targets == null || targets.isEmpty()) {
             throw new RuntimeException("no target is available");
         }
 
@@ -168,7 +168,7 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
     }
 
     /**
-     * Inits the targets.
+     * Initialize the targets and set weighted value for each target.
      *
      * @param lbFactors the lb factors
      * @return the list
@@ -246,7 +246,7 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
     }
 
     /**
-     * Can mod all.
+     * Can do modulo operation for all factor by base value.
      *
      * @param base the base
      * @param factors the factors
