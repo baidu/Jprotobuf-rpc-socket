@@ -308,4 +308,23 @@ public class RpcServiceRegistry {
         }
 
     }
+    
+    /**
+     * remove service by service name and method name
+     * @param methodName method name 
+     */
+    public void unRegisterDynamicService(String methodName) {
+        String methodSignature = ServiceSignatureUtils.makeSignature(Constants.DYNAMIC_SERVICE_NAME, methodName);
+        serviceMap.remove(methodSignature);
+    }
+
+    /**
+     * remove service by service name and method name
+     * @param serviceName service name
+     * @param methodName method name 
+     */
+    public void unRegisterDynamicService(String serviceName, String methodName) {
+        String methodSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
+        serviceMap.remove(methodSignature);
+    }
 }

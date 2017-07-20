@@ -242,6 +242,16 @@ public class RpcServer extends ServerBootstrap {
     }
     
     /**
+     * remove service by method signature. if method signature not exist nothing to do.
+     * 
+     * @param methodSignature target method signature to remove.
+     */
+    public void unRegisterDynamicService(String methodSignature) {
+        
+        rpcServiceRegistry.unRegisterDynamicService(methodSignature);
+    }
+    
+    /**
      * Register dynamic service.
      *
      * @param methodSignature the method signature
@@ -263,17 +273,39 @@ public class RpcServer extends ServerBootstrap {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
         start(inetSocketAddress);
     }
+    
+    /**
+     * Start.
+     *
+     * @param port the port
+     */
+    public void startSync(int port) {
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
+        startSync(inetSocketAddress);
+    }
 
     /**
      * Start.
      *
      * @param sa the sa
      */
+    public void startSync(final InetSocketAddress sa) {
+        LOG.log(Level.INFO, "RPC starting at: " + sa);
+        
+        try {
+            this.bind(sa).sync();
+        } catch (Throwable e) {
+            shutdown();
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        
+    }
+    
     public void start(final InetSocketAddress sa) {
         LOG.log(Level.INFO, "RPC starting at: " + sa);
         
         this.bind(sa).addListener(new ChannelFutureListener() {
-
+            
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
                     channel = future.channel();
@@ -285,8 +317,10 @@ public class RpcServer extends ServerBootstrap {
                 }
             }
         });
-        
     }
+    
+    
+    
 
     /**
      * Inits the after bind port.
