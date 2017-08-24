@@ -48,4 +48,5 @@ public class SnappyCompress implements Compress {
         return Snappy.uncompress(array);
     }
 
+    
 }

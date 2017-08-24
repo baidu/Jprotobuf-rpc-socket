@@ -22,7 +22,7 @@ package com.baidu.jprotobuf.pbrpc.compress;
  * @since 2.13
  */
 public class GZipCompressTest extends BaseCompressTest {
-
+    
     /* (non-Javadoc)
      * @see com.baidu.jprotobuf.pbrpc.compress.BaseCompressTest#createCompress()
      */
