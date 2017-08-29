@@ -39,18 +39,16 @@ public class ClientMain {
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(Integer.valueOf(args[0]));
         pbrpcProxy.setHost("localhost"); 
-        EchoService echoService = pbrpcProxy.proxy
-                ();
+        EchoService echoService = pbrpcProxy.proxy();
 
         EchoInfo echoInfo = new EchoInfo();
-        EchoInfo echo = echoService.echo(echoInfo);
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 1000; i++) {
         	echoInfo.setMessage("hi" + i);
         	
-        	echo = echoService.echo(echoInfo);
+        	echoInfo = echoService.echo(echoInfo);
         	
-            System.out.println(echo.getMessage());
+            System.out.println(echoInfo.getMessage());
         }
         System.out.println(System.currentTimeMillis() - time);
         pbrpcProxy.close();

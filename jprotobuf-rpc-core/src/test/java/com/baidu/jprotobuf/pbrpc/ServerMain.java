@@ -28,7 +28,7 @@ public class ServerMain {
     public static void main(String[] args) {
         
         if (args.length == 0) {
-            args = new String[]{"8122"};
+            args = new String[]{"80"};
         }
         
         RpcServerOptions rpcServerOptions = new RpcServerOptions();
@@ -38,7 +38,9 @@ public class ServerMain {
         RpcServer rpcServer = new RpcServer(rpcServerOptions);
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(Integer.valueOf(args[0]));
+        rpcServer.startSync(Integer.valueOf(args[0]));
+        
+        System.out.println("ok");
         
     }
 }

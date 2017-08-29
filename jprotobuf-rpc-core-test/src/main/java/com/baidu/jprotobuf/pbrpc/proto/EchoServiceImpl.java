@@ -27,7 +27,8 @@ import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
  * @since 1.0
  */
 public class EchoServiceImpl {
-
+    
+    
     @ProtobufRPCService(serviceName = "echoService", methodName = "echo")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = EchoInfo.newBuilder().setMessage("hello:" + info.getMessage()).build();
