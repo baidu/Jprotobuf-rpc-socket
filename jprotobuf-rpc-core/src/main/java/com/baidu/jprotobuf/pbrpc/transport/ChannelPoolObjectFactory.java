@@ -75,9 +75,7 @@ public class ChannelPoolObjectFactory extends BasePooledObjectFactory<Connection
      * @see org.apache.commons.pool2.BasePooledObjectFactory#wrap(java.lang.Object)
      */
     @Override
-    public PooledObject<Connection> wrap(Connection obj) {
-        Connection connection = fetchConnection();
-
+    public PooledObject<Connection> wrap(Connection connection) {
         InetSocketAddress address;
         if (host == null) {
             address = new InetSocketAddress(port);
