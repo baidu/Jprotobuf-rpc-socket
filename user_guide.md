@@ -7,7 +7,7 @@ EchoService 提供一个echo方法 ，参数对象EchoInfo只有一个message属
 ```java
 public class EchoInfo {
     
-    @Protobuf
+    @Protobuf(order = 1)
     public String message;
 }
 
