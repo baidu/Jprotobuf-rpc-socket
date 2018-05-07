@@ -1,22 +1,11 @@
-/*
- * Copyright 2002-2014 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.pbrpc.register.bns;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +44,20 @@ public class BNSNamingService implements NamingService, InitializingBean {
     private String bnsName;
 
     private String portName = "rpc";
+    
+    /** To set instance status value to filter. multiple use ',' to split */
+    private String filterInstanceStatus;
+    
+    private Set<Integer> instanceStatusFilterSet;
+    
+    /**
+     * Sets the filter instance status.
+     *
+     * @param filterInstanceStatus the new filter instance status
+     */
+    public void setFilterInstanceStatus(String filterInstanceStatus) {
+        this.filterInstanceStatus = filterInstanceStatus;
+    }
 
     /**
      * set portName value to portName
@@ -113,6 +116,13 @@ public class BNSNamingService implements NamingService, InitializingBean {
         Assert.notNull(bnsName, "property 'bnsName' is null.");
         Assert.notNull(portName, "property 'portName' is null.");
 
+        if (!StringUtils.isBlank(filterInstanceStatus)) {
+            instanceStatusFilterSet = new HashSet<Integer>();
+            String[] strings = StringUtils.split(filterInstanceStatus, ',');
+            for (String string : strings) {
+                instanceStatusFilterSet.add(StringUtils.toInt(string.trim(), 0));
+            }
+        }
     }
 
     /*
@@ -157,6 +167,11 @@ public class BNSNamingService implements NamingService, InitializingBean {
 
         List<RegisterInfo> ret = new ArrayList<RegisterInfo>();
         for (Instance bnsInstance : instanceList) {
+            int status = bnsInstance.getStatus();
+            if (instanceStatusFilterSet != null && !instanceStatusFilterSet.contains(status)) {
+                continue;
+            }
+            
             String ip = bnsInstance.getDottedIP();
 
             RegisterInfo registerInfo = new RegisterInfo();

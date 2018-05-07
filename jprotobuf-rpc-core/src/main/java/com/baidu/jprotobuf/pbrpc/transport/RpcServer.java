@@ -387,9 +387,13 @@ public class RpcServer extends ServerBootstrap {
 
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-
+        
         if (es != null) {
             es.shutdown();
+        }
+        
+        if (rpcServerPipelineInitializer != null) {
+            rpcServerPipelineInitializer.close();
         }
 
         if (httpServer != null) {

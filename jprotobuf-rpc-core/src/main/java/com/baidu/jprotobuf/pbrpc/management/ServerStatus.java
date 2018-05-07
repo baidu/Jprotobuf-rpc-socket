@@ -33,7 +33,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.jprotobuf.pbrpc.meta.MetaExportHelper;
 import com.baidu.jprotobuf.pbrpc.meta.RpcServiceMeta;
@@ -48,44 +52,47 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
  * @since 3.1.0
  */
 public class ServerStatus {
+    
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerStatus.class);
 
     /** The Constant SECONDS_IN_HOUR. */
     private static final int SECONDS_IN_HOUR = 3600;
-    
+
     /** The Constant SECONDS_IN_DAY. */
     private static final int SECONDS_IN_DAY = 86400;
-    
+
     /** The port. */
     private int port;
-    
+
     /** The http port. */
     private int httpPort;
-    
+
     /** The start time. */
     private long startTime;
 
     /** The rpc server. */
     private RpcServer rpcServer;
-    
+
     /** The close. */
     private transient boolean close = false;
-    
+
     private static transient boolean enabled = false;
 
     /** The Constant REQUEST_COUNTS. */
     public static final ConcurrentHashMap<String, AtomicLong> REQUEST_COUNTS =
             new ConcurrentHashMap<String, AtomicLong>();
-    
+
     /** The Constant ASYNC_REQUEST. */
     public static final BlockingQueue<RequestInfo> ASYNC_REQUEST = new LinkedBlockingQueue<ServerStatus.RequestInfo>();
-    
+
     /** The es. */
     private static ExecutorService es;
 
     public static void Enabled() {
         enabled = true;
     }
-    
+
     /**
      * Incr.
      *
@@ -96,10 +103,10 @@ public class ServerStatus {
         if (!enabled) {
             return;
         }
-        
+
         ASYNC_REQUEST.add(new RequestInfo(timetook, serviceSignature));
     }
-    
+
     /**
      * Do incr.
      *
@@ -128,20 +135,26 @@ public class ServerStatus {
         httpPort = rpcServer.getRpcServerOptions().getHttpServerPort();
 
         es = Executors.newSingleThreadExecutor();
-        
+
         es.execute(new Runnable() {
-            
+
             @Override
             public void run() {
                 while (!close) {
-                    
+
+                    RequestInfo requestInfo;
                     try {
-                        RequestInfo requestInfo = ASYNC_REQUEST.take();
-                        doIncr(requestInfo);
+                        requestInfo = ASYNC_REQUEST.poll(1, TimeUnit.SECONDS);
+                        if (requestInfo != null) {
+                            doIncr(requestInfo);
+                        }
                     } catch (InterruptedException e) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug(e.getMessage(), e);
+                        }
                     }
                 }
-                
+
             }
         });
     }
@@ -161,13 +174,13 @@ public class ServerStatus {
         ret.append("Chunk enabled").append(LINE_BREAK);
         ret.append("Compress enabled(Gzip Snappy)").append(LINE_BREAK);
         ret.append("Attachment enabled").append(LINE_BREAK);
-        
+
         if (rpcServer.getEs() != null) {
             ret.append("--------------Thread status----------------").append(LINE_BREAK);
             ret.append("Max task count:").append(rpcServer.getEs().getMaximumPoolSize()).append(LINE_BREAK);
             ret.append("Running task count:").append(rpcServer.getEs().getActiveCount()).append(LINE_BREAK);
             ret.append("Waiting task count:").append(rpcServer.getEs().getQueue().size()).append(LINE_BREAK);
-            
+
             ret.append(LINE_BREAK).append(LINE_BREAK);
         }
         ret.append(PRE_STARTS);
@@ -240,18 +253,18 @@ public class ServerStatus {
 
         return ret.toString();
     }
-    
+
     /**
      * The Class RequestInfo.
      */
     private static class RequestInfo {
-        
+
         /** The took. */
         private long took;
-        
+
         /** The signature. */
         private String signature;
-        
+
         /**
          * Instantiates a new request info.
          *
@@ -263,8 +276,7 @@ public class ServerStatus {
             this.took = took;
             this.signature = signature;
         }
-        
-        
+
     }
 
     /**
@@ -272,10 +284,10 @@ public class ServerStatus {
      */
     public void close() {
         close = true;
-        
+
         if (es != null) {
             es.shutdown();
         }
-        
+
     }
 }
