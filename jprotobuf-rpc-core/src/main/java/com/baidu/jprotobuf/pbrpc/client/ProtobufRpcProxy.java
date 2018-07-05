@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 
 package com.baidu.jprotobuf.pbrpc.client;
@@ -41,11 +29,16 @@ import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
 import com.baidu.jprotobuf.pbrpc.transport.Connection;
+import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * Protobuf RPC proxy utility class.
@@ -104,6 +97,18 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     /** The interceptor. */
     private InvokerInterceptor interceptor;
+
+    /** The exception handler. */
+    private ExceptionHandler exceptionHandler;
+
+    /**
+     * Sets the exception handler.
+     *
+     * @param exceptionHandler the new exception handler
+     */
+    public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
 
     /**
      * Sets the interceptor.
@@ -469,9 +474,10 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 // if use non-blocking call
                 Future<Object> f = new Future<Object>() {
 
+                    private TimeLimiter limiter = new SimpleTimeLimiter();
+                    
                     @Override
                     public boolean cancel(boolean mayInterruptIfRunning) {
-                        // can not cancel
                         return false;
                     }
 
@@ -500,7 +506,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     @Override
                     public Object get(long timeout, TimeUnit unit)
                             throws InterruptedException, ExecutionException, TimeoutException {
-                        return get();
+
+                        Future proxy = limiter.newProxy(this, Future.class, timeout, unit);
+                        try {
+                            return proxy.get();
+                        } catch (UncheckedTimeoutException e) {
+                            throw new TimeoutException(e.getMessage());
+                        }
                     }
                 };
 
@@ -529,11 +541,10 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      * @param rpcMethodInfo RPC method info
      * @param callback {@link BlockingRpcCallback} object
      * @return RPC result
-     * @throws ErrorDataException in case of error data message from RPC service
-     * @throws IOException in case of decode response from RPC failed
+     * @throws Exception the exception
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
-            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws ErrorDataException, IOException {
+            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
         if (!callback.isDone()) {
             synchronized (callback) {
                 while (!callback.isDone()) {
@@ -552,9 +563,20 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         if (response != null) {
             Integer errorCode = response.getErrorCode();
             if (!ErrorCodes.isSuccess(errorCode)) {
-                String error = message.getRpcMeta().getResponse().getErrorText();
-                throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
-                        errorCode);
+                if (exceptionHandler != null) {
+
+                    RpcErrorMessage rpcErrorMessage = new RpcErrorMessage(errorCode, response.getErrorText());
+                    Exception exception = exceptionHandler.handleException(rpcErrorMessage);
+                    if (exception != null) {
+                        throw exception;
+                    }
+
+                } else {
+                    String error = message.getRpcMeta().getResponse().getErrorText();
+                    throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
+                            errorCode);
+                }
+
             }
         }
 

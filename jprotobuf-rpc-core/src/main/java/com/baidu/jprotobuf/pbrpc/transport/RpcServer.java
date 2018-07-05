@@ -69,10 +69,10 @@ public class RpcServer extends ServerBootstrap {
 
     /** The boss group. */
     private EventLoopGroup bossGroup;
-    
+
     /** The worker group. */
     private EventLoopGroup workerGroup;
-    
+
     /** The channel. */
     private Channel channel;
 
@@ -87,9 +87,21 @@ public class RpcServer extends ServerBootstrap {
 
     /** The blockingqueue. */
     private BlockingQueue<Runnable> blockingqueue = new LinkedBlockingQueue<Runnable>();
-    
+
     /** The es. */
     private ThreadPoolExecutor es;
+
+    /** The exception catcher. */
+    private ExceptionCatcher exceptionCatcher;
+
+    /**
+     * Sets the exception catcher.
+     *
+     * @param exceptionCatcher the new exception catcher
+     */
+    public void setExceptionCatcher(ExceptionCatcher exceptionCatcher) {
+        this.exceptionCatcher = exceptionCatcher;
+    }
 
     /**
      * Sets the interceptor.
@@ -131,7 +143,7 @@ public class RpcServer extends ServerBootstrap {
      * @param rpcServiceRegistry the rpc service registry
      */
     public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
-            RpcServiceRegistry rpcServiceRegistry) {
+            RpcServiceRegistry rpcServiceRegistry, ExceptionCatcher exceptionCatcher) {
         if (rpcServiceRegistry == null) {
             throw new RuntimeException("protperty 'rpcServiceRegistry ' is null.");
         }
@@ -171,8 +183,14 @@ public class RpcServer extends ServerBootstrap {
         // do register meta service
         rpcServiceRegistry.doRegisterMetaService();
         this.rpcServerOptions = serverOptions;
-        this.rpcServerPipelineInitializer = new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es);
+        this.rpcServerPipelineInitializer =
+                new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es, exceptionCatcher);
         this.childHandler(rpcServerPipelineInitializer);
+    }
+    
+    public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
+            RpcServiceRegistry rpcServiceRegistry) {
+        this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry, null);
     }
 
     /**
@@ -181,7 +199,7 @@ public class RpcServer extends ServerBootstrap {
      * @param serverOptions the server options
      */
     public RpcServer(RpcServerOptions serverOptions) {
-        this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry());
+        this(NioServerSocketChannel.class, serverOptions, new RpcServiceRegistry(), null);
     }
 
     /**
@@ -191,7 +209,7 @@ public class RpcServer extends ServerBootstrap {
      * @param rpcServiceRegistry the rpc service registry
      */
     public RpcServer(RpcServerOptions serverOptions, RpcServiceRegistry rpcServiceRegistry) {
-        this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry);
+        this(NioServerSocketChannel.class, serverOptions, rpcServiceRegistry, null);
     }
 
     /**
@@ -200,6 +218,14 @@ public class RpcServer extends ServerBootstrap {
     public RpcServer() {
         this(new RpcServerOptions());
     }
+    
+    /**
+     * Instantiates a new rpc server.
+     */
+    public RpcServer(ExceptionCatcher exceptionCatcher) {
+        this(NioServerSocketChannel.class, new RpcServerOptions(), new RpcServiceRegistry(), exceptionCatcher);
+    }
+
 
     /**
      * Instantiates a new rpc server.
@@ -207,7 +233,7 @@ public class RpcServer extends ServerBootstrap {
      * @param serverChannelClass the server channel class
      */
     public RpcServer(Class<? extends ServerChannel> serverChannelClass) {
-        this(serverChannelClass, new RpcServerOptions(), new RpcServiceRegistry());
+        this(serverChannelClass, new RpcServerOptions(), new RpcServiceRegistry(), null);
     }
 
     /**
@@ -240,21 +266,22 @@ public class RpcServer extends ServerBootstrap {
             Class<? extends ServerAttachmentHandler> cls) {
         rpcServiceRegistry.doDynamicRegisterService(methodSignature, method, service, cls);
     }
-    
+
     /**
      * remove service by method signature. if method signature not exist nothing to do.
      * 
      * @param methodSignature target method signature to remove.
      */
     public void unRegisterDynamicService(String methodSignature) {
-        
+
         rpcServiceRegistry.unRegisterDynamicService(methodSignature);
     }
-    
+
     /**
      * Register dynamic service.
      *
-     * @param methodSignature the method signature
+     * @param serviceName the service name
+     * @param methodName the method name
      * @param method the method
      * @param service the service
      * @param cls the cls
@@ -273,7 +300,7 @@ public class RpcServer extends ServerBootstrap {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(port);
         start(inetSocketAddress);
     }
-    
+
     /**
      * Start.
      *
@@ -291,21 +318,26 @@ public class RpcServer extends ServerBootstrap {
      */
     public void startSync(final InetSocketAddress sa) {
         LOG.log(Level.INFO, "RPC starting at: " + sa);
-        
+
         try {
             this.bind(sa).sync();
         } catch (Throwable e) {
             shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
-        
+
     }
-    
+
+    /**
+     * Start.
+     *
+     * @param sa the sa
+     */
     public void start(final InetSocketAddress sa) {
         LOG.log(Level.INFO, "RPC starting at: " + sa);
-        
+
         this.bind(sa).addListener(new ChannelFutureListener() {
-            
+
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
                     channel = future.channel();
@@ -313,14 +345,11 @@ public class RpcServer extends ServerBootstrap {
                 } else {
                     shutdown();
                     throw new Exception("bind port failed:" + sa.toString() + " message:" + future.toString());
-                    
+
                 }
             }
         });
     }
-    
-    
-    
 
     /**
      * Inits the after bind port.
@@ -370,7 +399,7 @@ public class RpcServer extends ServerBootstrap {
     /**
      * Checks if is stop.
      *
-     * @return true, if is stop
+     * @return the stop
      */
     public boolean isStop() {
         return stop.get();
@@ -387,11 +416,11 @@ public class RpcServer extends ServerBootstrap {
 
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-        
+
         if (es != null) {
             es.shutdown();
         }
-        
+
         if (rpcServerPipelineInitializer != null) {
             rpcServerPipelineInitializer.close();
         }

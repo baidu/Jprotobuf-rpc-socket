@@ -16,6 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -168,6 +170,25 @@ public class RpcClient extends Bootstrap {
             throw new IllegalArgumentException("State already registered");
         }
         requestMap.put(seqId, state);
+    }
+    
+    /**
+     * Invalid broken channel.
+     *
+     * @param channel the channel
+     * @param e the e
+     */
+    public void invalidBrokenChannel(Channel channel, Throwable e) {
+        Collection<RpcClientCallState> values = new ArrayList<RpcClientCallState>(requestMap.values());
+        for (RpcClientCallState rpcClientCallState : values) {
+            
+            boolean currentChannel = rpcClientCallState.isCurrentChannel(channel);
+            if (currentChannel) {
+                rpcClientCallState.handleFailure(e.getMessage());
+                Long id = rpcClientCallState.getDataPackage().getRpcMeta().getCorrelationId();
+                requestMap.remove(id);
+            }
+        }
     }
 
     /**

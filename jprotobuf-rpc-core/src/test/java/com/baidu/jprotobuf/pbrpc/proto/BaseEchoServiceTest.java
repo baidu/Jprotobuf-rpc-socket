@@ -27,6 +27,7 @@ import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 
 /**
  * Base test class for echo RPC server and client
@@ -45,7 +46,10 @@ public abstract class BaseEchoServiceTest extends BaseTest {
     
     @Before
     public void setUp() {
-        rpcServer = new RpcServer();
+        RpcServerOptions config = new RpcServerOptions();
+        config.setHttpServerPort(8081);
+        
+        rpcServer = new RpcServer(config);
         
         EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
         rpcServer.registerService(echoServiceImpl);

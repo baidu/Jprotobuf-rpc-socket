@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -12,31 +13,31 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>3.5.12</version>
+	<version>3.5.14-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>jprotobuf-rpc-socket</name>
 	<description>RPC implements </description>
-	<url>https://github.com/jhunters/jprotobuf/</url> 
+	<url>https://github.com/jhunters/jprotobuf/</url>
 
-	<properties> 
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<java.version>1.6</java.version>
 		<junit.version>4.10</junit.version>
-		
+
 		<!-- Common libs -->
-		<jprotobuf.version>1.11.0</jprotobuf.version>
-		<jprotobuf-rpc-common.version>1.8</jprotobuf-rpc-common.version> 
+		<jprotobuf.version>1.11.1</jprotobuf.version>
+		<jprotobuf-rpc-common.version>1.8</jprotobuf-rpc-common.version>
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.27.Final</netty-all.version>
 		<snappy-java.version>1.1.1.6</snappy-java.version>
 		<spring-web.version>3.2.11.RELEASE</spring-web.version>
 		<servlet-api.version>2.4</servlet-api.version>
 		<jedis.version>2.0.0</jedis.version>
-	
+
 		<!-- publish version -->
-		
+
 	</properties>
 
 	<issueManagement>
@@ -47,7 +48,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/Baidu-ecom/Jprotobuf-rpc-socket.git</connection>
 		<developerConnection>scm:git:git@github.com:Baidu-ecom/Jprotobuf-rpc-socket.git</developerConnection>
-		<url>https://github.com/Baidu-ecom/Jprotobuf-rpc-socket</url> 
+		<url>https://github.com/Baidu-ecom/Jprotobuf-rpc-socket</url>
 	</scm>
 
 	<licenses>
@@ -66,9 +67,9 @@
 	<modules>
 		<module>jprotobuf-rpc-core-test</module>
 		<module>jprotobuf-rpc-core</module>
- 		<module>jprotobuf-rpc-core-spring-base</module>
- 		<module>jprotobuf-rpc-core-spring2</module>
- 		<module>jprotobuf-rpc-core-spring</module>
+		<module>jprotobuf-rpc-core-spring-base</module>
+		<module>jprotobuf-rpc-core-spring2</module>
+		<module>jprotobuf-rpc-core-spring</module>
 		<module>jprotobuf-rpc-registry-redis</module>
 		<module>jprotobuf-rpc-registry-bns</module>
 		<module>jprotobuf-rpc-ext-validator</module>
@@ -84,16 +85,16 @@
 		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
-			<artifactId>jprotobuf</artifactId> 
+			<artifactId>jprotobuf</artifactId>
 			<version>${jprotobuf.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency> 
+		<dependency>
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf-rpc-common</artifactId>
 			<version>${jprotobuf-rpc-common.version}</version>
 			<scope>compile</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-pool2</artifactId>
@@ -113,7 +114,7 @@
 			<version>${snappy-java.version}</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>	
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -155,6 +156,9 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

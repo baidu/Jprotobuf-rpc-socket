@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
@@ -61,7 +62,10 @@ public class RpcChannelFutureListener implements ChannelFutureListener {
         while (null != (requestState = conn.consumeRequest())) {
             LOG.log(Level.FINEST, "[correlationId:" + requestState.getDataPackage().getRpcMeta().getCorrelationId()
                     + "] send over from queue");
-            conn.getFuture().channel().writeAndFlush(requestState.getDataPackage());
+            
+            Channel channel = conn.getFuture().channel();
+            requestState.setChannel(channel);
+            channel.writeAndFlush(requestState.getDataPackage());
         }
     }
 

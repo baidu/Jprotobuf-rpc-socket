@@ -18,6 +18,7 @@ package com.baidu.jprotobuf.pbrpc.transport;
 
 import java.util.concurrent.TimeUnit;
 
+import io.netty.channel.Channel;
 import io.netty.util.Timeout;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
@@ -43,6 +44,32 @@ public class RpcClientCallState {
     
     /** The timeout. */
     private Timeout timeout;
+    
+    /** The channel. */
+    private Channel channel;
+    
+    /**
+     * Sets the channel.
+     *
+     * @param channel the new channel
+     */
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+    
+    /**
+     * Checks if is current channel.
+     *
+     * @param channel the channel
+     * @return true, if is current channel
+     */
+    public boolean isCurrentChannel(Channel channel) {
+        if (this.channel == null) {
+            return false;
+        }
+        
+        return channel.equals(channel);
+    }
 
     /**
      * Instantiates a new rpc client call state.

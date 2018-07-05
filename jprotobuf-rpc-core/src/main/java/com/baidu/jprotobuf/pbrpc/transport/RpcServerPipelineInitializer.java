@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.jprotobuf.pbrpc.transport;
 
@@ -79,18 +67,32 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 	/** The es. */
 	private ExecutorService es;
 
+    /** The exception catcher. */
+    private ExceptionCatcher exceptionCatcher;
+    
+    /**
+     * Sets the exception catcher.
+     *
+     * @param exceptionCatcher the new exception catcher
+     */
+    public void setExceptionCatcher(ExceptionCatcher exceptionCatcher) {
+        this.exceptionCatcher = exceptionCatcher;
+    }
+
 	/**
 	 * Instantiates a new rpc server pipeline initializer.
 	 *
 	 * @param rpcServiceRegistry the rpc service registry
 	 * @param rpcServerOptions the rpc server options
 	 * @param es the es
+	 * @param exceptionCatcher the exception catcher
 	 */
 	public RpcServerPipelineInitializer(RpcServiceRegistry rpcServiceRegistry, RpcServerOptions rpcServerOptions,
-			ExecutorService es) {
+			ExecutorService es, ExceptionCatcher exceptionCatcher) {
 		this.rpcServiceRegistry = rpcServiceRegistry;
 		this.rpcServerOptions = rpcServerOptions;
 		this.es = es;
+        this.exceptionCatcher = exceptionCatcher;
 	}
 
 	/* (non-Javadoc)
@@ -124,7 +126,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
 		// to process RPC service handler of request object RpcDataPackage and
 		// return new RpcDataPackage
-		RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(this.rpcServiceRegistry);
+		RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(this.rpcServiceRegistry, exceptionCatcher);
 		rpcServiceHandler.setEs(es);
 		channelPipe.addLast(RPC_SERVER_HANDLER, rpcServiceHandler);
 

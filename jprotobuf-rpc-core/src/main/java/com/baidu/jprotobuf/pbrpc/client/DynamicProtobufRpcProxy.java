@@ -42,11 +42,16 @@ import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
 import com.baidu.jprotobuf.pbrpc.transport.Connection;
+import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
+import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * 增加动态代理功能，支持动态RPC调用能力. 相比较 {@link ProtobufRpcProxy}实现，无需要提供接口定义。
@@ -82,6 +87,18 @@ public class DynamicProtobufRpcProxy {
 
     /** The Constant TIMEOUT_KEY. */
     public static final String TIMEOUT_KEY = "TIME_OUT";
+    
+    /** The exception handler. */
+    private ExceptionHandler exceptionHandler;
+    
+    /**
+     * Sets the exception handler.
+     *
+     * @param exceptionHandler the new exception handler
+     */
+    public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
 
     /**
      * Instantiates a new dynamic protobuf rpc proxy.
@@ -323,6 +340,7 @@ public class DynamicProtobufRpcProxy {
         if (method.getReturnType().isAssignableFrom(Future.class)) {
             // if use non-blocking call
             Future<Object> f = new Future<Object>() {
+                private TimeLimiter limiter = new SimpleTimeLimiter();
 
                 @Override
                 public boolean cancel(boolean mayInterruptIfRunning) {
@@ -354,7 +372,12 @@ public class DynamicProtobufRpcProxy {
                 @Override
                 public Object get(long timeout, TimeUnit unit)
                         throws InterruptedException, ExecutionException, TimeoutException {
-                    return get();
+                    Future proxy = limiter.newProxy(this, Future.class, timeout, unit);
+                    try {
+                        return proxy.get();
+                    } catch (UncheckedTimeoutException e) {
+                        throw new TimeoutException(e.getMessage());
+                    }
                 }
             };
 
@@ -389,11 +412,10 @@ public class DynamicProtobufRpcProxy {
      * @param rpcMethodInfo RPC method info
      * @param callback {@link BlockingRpcCallback} object
      * @return RPC result
-     * @throws ErrorDataException in case of error data message from RPC service
-     * @throws IOException in case of decode response from RPC failed
+     * @throws Exception the exception
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
-            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws ErrorDataException, IOException {
+            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
         if (!callback.isDone()) {
             synchronized (callback) {
                 while (!callback.isDone()) {
@@ -412,9 +434,20 @@ public class DynamicProtobufRpcProxy {
         if (response != null) {
             Integer errorCode = response.getErrorCode();
             if (!ErrorCodes.isSuccess(errorCode)) {
-                String error = message.getRpcMeta().getResponse().getErrorText();
-                throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
-                        errorCode);
+                
+                if (exceptionHandler != null) {
+                    
+                    RpcErrorMessage rpcErrorMessage = new RpcErrorMessage(errorCode, response.getErrorText());
+                    Exception exception = exceptionHandler.handleException(rpcErrorMessage);
+                    if (exception != null) {
+                        throw exception;
+                    }
+                    
+                } else {
+                    String error = message.getRpcMeta().getResponse().getErrorText();
+                    throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
+                            errorCode);
+                }
             }
         }
 

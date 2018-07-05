@@ -41,6 +41,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceS
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
+import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
@@ -93,6 +94,18 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     
 	/** The interceptor. */
 	private InvokerInterceptor interceptor;
+	
+	/** The exception handler. */
+	private ExceptionHandler exceptionHandler;
+	
+	/**
+	 * Sets the exception handler.
+	 *
+	 * @param exceptionHandler the new exception handler
+	 */
+    public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
 
 	/**
 	 * Sets the interceptor.
@@ -172,6 +185,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         ProtobufRpcProxy<T> protobufRpcProxy = new ProtobufRpcProxy<T>(rpcClient, interfaceClass);
         protobufRpcProxy.setInterceptor(interceptor);
+        protobufRpcProxy.setExceptionHandler(exceptionHandler);
         return protobufRpcProxy;
     }
 

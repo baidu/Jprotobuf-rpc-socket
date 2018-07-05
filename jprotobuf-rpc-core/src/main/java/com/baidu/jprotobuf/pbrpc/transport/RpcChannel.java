@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import io.netty.channel.Channel;
 import io.netty.util.Timeout;
 
 import java.util.concurrent.TimeUnit;
@@ -122,7 +123,9 @@ public class RpcChannel {
                 }
             }
         } else {
-            connection.getFuture().channel().writeAndFlush(state.getDataPackage());
+            Channel channel = connection.getFuture().channel();
+            state.setChannel(channel);
+            channel.writeAndFlush(state.getDataPackage());
         }
 
         long callMethodEnd = System.currentTimeMillis();

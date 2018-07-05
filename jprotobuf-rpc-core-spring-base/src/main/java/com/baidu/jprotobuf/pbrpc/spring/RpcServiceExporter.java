@@ -29,6 +29,7 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.registry.RegistryCenterService;
+import com.baidu.jprotobuf.pbrpc.transport.ExceptionCatcher;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
@@ -66,6 +67,18 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
     
 	/** The interceptor. */
 	private InvokerInterceptor interceptor;
+	
+	/** The exception catcher. */
+	private ExceptionCatcher exceptionCatcher;
+	
+    /**
+     * Sets the exception catcher.
+     *
+     * @param exceptionCatcher the new exception catcher
+     */
+    public void setExceptionCatcher(ExceptionCatcher exceptionCatcher) {
+        this.exceptionCatcher = exceptionCatcher;
+    }
 
 	/**
 	 * Sets the interceptor.
@@ -184,6 +197,7 @@ public class RpcServiceExporter extends RpcServerOptions implements Initializing
         
         prRpcServer = new RpcServer(this, rpcServiceRegistryBean);
         prRpcServer.setInterceptor(interceptor);
+        prRpcServer.setExceptionCatcher(exceptionCatcher);
         
         for (Object service : registerServices) {
             prRpcServer.registerService(service);
