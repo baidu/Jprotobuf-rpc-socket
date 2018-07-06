@@ -475,7 +475,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 Future<Object> f = new Future<Object>() {
 
                     private TimeLimiter limiter = new SimpleTimeLimiter();
-                    
+
                     @Override
                     public boolean cancel(boolean mayInterruptIfRunning) {
                         return false;
@@ -511,6 +511,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                         try {
                             return proxy.get();
                         } catch (UncheckedTimeoutException e) {
+                            // dummy return
+                            callback.run(null);
                             throw new TimeoutException(e.getMessage());
                         }
                     }
@@ -546,10 +548,10 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
             RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
         if (!callback.isDone()) {
-            synchronized (callback) {
-                while (!callback.isDone()) {
+            while (!callback.isDone()) {
+                synchronized (callback) {
                     try {
-                        callback.wait();
+                        callback.wait(100L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }

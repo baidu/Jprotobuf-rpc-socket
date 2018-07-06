@@ -51,7 +51,7 @@ public class ClientMain {
                 echoInfo.setMessage("hi" + i);
 
                 Future<EchoInfo> echoInfo2 = echoService.echoAsync(echoInfo);
-                EchoInfo echoInfo3 = echoInfo2.get();
+                EchoInfo echoInfo3 = echoInfo2.get(3, TimeUnit.SECONDS);
                 System.out.println(echoInfo3);
             } catch (Exception e) {
                 e.printStackTrace();

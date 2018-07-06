@@ -376,6 +376,8 @@ public class DynamicProtobufRpcProxy {
                     try {
                         return proxy.get();
                     } catch (UncheckedTimeoutException e) {
+                        // dummy return
+                        callback.run(null);
                         throw new TimeoutException(e.getMessage());
                     }
                 }
@@ -417,10 +419,10 @@ public class DynamicProtobufRpcProxy {
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
             RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
         if (!callback.isDone()) {
-            synchronized (callback) {
                 while (!callback.isDone()) {
+                synchronized (callback) {
                     try {
-                        callback.wait();
+                        callback.wait(100);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
