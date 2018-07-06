@@ -68,7 +68,7 @@ public class RpcClientCallState {
             return false;
         }
         
-        return channel.equals(channel);
+        return this.channel.equals(channel);
     }
 
     /**

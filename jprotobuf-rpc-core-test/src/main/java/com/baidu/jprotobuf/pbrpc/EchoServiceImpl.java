@@ -47,6 +47,9 @@ public class EchoServiceImpl {
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
+        
+        SleepUtils.dummySleep(2000000);
+        
         return ret;
     }
     

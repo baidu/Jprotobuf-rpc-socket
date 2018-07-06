@@ -28,7 +28,7 @@ public class ServerMain {
     public static void main(String[] args) {
         
         if (args.length == 0) {
-            args = new String[]{"80"};
+            args = new String[]{"8000"};
         }
         
         RpcServerOptions rpcServerOptions = new RpcServerOptions();

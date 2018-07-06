@@ -38,7 +38,7 @@ public interface EchoService {
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1000000, compressType=CompressType.NO)
     EchoInfo echo(EchoInfo info);
     
-    @ProtobufRPC(serviceName = "echoService", methodName = "echo2", onceTalkTimeout = 1000000)
+    @ProtobufRPC(serviceName = "echoService", methodName = "echo2", onceTalkTimeout = 500000)
     Future<EchoInfo> echoAsync(EchoInfo info);
     
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 10000000, 

@@ -15,6 +15,9 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
@@ -27,28 +30,32 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 public class ClientMain {
 
     public static void main(String[] args) {
-        
+
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(10);
         options.setMaxIdleSize(10);
         options.setMinIdleSize(10);
         options.setMaxWait(1000);
         options.setShortConnection(false);
-        
+
         RpcClient rpcClient = new RpcClient(options);
         ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
-        pbrpcProxy.setPort(Integer.valueOf(args[0]));
-        pbrpcProxy.setHost("localhost"); 
+        pbrpcProxy.setPort(8000);
+        pbrpcProxy.setHost("localhost");
         EchoService echoService = pbrpcProxy.proxy();
 
         EchoInfo echoInfo = new EchoInfo();
         long time = System.currentTimeMillis();
         for (int i = 0; i < 1000; i++) {
-        	echoInfo.setMessage("hi" + i);
-        	
-        	echoInfo = echoService.echo(echoInfo);
-        	
-            System.out.println(echoInfo.getMessage());
+            try {
+                echoInfo.setMessage("hi" + i);
+
+                Future<EchoInfo> echoInfo2 = echoService.echoAsync(echoInfo);
+                EchoInfo echoInfo3 = echoInfo2.get();
+                System.out.println(echoInfo3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         System.out.println(System.currentTimeMillis() - time);
         pbrpcProxy.close();

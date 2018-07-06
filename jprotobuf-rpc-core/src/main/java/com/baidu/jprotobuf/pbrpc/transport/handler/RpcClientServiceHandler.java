@@ -92,7 +92,7 @@ public class RpcClientServiceHandler extends SimpleChannelInboundHandler<RpcData
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // to remove broken channel client handle
+        // to remove broken channel from client handler
         try {
             Channel channel = ctx.channel();
             rpcClient.invalidBrokenChannel(channel, cause);
