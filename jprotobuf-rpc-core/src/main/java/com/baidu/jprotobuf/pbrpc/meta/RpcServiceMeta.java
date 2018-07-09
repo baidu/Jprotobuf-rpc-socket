@@ -27,27 +27,27 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class RpcServiceMeta {
 
     /** rpc 服务名. */
-    @Protobuf(required = true)
+    @Protobuf(required = true, order = 1)
     private String serviceName;
     
     /** rpc方法中. */
-    @Protobuf(required = true)
+    @Protobuf(required = true, order = 2)
     private String methodName;
     
     /** 请求参数 google protocol buffer IDL 描述说明. */
-    @Protobuf
+    @Protobuf(order = 3)
     private String inputProto;
     
     /** 请求参数对象名称. */
-    @Protobuf 
+    @Protobuf(order = 4) 
     private String inputObjName;
     
     /**  返回参数 google protocol buffer IDL 描述说明. */
-    @Protobuf
+    @Protobuf(order = 5)
     private String outputProto;
     
     /** 返回参数对象名称. */
-    @Protobuf 
+    @Protobuf(order = 6) 
     private String outputObjName;
 
     /**

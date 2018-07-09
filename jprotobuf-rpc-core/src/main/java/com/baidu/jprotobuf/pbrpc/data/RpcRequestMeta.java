@@ -37,19 +37,19 @@ public class RpcRequestMeta implements Readable, Writerable {
     private static final Codec<RpcRequestMeta> CODEC = ProtobufProxy.create(RpcRequestMeta.class);
 
     /** 服务名. */
-    @Protobuf(required = true)
+    @Protobuf(required = true, order = 1)
     private String serviceName;
     
     /** 方法名. */
-    @Protobuf(required = true)
+    @Protobuf(required = true, order = 2)
     private String methodName;
     
     /** 用于打印日志。可用于存放BFE_LOGID。该参数可选。. */
-    @Protobuf
+    @Protobuf(order = 3)
     private Long logId;
     
     /** 非PbRpc规范，用于传输额外的参数. */
-    @Protobuf(fieldType = FieldType.BYTES)
+    @Protobuf(fieldType = FieldType.BYTES, order = 4)
     private byte[] extraParam;
 
     /**

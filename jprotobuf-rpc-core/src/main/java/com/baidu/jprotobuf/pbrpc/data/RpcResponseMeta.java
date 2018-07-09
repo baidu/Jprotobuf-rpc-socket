@@ -53,11 +53,11 @@ public class RpcResponseMeta implements Readable, Writerable {
     }
 
     /** 发生错误时的错误号，0表示正常，非0表示错误。具体含义由应用方自行定义。. */
-    @Protobuf
+    @Protobuf(order = 1)
     private Integer errorCode;
     
     /** 错误的文本描述. */
-    @Protobuf
+    @Protobuf(order = 2)
     private String errorText;
 
     /**

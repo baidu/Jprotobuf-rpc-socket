@@ -46,11 +46,11 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
     private static final Codec<RpcMeta> CODEC = ProtobufProxy.create(RpcMeta.class);
 
     /** 请求包元数据. */
-    @Protobuf(fieldType = FieldType.OBJECT)
+    @Protobuf(fieldType = FieldType.OBJECT, order = 1)
     private RpcRequestMeta request;
     
     /** 响应包元数据. */
-    @Protobuf(fieldType = FieldType.OBJECT)
+    @Protobuf(fieldType = FieldType.OBJECT, order = 2)
     private RpcResponseMeta response;
     
     /**
@@ -58,23 +58,23 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
      * 1 使用Snappy 1.0.5
      * 2 使用gzip
      */
-    @Protobuf
+    @Protobuf(order = 3)
     private Integer compressType;
     
     /** 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。. */
-    @Protobuf
+    @Protobuf(order = 4)
     private Long correlationId;
     
     /** 附件大小. */
-    @Protobuf
+    @Protobuf(order = 5)
     private Integer attachmentSize;
     
     /** Chunk模式本质上是将一个大的数据流拆分成一个个小的Chunk包按序进行发送。如何拆分还原由通信双方确定. */
-    @Protobuf
+    @Protobuf(order = 6)
     private ChunkInfo chunkInfo;
     
     /** 用于存放身份认证相关信息. */
-    @Protobuf(fieldType = FieldType.BYTES)
+    @Protobuf(fieldType = FieldType.BYTES, order = 7)
     private byte[] authenticationData;
 
     /**

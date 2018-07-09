@@ -30,15 +30,15 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class RpcServiceMetaList {
 
     /** The rpc service metas. */
-    @Protobuf(fieldType = FieldType.OBJECT)
+    @Protobuf(fieldType = FieldType.OBJECT, order = 1)
     private List<RpcServiceMeta> rpcServiceMetas;
     
     /** The types idl. */
-    @Protobuf
+    @Protobuf(order = 2)
     private String typesIDL;
     
     /** The rpcs idl. */
-    @Protobuf
+    @Protobuf(order = 3)
     private String rpcsIDL;
     
 
