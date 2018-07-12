@@ -39,7 +39,7 @@ public class RpcChannel {
 
     /** RPC client. */
     private RpcClient rpcClient;
-    
+
     /** The channel pool. */
     private ChannelPool channelPool;
 
@@ -100,12 +100,9 @@ public class RpcChannel {
         long callMethodStart = System.currentTimeMillis();
 
         // register timer
-        Timeout timeout =
-                rpcClient.getTimer()
-                        .newTimeout(
-                                new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient,
-                                        onceTalkTimeout, TimeUnit.MILLISECONDS),
-                                onceTalkTimeout, TimeUnit.MILLISECONDS);
+        Timeout timeout = rpcClient.getTimer()
+                .newTimeout(new RpcTimerTask(rpcDataPackage.getRpcMeta().getCorrelationId(), this.rpcClient,
+                        onceTalkTimeout, TimeUnit.MILLISECONDS), onceTalkTimeout, TimeUnit.MILLISECONDS);
 
         RpcClientCallState state = new RpcClientCallState(callback, rpcDataPackage, timeout);
 
@@ -125,6 +122,9 @@ public class RpcChannel {
         } else {
             Channel channel = connection.getFuture().channel();
             state.setChannel(channel);
+
+            LOG.log(Level.FINE, "Do send request with service name '" + rpcDataPackage.serviceName() + "' method name '"
+                    + rpcDataPackage.methodName() + "' bound channel =>" + channel);
             channel.writeAndFlush(state.getDataPackage());
         }
 

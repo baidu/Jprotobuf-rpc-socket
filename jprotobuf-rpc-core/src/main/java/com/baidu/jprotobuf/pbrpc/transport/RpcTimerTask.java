@@ -36,13 +36,13 @@ public class RpcTimerTask implements TimerTask {
 
     /** The correlation id. */
     private long correlationId;
-    
+
     /** The rpc client. */
     private RpcClient rpcClient;
 
     /** The time. */
     private final long time;
-    
+
     /** The time unit. */
     private final TimeUnit timeUnit;
 
@@ -61,15 +61,18 @@ public class RpcTimerTask implements TimerTask {
         this.timeUnit = timeUnit;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see io.netty.util.TimerTask#run(io.netty.util.Timeout)
      */
     public void run(Timeout timeout) throws Exception {
 
-        LOG.log(Level.FINE, "correlationId:" + correlationId + " timeout");
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         if (null != state) {
-            state.handleTimeout(time, timeUnit);
+            String msg =  "correlationId:" + correlationId + " timeout with bound channel =>" + state.getChannel();
+            LOG.log(Level.WARNING, msg);
+            state.handleTimeout(time, timeUnit, msg);
         } else {
             LOG.log(Level.FINE, "correlationId:" + correlationId
                     + ": is timeout and no PendingClientCallState found for correlationId " + correlationId);

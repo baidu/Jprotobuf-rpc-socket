@@ -23,7 +23,6 @@ import io.netty.channel.ChannelFutureListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  * A {@link ChannelFutureListener} implementation of RPC operation complete call back.
  *
@@ -47,7 +46,9 @@ public class RpcChannelFutureListener implements ChannelFutureListener {
         this.conn = conn;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see io.netty.util.concurrent.GenericFutureListener#operationComplete(io.netty.util.concurrent.Future)
      */
     public void operationComplete(ChannelFuture future) throws Exception {
@@ -62,9 +63,12 @@ public class RpcChannelFutureListener implements ChannelFutureListener {
         while (null != (requestState = conn.consumeRequest())) {
             LOG.log(Level.FINEST, "[correlationId:" + requestState.getDataPackage().getRpcMeta().getCorrelationId()
                     + "] send over from queue");
-            
+
             Channel channel = conn.getFuture().channel();
             requestState.setChannel(channel);
+
+            LOG.log(Level.FINE, "Do send request with service name '" + requestState.getDataPackage().serviceName()
+                    + "' method name '" + requestState.getDataPackage().methodName() + "' bound channel =>" + channel);
             channel.writeAndFlush(requestState.getDataPackage());
         }
     }
