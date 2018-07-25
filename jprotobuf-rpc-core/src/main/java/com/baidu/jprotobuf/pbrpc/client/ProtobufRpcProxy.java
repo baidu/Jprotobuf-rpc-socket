@@ -454,18 +454,29 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             }
 
             final Connection connection = rpcChannel.getConnection();
-
-            final BlockingRpcCallback callback = new BlockingRpcCallback(new BlockingRpcCallback.CallbackDone() {
-
-                @Override
-                public void done() {
-                    if (rpcChannel != null) {
-                        rpcChannel.releaseConnection(connection);
+            
+            BlockingRpcCallback.CallbackDone callbackDone = null;
+            if (!rpcClient.getRpcClientOptions().isInnerResuePool()) {
+                callbackDone = new BlockingRpcCallback.CallbackDone() {
+                    @Override
+                    public void done() {
+                        if (rpcChannel != null) {
+                           rpcChannel.releaseConnection(connection);
+                        }
                     }
-                }
-            });
+               
+                };
+            }
 
-            rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
+            final BlockingRpcCallback callback = new BlockingRpcCallback(callbackDone);
+            
+            try {
+                rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
+            } finally {
+                if (rpcClient.getRpcClientOptions().isInnerResuePool() && rpcChannel != null) {
+                    rpcChannel.releaseConnection(connection);
+                }
+            }
 
             final String m = methodName;
             if (method.getReturnType().isAssignableFrom(Future.class)) {

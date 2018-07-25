@@ -86,6 +86,9 @@ public class RpcClientOptions {
     
     /** The jmx enabled. */
     private boolean jmxEnabled = false;
+    
+    /** this set ture will use Netty pool solution. */
+    private boolean innerResuePool = true;
 
     /**
      * Copy from.
@@ -124,6 +127,25 @@ public class RpcClientOptions {
      * time out set for chunk package wait in ms.
      */
     private int chunkPackageTimeout = 300 * 1000;
+    
+    /**
+     * Sets the inner resue pool.
+     *
+     * @param innerResuePool the new inner resue pool
+     */
+    public void setInnerResuePool(boolean innerResuePool) {
+        this.innerResuePool = innerResuePool;
+    }
+    
+    /**
+     * Checks if is inner resue pool.
+     *
+     * @return true, if is inner resue pool
+     */
+    public boolean isInnerResuePool() {
+        return innerResuePool;
+    }
+    
     
     /**
      * Gets the time out set for chunk package wait in ms.
