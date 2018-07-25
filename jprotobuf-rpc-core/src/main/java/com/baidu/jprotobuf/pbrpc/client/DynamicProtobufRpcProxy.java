@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.jprotobuf.pbrpc.client;
 
@@ -49,9 +37,6 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * 增加动态代理功能，支持动态RPC调用能力. 相比较 {@link ProtobufRpcProxy}实现，无需要提供接口定义。
@@ -90,7 +75,7 @@ public class DynamicProtobufRpcProxy {
     
     /** The exception handler. */
     private ExceptionHandler exceptionHandler;
-    
+
     /**
      * Sets the exception handler.
      *
@@ -340,8 +325,6 @@ public class DynamicProtobufRpcProxy {
         if (method.getReturnType().isAssignableFrom(Future.class)) {
             // if use non-blocking call
             Future<Object> f = new Future<Object>() {
-                private TimeLimiter limiter = new SimpleTimeLimiter();
-
                 @Override
                 public boolean cancel(boolean mayInterruptIfRunning) {
                     // can not cancel
@@ -362,7 +345,7 @@ public class DynamicProtobufRpcProxy {
                 public Object get() throws InterruptedException, ExecutionException {
                     try {
                         Object o = doWaitCallback(method, args, rpcMethodInfo.getServiceName(), m, rpcMethodInfo,
-                                callback);
+                                callback, -1, null);
                         return o;
                     } catch (Exception e) {
                         throw new ExecutionException(e.getMessage(), e);
@@ -372,13 +355,12 @@ public class DynamicProtobufRpcProxy {
                 @Override
                 public Object get(long timeout, TimeUnit unit)
                         throws InterruptedException, ExecutionException, TimeoutException {
-                    Future proxy = limiter.newProxy(this, Future.class, timeout, unit);
                     try {
-                        return proxy.get();
-                    } catch (UncheckedTimeoutException e) {
-                        // dummy return
-                        callback.run(null);
-                        throw new TimeoutException(e.getMessage());
+                        Object o = doWaitCallback(method, args, rpcMethodInfo.getServiceName(), m, rpcMethodInfo,
+                                callback, timeout, unit);
+                        return o;
+                    } catch (Exception e) {
+                        throw new ExecutionException(e.getMessage(), e);
                     }
                 }
             };
@@ -387,7 +369,7 @@ public class DynamicProtobufRpcProxy {
         }
 
         Object o = doWaitCallback(method, args, rpcMethodInfo.getServiceName(), rpcMethodInfo.getMethodName(),
-                rpcMethodInfo, callback);
+                rpcMethodInfo, callback, -1, null);
         return o;
     }
 
@@ -417,12 +399,19 @@ public class DynamicProtobufRpcProxy {
      * @throws Exception the exception
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
-            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
+            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback, long timeout, TimeUnit unit) throws Exception {
         if (!callback.isDone()) {
-                while (!callback.isDone()) {
+            long timeExpire = 0;
+            if (timeout > 0 && unit != null) {
+                timeExpire = System.currentTimeMillis() + unit.toMillis(timeout);
+            }
+            while (!callback.isDone()) {
                 synchronized (callback) {
                     try {
-                        callback.wait(100);
+                        if (timeExpire > 0 && System.currentTimeMillis() > timeExpire) {
+                            throw new TimeoutException("Ocurrs time out with specfied time " + timeout + " " + unit);
+                        }
+                        callback.wait(10L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }

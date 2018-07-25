@@ -36,9 +36,6 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
 
 /**
  * Protobuf RPC proxy utility class.
@@ -215,6 +212,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             throw new IllegalArgumentException("Param 'interfaceClass'  is null.");
         }
         this.rpcClient = rpcClient;
+
     }
 
     /**
@@ -474,8 +472,6 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 // if use non-blocking call
                 Future<Object> f = new Future<Object>() {
 
-                    private TimeLimiter limiter = new SimpleTimeLimiter();
-
                     @Override
                     public boolean cancel(boolean mayInterruptIfRunning) {
                         return false;
@@ -494,7 +490,8 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     @Override
                     public Object get() throws InterruptedException, ExecutionException {
                         try {
-                            Object o = doWaitCallback(method, args, serviceName, m, rpcMethodInfo, callback);
+
+                            Object o = doWaitCallback(method, args, serviceName, m, rpcMethodInfo, callback, -1, null);
                             PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
                                     + (System.currentTimeMillis() - time) + " ms");
                             return o;
@@ -507,21 +504,19 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                     public Object get(long timeout, TimeUnit unit)
                             throws InterruptedException, ExecutionException, TimeoutException {
 
-                        Future proxy = limiter.newProxy(this, Future.class, timeout, unit);
                         try {
-                            return proxy.get();
-                        } catch (UncheckedTimeoutException e) {
-                            // dummy return
-                            callback.run(null);
-                            throw new TimeoutException(e.getMessage());
+                            return doWaitCallback(method, args, serviceName, m, rpcMethodInfo, callback, timeout, unit);
+                        } catch (Exception e) {
+                            throw new ExecutionException(e.getMessage(), e);
                         }
+
                     }
                 };
 
                 return f;
             }
 
-            Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback);
+            Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback, -1, null);
 
             PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
                     + (System.currentTimeMillis() - time) + " ms");
@@ -546,12 +541,19 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      * @throws Exception the exception
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
-            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback) throws Exception {
+            RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback, long timeout, TimeUnit unit) throws Exception {
         if (!callback.isDone()) {
+            long timeExpire = 0;
+            if (timeout > 0 && unit != null) {
+                timeExpire = System.currentTimeMillis() + unit.toMillis(timeout);
+            }
             while (!callback.isDone()) {
                 synchronized (callback) {
                     try {
-                        callback.wait(100L);
+                        if (timeExpire > 0 && System.currentTimeMillis() > timeExpire) {
+                            throw new TimeoutException("Ocurrs time out with specfied time " + timeout + " " + unit);
+                        }
+                        callback.wait(10L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }

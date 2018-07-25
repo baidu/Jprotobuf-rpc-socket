@@ -15,8 +15,12 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
@@ -32,10 +36,10 @@ public class ClientMain {
     public static void main(String[] args) {
 
         RpcClientOptions options = new RpcClientOptions();
-        options.setThreadPoolSize(10);
-        options.setMaxIdleSize(10);
+        options.setThreadPoolSize(100);
+        options.setMaxIdleSize(100);
         options.setMinIdleSize(10);
-        options.setMaxWait(1000);
+        options.setMaxWait(5000);
         options.setShortConnection(false);
 
         RpcClient rpcClient = new RpcClient(options);
@@ -46,17 +50,34 @@ public class ClientMain {
 
         EchoInfo echoInfo = new EchoInfo();
         long time = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
+        List<Future<EchoInfo>> list = new ArrayList<Future<EchoInfo>>();
+        for (int i = 0; i < 20; i++) {
             try {
                 echoInfo.setMessage("hi" + i);
 
                 Future<EchoInfo> echoInfo2 = echoService.echoAsync(echoInfo);
-                EchoInfo echoInfo3 = echoInfo2.get(3, TimeUnit.SECONDS);
-                System.out.println(echoInfo3);
+                list.add(echoInfo2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("begin wait");
+        for (Future<EchoInfo> future : list) {
+            EchoInfo echoInfo3;
+            try {
+                echoInfo3 = future.get(500, TimeUnit.MILLISECONDS);
+                System.out.println(echoInfo3);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        
+        
         System.out.println(System.currentTimeMillis() - time);
         pbrpcProxy.close();
         rpcClient.shutdown();
