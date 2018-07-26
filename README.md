@@ -52,7 +52,7 @@ golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.c
     <plugin>
         <groupId>com.baidu</groupId>
         <artifactId>jprotobuf-precompile-plugin</artifactId>
-        <version>1.2.4</version>
+        <version>1.2.8</version>
         <configuration>
             <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
             <filterClassPackage>com.baidu</filterClassPackage>
