@@ -16,6 +16,9 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.google.protobuf.RpcCallback;
 
@@ -27,6 +30,9 @@ import com.google.protobuf.RpcCallback;
  * @since 1.0
  */
 public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
+    
+    /** The log. */
+    private static Logger LOG = Logger.getLogger(BlockingRpcCallback.class.getName());
 
     /** The done. */
     private boolean done = false; // 会话完成标识
@@ -63,7 +69,13 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
     public void run(RpcDataPackage message) {
         this.message = message;
         if (callbackDone != null) {
-        	callbackDone.done();
+            try {
+                callbackDone.done();
+            } catch (Exception e) {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, e.getMessage(), e);
+                }
+            }
         }
         synchronized (this) {
             done = true;
