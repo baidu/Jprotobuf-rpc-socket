@@ -22,6 +22,51 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 
 /**
  * RPC 包数据完整定义实现.
+ * 
+ *  Data package for baidu RPC.
+ *  all request and response data package should apply this.
+ * 
+ * -----------------------------------
+ * | Head | Meta | Data | Attachment |
+ * -----------------------------------
+ * 
+ * 1. <Head> with fixed 12 byte length as follow format
+ * ----------------------------------------------
+ * | PRPC | MessageSize(int32) | MetaSize(int32) |
+ * ----------------------------------------------
+ * MessageSize = totalSize - 12(Fixed Head Size)
+ * MetaSize = Meta object size
+ * 
+ * 2. <Meta> body proto description as follow
+ * message RpcMeta {
+ *     optional RpcRequestMeta request = 1;
+ *     optional RpcResponseMeta response = 2;
+ *     optional int32 compress_type = 3; // 0:nocompress 1:Snappy 2:gzip
+ *     optional int64 correlation_id = 4;
+ *     optional int32 attachment_size = 5;
+ *     optional ChunkInfo chuck_info = 6;
+ *     optional bytes authentication_data = 7;
+ * };
+ * 
+ * message Request {
+ *     required string service_name = 1;
+ *     required string method_name = 2;
+ *     optional int64 log_id = 3;
+ * };
+ * 
+ * message Response {
+ *     optional int32 error_code = 1;
+ *     optional string error_text = 2;
+ * };
+ * 
+ * messsage ChunkInfo {
+ *         required int64 stream_id = 1;
+ *         required int64 chunk_id = 2;
+ * };
+ * 
+ * 3. <Data> customize transport data message.
+ * 
+ * 4. <Attachment> attachment body data message
  *
  * @author xiemalin
  * @since 1.0
