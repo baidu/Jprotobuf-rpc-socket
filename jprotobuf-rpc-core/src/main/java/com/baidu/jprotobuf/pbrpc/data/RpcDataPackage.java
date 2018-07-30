@@ -32,9 +32,9 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * 
  * 1. <Head> with fixed 12 byte length as follow format
  * ----------------------------------------------
- * | PRPC | MessageSize(int32) | MetaSize(int32) |
+ * | PRPC | TotalSize(int32) | MetaSize(int32) |
  * ----------------------------------------------
- * MessageSize = totalSize - 12(Fixed Head Size)
+ * TotalSize = totalSize
  * MetaSize = Meta object size
  * 
  * 2. <Meta> body proto description as follow
