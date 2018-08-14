@@ -87,7 +87,7 @@ public class RpcClientOptions {
     /** The jmx enabled. */
     private boolean jmxEnabled = false;
     
-    /** this set ture will use Netty pool solution. */
+    /** this set true will use Netty pool solution. */
     private boolean innerResuePool = true;
 
     /**

@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
@@ -55,7 +54,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 10000;
+    int totalRequestSize = 100000;
     
     /**
 	 * set totalRequestSize value to totalRequestSize
@@ -96,7 +95,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
         echoInfo = new EchoInfo();
         echoInfo.setMessage(requestData);
-        echoService.echo(echoInfo);
+        echoService.echoAsync(echoInfo);
         in = buildPackage(requestData.getBytes(), null, null, "echoService", "echo");
         out = buildPackage(responseData.getBytes(), null, null, "echoService", "echo");
     }
@@ -116,7 +115,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     @Test
     public void performanceOneTreadTest2() {
-        oneThreadExecute("world", "hello world");
+        oneThreadExecuteAsync("world", "hello world");
 
     }
 
@@ -132,6 +131,31 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
         oneThreadExecute(requestString, responseString);
 
+    }
+    
+    private void oneThreadExecuteAsync(String requestString, String responseString) {
+        setUp(1, requestString, responseString);
+
+        long time = System.currentTimeMillis();
+        List<Future<EchoInfo>> list = new ArrayList<Future<EchoInfo>>(totalRequestSize);
+        for (int i = 0; i < totalRequestSize; i++) {
+            Future<EchoInfo> echoAsync = echoService.echoAsync(echoInfo);
+            list.add(echoAsync);
+        }
+        
+        for (Future<EchoInfo> future : list) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        long timetook = System.currentTimeMillis() - time;
+
+        printResult(in, out, totalRequestSize, timetook, 1);
     }
 
     /**

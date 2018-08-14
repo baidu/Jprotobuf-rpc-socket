@@ -51,7 +51,7 @@ public class ClientMain {
         EchoInfo echoInfo = new EchoInfo();
         long time = System.currentTimeMillis();
         List<Future<EchoInfo>> list = new ArrayList<Future<EchoInfo>>();
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 1; i++) {
             try {
                 echoInfo.setMessage("hi" + i);
 
@@ -65,7 +65,7 @@ public class ClientMain {
         for (Future<EchoInfo> future : list) {
             EchoInfo echoInfo3;
             try {
-                echoInfo3 = future.get(5000, TimeUnit.MILLISECONDS);
+                echoInfo3 = future.get(500000, TimeUnit.MILLISECONDS);
                 System.out.println(echoInfo3);
             } catch (InterruptedException e) {
                 e.printStackTrace();

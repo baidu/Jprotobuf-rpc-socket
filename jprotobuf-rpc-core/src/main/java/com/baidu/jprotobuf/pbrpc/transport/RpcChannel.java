@@ -16,15 +16,14 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import io.netty.channel.Channel;
-import io.netty.util.Timeout;
-
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
-import com.google.protobuf.RpcCallback;
+
+import io.netty.channel.Channel;
+import io.netty.util.Timeout;
 
 /**
  * RPC request and response channel processor.
@@ -91,8 +90,8 @@ public class RpcChannel {
      * @param callback the callback
      * @param onceTalkTimeout the once talk timeout
      */
-    public void doTransport(Connection connection, RpcDataPackage rpcDataPackage, RpcCallback<RpcDataPackage> callback,
-            long onceTalkTimeout) {
+    public void doTransport(Connection connection, RpcDataPackage rpcDataPackage,
+            BlockingRpcCallback callback, long onceTalkTimeout) {
         if (rpcDataPackage == null) {
             throw new IllegalArgumentException("param 'rpcDataPackage' is null.");
         }
