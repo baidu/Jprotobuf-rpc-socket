@@ -40,6 +40,9 @@ public class RpcClientOptions {
     /** The thread pool size. */
     private int threadPoolSize = 20;
     
+    /** The work group thread size. */
+    private int workGroupThreadSize = 0;
+    
     /** The max idle size. */
     private int maxIdleSize = 20;
     
@@ -121,7 +124,28 @@ public class RpcClientOptions {
         this.lifo = options.lifo;
         this.maxSize = options.maxSize;
         this.ioEventGroupType = options.ioEventGroupType;
+        this.workGroupThreadSize = options.workGroupThreadSize;
     }
+    
+    /**
+     * Sets the work group thread size.
+     *
+     * @param workGroupThreadSize the new work group thread size
+     */
+    public void setWorkGroupThreadSize(int workGroupThreadSize) {
+        this.workGroupThreadSize = workGroupThreadSize;
+    }
+    
+    /**
+     * Gets the work group thread size.
+     *
+     * @return the work group thread size
+     */
+    public int getWorkGroupThreadSize() {
+        return workGroupThreadSize;
+    }
+    
+    
 
     /**
      * time out set for chunk package wait in ms.

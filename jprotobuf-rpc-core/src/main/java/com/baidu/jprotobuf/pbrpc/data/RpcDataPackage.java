@@ -25,7 +25,7 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * 
  *  Data package for baidu RPC.
  *  all request and response data package should apply this.
- * 
+ * <pre>
  * -----------------------------------
  * | Head | Meta | Data | Attachment |
  * -----------------------------------
@@ -67,7 +67,7 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * 3. <Data> customize transport data message.
  * 
  * 4. <Attachment> attachment body data message
- *
+ * </pre>
  * @author xiemalin
  * @since 1.0
  */

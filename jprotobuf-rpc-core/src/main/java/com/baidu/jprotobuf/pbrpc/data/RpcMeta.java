@@ -32,47 +32,50 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @since 1.0
  */
 public class RpcMeta implements Readable, Writerable, Cloneable {
-    
+
     /** The Constant COMPRESS_NO. */
     public static final int COMPRESS_NO = 0;
-    
+
     /** The Constant COMPRESS_SNAPPY. */
     public static final int COMPRESS_SNAPPY = 1;
-    
+
     /** The Constant COMPERESS_GZIP. */
     public static final int COMPERESS_GZIP = 2;
-    
+
     /** Decode and encode handler. */
     private static final Codec<RpcMeta> CODEC = ProtobufProxy.create(RpcMeta.class);
 
     /** 请求包元数据. */
     @Protobuf(fieldType = FieldType.OBJECT, order = 1)
     private RpcRequestMeta request;
-    
+
     /** 响应包元数据. */
     @Protobuf(fieldType = FieldType.OBJECT, order = 2)
     private RpcResponseMeta response;
-    
+
     /**
-     * 0 不压缩
-     * 1 使用Snappy 1.0.5
-     * 2 使用gzip
+     * 0 不压缩 1 使用Snappy 1.0.5 2 使用gzip
      */
     @Protobuf(order = 3)
     private Integer compressType;
-    
-    /** 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。. */
+
+    /**
+     * 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br>
+     * 请求方有义务保证其唯一性，协议本身对此不做任何检查。 <br>
+     * 响应方需要在对应的响应包里面将correlation_id设为同样的值。.
+     * 
+     */
     @Protobuf(order = 4)
     private Long correlationId;
-    
+
     /** 附件大小. */
     @Protobuf(order = 5)
     private Integer attachmentSize;
-    
+
     /** Chunk模式本质上是将一个大的数据流拆分成一个个小的Chunk包按序进行发送。如何拆分还原由通信双方确定. */
     @Protobuf(order = 6)
     private ChunkInfo chunkInfo;
-    
+
     /** 用于存放身份认证相关信息. */
     @Protobuf(fieldType = FieldType.BYTES, order = 7)
     private byte[] authenticationData;
@@ -135,9 +138,13 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
     }
 
     /**
-     * Gets the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。.
+     * Gets the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br>
+     * 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br>
+     * 响应方需要在对应的响应包里面将correlation_id设为同样的值。.
      *
-     * @return the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。
+     * @return the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br>
+     *         请求方有义务保证其唯一性，协议本身对此不做任何检查。<br>
+     *         响应方需要在对应的响应包里面将correlation_id设为同样的值。
      */
     public Long getCorrelationId() {
         if (correlationId == null) {
@@ -147,9 +154,13 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
     }
 
     /**
-     * Sets the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。.
+     * Sets the 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br>
+     * 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br>
+     * 响应方需要在对应的响应包里面将correlation_id设为同样的值。.
      *
-     * @param correlationId the new 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br> 请求方有义务保证其唯一性，协议本身对此不做任何检查。<br> 响应方需要在对应的响应包里面将correlation_id设为同样的值。
+     * @param correlationId the new 请求包中的该域由请求方设置，用于唯一标识一个RPC请求。<br>
+     *            请求方有义务保证其唯一性，协议本身对此不做任何检查。<br>
+     *            响应方需要在对应的响应包里面将correlation_id设为同样的值。
      */
     public void setCorrelationId(Long correlationId) {
         this.correlationId = correlationId;
@@ -194,7 +205,9 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
         this.authenticationData = authenticationData;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.remoting.pbrpc.Writerable#write()
      */
     public byte[] write() {
@@ -205,7 +218,9 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.remoting.pbrpc.Readable#read(byte[])
      */
     public void read(byte[] bytes) {
@@ -219,7 +234,7 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * copy {@link RpcMeta}.
      *
@@ -237,7 +252,7 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
         setCorrelationId(meta.getCorrelationId());
         setChunkInfo(meta.getChunkInfo());
     }
-    
+
     /**
      * Copy.
      *
@@ -245,7 +260,7 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
      */
     public RpcMeta copy() {
         RpcMeta rpcMeta = new RpcMeta();
-        
+
         if (chunkInfo != null) {
             rpcMeta.setChunkInfo(chunkInfo.copy());
         }
@@ -259,8 +274,7 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
         rpcMeta.setAuthenticationData(authenticationData);
         rpcMeta.setCompressType(compressType);
         rpcMeta.setCorrelationId(correlationId);
-        
-        
+
         return rpcMeta;
     }
 
@@ -281,5 +295,5 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
     public void setChunkInfo(ChunkInfo chunkInfo) {
         this.chunkInfo = chunkInfo;
     }
-    
+
 }

@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import com.baidu.jprotobuf.pbrpc.AuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.DummyAuthenticationDataHandler;
-import com.baidu.jprotobuf.pbrpc.ServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.DummyClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.DummyLogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;

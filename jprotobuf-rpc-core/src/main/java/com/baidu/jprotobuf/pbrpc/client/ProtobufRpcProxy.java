@@ -177,7 +177,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 serviceSignatures.add(methodSignature);
             }
         }
-        // if not protobufRpc method defined throw exception
+        // if no protobufRpc methods defined throw exception
         if (serviceSignatures.isEmpty()) {
             throw new IllegalArgumentException(
                     "This no protobufRpc method in interface class:" + interfaceClass.getName());
