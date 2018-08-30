@@ -31,7 +31,7 @@ import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
  * @param <T> the generic type
  * @since 2.17
  */
-public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> {
+public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> { 
     
     /** The Constant CURRENT_PARAMS. */
     private static final ThreadLocal<MethodInvocation> CURRENT_PARAMS = new ThreadLocal<MethodInvocation>();
@@ -45,6 +45,8 @@ public class HaProtobufRpcProxyBean<T> extends HaProtobufRpcProxy<T> {
     @Override
     protected ProtobufRpcProxy<T> onBuildProtobufRpcProxy(RpcClient rpcClient, Class<T> interfaceClass) {
         ProtobufRpcProxyBean<T> protobufRpcProxyBean = new ProtobufRpcProxyBean<T>(rpcClient, interfaceClass);
+        protobufRpcProxyBean.setInterceptor(interceptor);
+        protobufRpcProxyBean.setExceptionHandler(exceptionHandler);
         return protobufRpcProxyBean;
     }
 

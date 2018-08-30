@@ -93,10 +93,10 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     private AtomicBoolean proxied = new AtomicBoolean(false);
     
 	/** The interceptor. */
-	private InvokerInterceptor interceptor;
+	protected InvokerInterceptor interceptor;
 	
 	/** The exception handler. */
-	private ExceptionHandler exceptionHandler;
+	protected ExceptionHandler exceptionHandler;
 	
 	/**
 	 * Sets the exception handler.
