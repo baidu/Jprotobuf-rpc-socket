@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.AuthenticationDataHandler;
@@ -683,7 +684,14 @@ public class RpcDataPackage implements Readable, Writerable {
             attachment = new byte[attachmentSize];
             bais.read(attachment, 0, attachmentSize);
         }
-
+        
+        try {
+            bais.close(); // ByteArrayInputStream close method is empty
+        } catch (IOException e) {
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, e.getMessage());
+            }
+        }
     }
 
     /**

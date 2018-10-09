@@ -553,18 +553,21 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
             RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback, long timeout, TimeUnit unit) throws Exception {
-        if (!callback.isDone()) {
+        
+        BlockingRpcCallback c = callback;
+        
+        if (!c.isDone()) {
             long timeExpire = 0;
             if (timeout > 0 && unit != null) {
                 timeExpire = System.currentTimeMillis() + unit.toMillis(timeout);
             }
-            while (!callback.isDone()) {
-                synchronized (callback) {
+            while (!c.isDone()) {
+                synchronized (c) {
                     try {
                         if (timeExpire > 0 && System.currentTimeMillis() > timeExpire) {
                             throw new TimeoutException("Ocurrs time out with specfied time " + timeout + " " + unit);
                         }
-                        callback.wait(10L);
+                        c.wait(10L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -572,7 +575,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             }
         }
 
-        RpcDataPackage message = callback.getMessage();
+        RpcDataPackage message = c.getMessage();
 
         RpcResponseMeta response = message.getRpcMeta().getResponse();
         if (response != null) {
