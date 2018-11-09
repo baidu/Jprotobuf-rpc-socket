@@ -64,7 +64,13 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
         			ParameterizedType pt = (ParameterizedType) genericReturnType;
         			Type[] types = pt.getActualTypeArguments();
         			if (types != null && types.length == 1) {
-        				outputClass = (Class) types[0];
+        			    
+        			    Class c = (Class) types[0];
+        			    if (!Void.class.isAssignableFrom(c)) {
+        			        outputClass = (Class) types[0];
+        			    } else {
+        			        outputClass = null;
+        			    }
         			} else {
         				outputClass = null;
         			}
