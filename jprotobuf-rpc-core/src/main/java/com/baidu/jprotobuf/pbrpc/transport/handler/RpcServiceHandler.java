@@ -114,7 +114,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                     errorCode = error.getErrorCode();
                 }
                 data = dataPackage.getErrorResponseRpcDataPackage(errorCode, cause.getCause().getMessage());
-                
+
                 handleException(data, exceptionCatcher, (ErrorDataException) cause);
             }
         }
@@ -124,7 +124,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
             data = data.magicCode(ProtocolConstant.MAGIC_CODE).getErrorResponseRpcDataPackage(ErrorCodes.ST_ERROR,
                     cause.getCause().getMessage());
         }
-        
+
         ctx.fireChannelRead(data);
     }
 
@@ -189,8 +189,10 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
             try {
                 RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
                 if (handler == null) {
+                    String message = "service name '" + serviceName + "' and methodName '" + methodName + "' not found";
+                    LOG.log(Level.WARNING, message);
                     dataPackage.errorCode(ErrorCodes.ST_SERVICE_NOTFOUND);
-                    dataPackage.errorText(ErrorCodes.MSG_SERVICE_NOTFOUND);
+                    dataPackage.errorText(message);
                 } else {
 
                     byte[] data = dataPackage.getData();
@@ -262,7 +264,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
         if (exceptionCatcher == null) {
             return;
         }
-        
+
         RpcErrorMessage rpcErrorMessage = exceptionCatcher.onException(e);
         if (rpcErrorMessage != null) {
             rpcDataPackage.errorCode(rpcErrorMessage.getErrorCode());
