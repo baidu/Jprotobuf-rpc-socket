@@ -130,7 +130,7 @@ public class NetUtils {
      * @return true, if is invalid port
      */
     public static boolean isInvalidPort(int port) {
-        return port > MIN_PORT || port <= MAX_PORT;
+        return port > MIN_PORT && port <= MAX_PORT;
     }
 
     /** The Constant ADDRESS_PATTERN. */

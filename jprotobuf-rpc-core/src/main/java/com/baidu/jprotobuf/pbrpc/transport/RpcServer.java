@@ -23,8 +23,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
@@ -56,7 +57,7 @@ public class RpcServer extends ServerBootstrap {
     private static final int DEFAULT_WAIT_STOP_INTERVAL = 200;
 
     /** The Constant LOG. */
-    private static final Logger LOG = Logger.getLogger(RpcServer.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(RpcServer.class);
 
     /** The stop. */
     private AtomicBoolean stop = new AtomicBoolean(false);
@@ -317,7 +318,7 @@ public class RpcServer extends ServerBootstrap {
      * @param sa the sa
      */
     public void startSync(final InetSocketAddress sa) {
-        LOG.log(Level.INFO, "RPC starting at: " + sa);
+        LOG.info("RPC starting at: " + sa);
 
         try {
             this.bind(sa).sync();
@@ -334,7 +335,7 @@ public class RpcServer extends ServerBootstrap {
      * @param sa the sa
      */
     public void start(final InetSocketAddress sa) {
-        LOG.log(Level.INFO, "RPC starting at: " + sa);
+        LOG.info("RPC starting at: " + sa);
 
         this.bind(sa).addListener(new ChannelFutureListener() {
 
