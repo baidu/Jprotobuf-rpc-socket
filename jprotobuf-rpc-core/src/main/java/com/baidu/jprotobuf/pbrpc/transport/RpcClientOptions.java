@@ -92,6 +92,28 @@ public class RpcClientOptions {
     
     /** this set true will use Netty pool solution. */
     private boolean innerResuePool = true;
+    
+    /** 启动相同Host和port的使用一个共用连接池 */
+    private boolean shareChannelPool = false;
+    
+    /**
+     * Sets the share channel pool.
+     *
+     * @param shareChannelPool the new share channel pool
+     */
+    public void setShareChannelPool(boolean shareChannelPool) {
+        this.shareChannelPool = shareChannelPool;
+    }
+    
+    /**
+     * Checks if is share channel pool.
+     *
+     * @return true, if is share channel pool
+     */
+    public boolean isShareChannelPool() {
+        return shareChannelPool;
+    }
+    
 
     /**
      * Copy from.

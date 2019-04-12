@@ -28,11 +28,14 @@ import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
+import com.baidu.jprotobuf.pbrpc.transport.ChannelPoolSharableFactory;
 import com.baidu.jprotobuf.pbrpc.transport.Connection;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
+import com.baidu.jprotobuf.pbrpc.transport.GlobalChannelPoolSharableFactory;
 import com.baidu.jprotobuf.pbrpc.transport.RpcChannel;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
+import com.baidu.jprotobuf.pbrpc.transport.SimpleChannelPoolSharableFactory;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
@@ -97,6 +100,18 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
 
     /** The exception handler. */
     private ExceptionHandler exceptionHandler;
+
+    /** The channel pool sharable factory. */
+    private ChannelPoolSharableFactory channelPoolSharableFactory;
+
+    /**
+     * Sets the channel pool sharable factory.
+     *
+     * @param channelPoolSharableFactory the new channel pool sharable factory
+     */
+    public void setChannelPoolSharableFactory(ChannelPoolSharableFactory channelPoolSharableFactory) {
+        this.channelPoolSharableFactory = channelPoolSharableFactory;
+    }
 
     /**
      * Sets the exception handler.
@@ -235,6 +250,21 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             return instance;
         }
 
+        if (channelPoolSharableFactory == null) {
+
+            boolean shareChannelPool = rpcClient.getRpcClientOptions().isShareChannelPool();
+            if (shareChannelPool) {
+                channelPoolSharableFactory = new GlobalChannelPoolSharableFactory();
+                LOGGER.info(
+                        "Use global share channel pool to create protobuf RPC proxy with interface " + interfaceClass);
+            } else {
+                channelPoolSharableFactory = new SimpleChannelPoolSharableFactory();
+                LOGGER.info(
+                        "Use Simple share channel pool to create protobuf RPC proxy with interface " + interfaceClass);
+            }
+
+        }
+
         // to parse interface
         Method[] methods = getMethds();
         for (Method method : methods) {
@@ -288,7 +318,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 }
 
                 if (!rpcChannelMap.containsKey(channelKey)) {
-                    RpcChannel rpcChannel = new RpcChannel(rpcClient, eHost, ePort);
+                    RpcChannel rpcChannel = channelPoolSharableFactory.getOrCreateChannelPool(rpcClient, eHost, ePort);
                     if (lookupStubOnStartup) {
                         rpcChannel.testChannlConnect();
                     }
@@ -454,22 +484,22 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             }
 
             final Connection connection = rpcChannel.getConnection();
-            
+
             BlockingRpcCallback.CallbackDone callbackDone = null;
             if (!rpcClient.getRpcClientOptions().isInnerResuePool()) {
                 callbackDone = new BlockingRpcCallback.CallbackDone() {
                     @Override
                     public void done() {
                         if (rpcChannel != null) {
-                           rpcChannel.releaseConnection(connection);
+                            rpcChannel.releaseConnection(connection);
                         }
                     }
-               
+
                 };
             }
 
             final BlockingRpcCallback callback = new BlockingRpcCallback(callbackDone);
-            
+
             try {
                 rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
             } finally {
@@ -553,9 +583,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     private Object doWaitCallback(Method method, Object[] args, String serviceName, String methodName,
             RpcMethodInfo rpcMethodInfo, BlockingRpcCallback callback, long timeout, TimeUnit unit) throws Exception {
-        
+
         BlockingRpcCallback c = callback;
-        
+
         if (!c.isDone()) {
             long timeExpire = 0;
             if (timeout > 0 && unit != null) {
