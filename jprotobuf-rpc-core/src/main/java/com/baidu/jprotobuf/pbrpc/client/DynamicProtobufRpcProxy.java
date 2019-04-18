@@ -256,12 +256,13 @@ public class DynamicProtobufRpcProxy {
         RpcChannel rpcChannel = rpcChannelMap.get(serviceSignature);
 
         if (rpcChannel == null) {
-
             synchronized (serviceSignature) {
-
-                rpcChannel = new RpcChannel(rpcClient, host, port);
-                rpcChannelMap.put(serviceSignature, rpcChannel);
-
+                if (!rpcChannelMap.containsKey(serviceSignature)) {
+                    rpcChannel = new RpcChannel(rpcClient, host, port);
+                    rpcChannelMap.put(serviceSignature, rpcChannel);
+                } else {
+                    rpcChannel = rpcChannelMap.get(serviceSignature);
+                }
             }
 
         }
