@@ -46,16 +46,15 @@ public class EchoServiceImpl {
     @ProtobufRPCService(serviceName = "echoService", methodName = "echo", description ="echo测试服务")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
+        //SleepUtils.dummySleep(100000);
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
-        
-        SleepUtils.dummySleep(2000000);
-        
         return ret;
     }
     
 
     @ProtobufRPCService(serviceName = "echoService", methodName = "echo2", description ="echo测试服务")
     public EchoInfo doEchoAnnother(EchoInfo info) {
+        //SleepUtils.dummySleep(10000);
         return doEcho(info);
     }
 
