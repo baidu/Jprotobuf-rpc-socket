@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 
 package com.baidu.jprotobuf.pbrpc.transport;
@@ -35,6 +23,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 /**
  * RPC client handler class.
@@ -58,21 +47,24 @@ public class RpcClient extends Bootstrap {
 
     /** The correlation id. */
     private AtomicLong correlationId = new AtomicLong(1); // session标识
-    
+
     /** The timer. */
     private static Timer timer = createTimer(); // 初始化定时器
-    
+
     /** The rpc client options. */
     private RpcClientOptions rpcClientOptions;
-    
+
     /** The channel pool. */
     private ChannelPool channelPool;
-    
+
     /** The worker group. */
     private EventLoopGroup workerGroup;
 
     /** The Constant INSTANCE_COUNT. */
     private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger();
+
+    /** The Constant CLIENT_T_NAME. */
+    private static final String CLIENT_T_NAME = "Jprotobuf-RPC-Client";
 
     /**
      * Creates the timer.
@@ -117,11 +109,12 @@ public class RpcClient extends Bootstrap {
      * @param rpcClientOptions the rpc client options
      */
     public RpcClient(Class<? extends Channel> clientChannelClass, RpcClientOptions rpcClientOptions) {
-
         if (rpcClientOptions.getIoEventGroupType() == RpcClientOptions.POLL_EVENT_GROUP) {
-            this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getWorkGroupThreadSize());
+            this.workerGroup = new NioEventLoopGroup(rpcClientOptions.getWorkGroupThreadSize(),
+                    new DefaultThreadFactory(CLIENT_T_NAME));
         } else {
-            this.workerGroup = new EpollEventLoopGroup(rpcClientOptions.getWorkGroupThreadSize());
+            this.workerGroup = new EpollEventLoopGroup(rpcClientOptions.getWorkGroupThreadSize(),
+                    new DefaultThreadFactory(CLIENT_T_NAME));
         }
 
         this.group(workerGroup);
@@ -171,7 +164,7 @@ public class RpcClient extends Bootstrap {
         }
         requestMap.put(seqId, state);
     }
-    
+
     /**
      * Invalid broken channel.
      *
@@ -181,7 +174,7 @@ public class RpcClient extends Bootstrap {
     public void invalidBrokenChannel(Channel channel, Throwable e) {
         Collection<RpcClientCallState> values = new ArrayList<RpcClientCallState>(requestMap.values());
         for (RpcClientCallState rpcClientCallState : values) {
-            
+
             boolean currentChannel = rpcClientCallState.isCurrentChannel(channel);
             if (currentChannel) {
                 rpcClientCallState.handleFailure(e.getMessage());

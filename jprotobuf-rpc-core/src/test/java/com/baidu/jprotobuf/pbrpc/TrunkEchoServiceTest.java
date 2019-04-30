@@ -15,8 +15,6 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
-import org.junit.Ignore;
-
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 

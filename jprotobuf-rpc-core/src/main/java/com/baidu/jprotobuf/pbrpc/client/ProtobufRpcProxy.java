@@ -84,7 +84,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
     private int port;
 
     /** The lookup stub on startup. */
-    private boolean lookupStubOnStartup = true;
+    private boolean lookupStubOnStartup = false;
 
     /** The instance. */
     private T instance;

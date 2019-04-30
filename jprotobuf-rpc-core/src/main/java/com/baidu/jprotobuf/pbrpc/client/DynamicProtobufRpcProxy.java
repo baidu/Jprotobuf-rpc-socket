@@ -192,7 +192,7 @@ public class DynamicProtobufRpcProxy {
 
         RpcMethodInfo rpcMethodInfo = rpcMethods.get(serviceSignature);
         if (rpcMethodInfo == null) {
-            synchronized (serviceSignature) {
+            synchronized (proxy) {
                 ProtobufRPC protobufPRC = new ProtobufRPC() {
 
                     @Override
@@ -256,7 +256,7 @@ public class DynamicProtobufRpcProxy {
         RpcChannel rpcChannel = rpcChannelMap.get(serviceSignature);
 
         if (rpcChannel == null) {
-            synchronized (serviceSignature) {
+            synchronized (proxy) {
                 if (!rpcChannelMap.containsKey(serviceSignature)) {
                     rpcChannel = new RpcChannel(rpcClient, host, port);
                     rpcChannelMap.put(serviceSignature, rpcChannel);

@@ -22,10 +22,10 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.Enumeration;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utiltiy class for net.
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 public class NetUtils {
 
     /** The Constant logger. */
-    private static final Logger logger = Logger.getLogger(NetUtils.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NetUtils.class.getName());
 
     /** The Constant LOCALHOST. */
     public static final String LOCALHOST = "127.0.0.1";
@@ -52,7 +52,7 @@ public class NetUtils {
 
     /** The Constant RANDOM. */
     private static final Random RANDOM = new Random(System.currentTimeMillis());
-    
+
     /** The local address. */
     private static volatile InetAddress LOCAL_ADDRESS = null;
 
@@ -83,6 +83,9 @@ public class NetUtils {
                 try {
                     ss.close();
                 } catch (IOException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(e.getMessage(), e);
+                    }
                 }
             }
         }
@@ -110,6 +113,9 @@ public class NetUtils {
                     try {
                         ss.close();
                     } catch (IOException e) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e.getMessage(), e);
+                        }
                     }
                 }
             }
@@ -130,6 +136,16 @@ public class NetUtils {
      * @return true, if is invalid port
      */
     public static boolean isInvalidPort(int port) {
+        return !isValidPort(port);
+    }
+    
+    /**
+     * Checks if is valid port.
+     *
+     * @param port the port
+     * @return true, if is valid port
+     */
+    public static boolean isValidPort(int port) {
         return port > MIN_PORT && port <= MAX_PORT;
     }
 
@@ -211,8 +227,9 @@ public class NetUtils {
      * @return true, if is valid address
      */
     private static boolean isValidAddress(InetAddress address) {
-        if (address == null || address.isLoopbackAddress())
+        if (address == null || address.isLoopbackAddress()) {
             return false;
+        }
         String name = address.getHostAddress();
         return (name != null && !ANYHOST.equals(name) && !LOCALHOST.equals(name) && IP_PATTERN.matcher(name).matches());
     }
@@ -223,8 +240,9 @@ public class NetUtils {
      * @return the local address
      */
     public static InetAddress getLocalAddress() {
-        if (LOCAL_ADDRESS != null)
+        if (LOCAL_ADDRESS != null) {
             return LOCAL_ADDRESS;
+        }
         InetAddress localAddress = getLocalAddress0();
         LOCAL_ADDRESS = localAddress;
         return localAddress;
@@ -253,7 +271,7 @@ public class NetUtils {
                 return localAddress;
             }
         } catch (Throwable e) {
-            logger.log(Level.WARNING, "Failed to retriving ip address, " + e.getMessage(), e);
+            logger.warn("Failed to retriving ip address, " + e.getMessage(), e);
         }
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -270,19 +288,19 @@ public class NetUtils {
                                         return address;
                                     }
                                 } catch (Throwable e) {
-                                    logger.log(Level.WARNING, "Failed to retriving ip address, " + e.getMessage(), e);
+                                    logger.warn("Failed to retriving ip address, " + e.getMessage(), e);
                                 }
                             }
                         }
                     } catch (Throwable e) {
-                        logger.log(Level.WARNING, "Failed to retriving ip address, " + e.getMessage(), e);
+                        logger.warn("Failed to retriving ip address, " + e.getMessage(), e);
                     }
                 }
             }
         } catch (Throwable e) {
-            logger.log(Level.WARNING, "Failed to retriving ip address, " + e.getMessage(), e);
+            logger.warn("Failed to retriving ip address, " + e.getMessage(), e);
         }
-        logger.log(Level.SEVERE, "Could not get local host ip address, will use 127.0.0.1 instead.");
+        logger.error("Could not get local host ip address, will use 127.0.0.1 instead.");
         return localAddress;
     }
 }

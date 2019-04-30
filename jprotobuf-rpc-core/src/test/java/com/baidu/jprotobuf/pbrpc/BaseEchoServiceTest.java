@@ -54,30 +54,8 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         if (rpcServerOptions == null) {
             rpcServerOptions = new RpcServerOptions();
         }
-        rpcServer = new RpcServer(rpcServerOptions);
-        rpcServer.setInterceptor(new InvokerInterceptor() {
-            
-            @Override
-            public Object process(MethodInvocationInfo methodInvocation) {
-                System.out.println("server intercepr method:" + methodInvocation.getMethod());
-                return null;
-            }
-            
-            @Override
-            public void beforeInvoke(MethodInvocationInfo methodInvocation) {
-                Assert.assertNotNull(methodInvocation.getMethod());
-                
-            }
-
-            @Override
-            public void afterProcess() {
-                
-            }
-		});
-        
-        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
-        rpcServer.registerService(echoServiceImpl);
-        rpcServer.start(PORT);
+        rpcServer = createRpcServer(rpcServerOptions, PORT);
+        //RpcServer rpcServer = createRpcServer(rpcServerOptions, 8099);
         
         RpcClientOptions options = getRpcClientOptions();
         if (options == null) {
@@ -87,6 +65,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         
         pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(PORT);
+        
         
         pbrpcProxy.setInterceptor(new InvokerInterceptor() {
 			
@@ -109,6 +88,35 @@ public abstract class BaseEchoServiceTest extends BaseTest {
 		});
         
         echoService = pbrpcProxy.proxy();
+    }
+
+    private RpcServer createRpcServer(RpcServerOptions rpcServerOptions, int port) {
+        RpcServer rpcServer = new RpcServer(rpcServerOptions);
+        rpcServer.setInterceptor(new InvokerInterceptor() {
+            
+            @Override
+            public Object process(MethodInvocationInfo methodInvocation) {
+                System.out.println("server intercepr method:" + methodInvocation.getMethod());
+                return null;
+            }
+            
+            @Override
+            public void beforeInvoke(MethodInvocationInfo methodInvocation) {
+                Assert.assertNotNull(methodInvocation.getMethod());
+                
+            }
+
+            @Override
+            public void afterProcess() {
+                
+            }
+		});
+        
+        EchoServiceImpl echoServiceImpl = new EchoServiceImpl();
+        rpcServer.registerService(echoServiceImpl);
+        rpcServer.start(port);
+        
+        return rpcServer;
     }
     
     protected void startServer() {
