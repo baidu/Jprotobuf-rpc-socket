@@ -77,7 +77,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     private T proxyInstance;
 
     /** The lookup stub on startup. */
-    private boolean lookupStubOnStartup = true;
+    private boolean lookupStubOnStartup = false;
 
     /** The instances map. */
     private Map<String, Object> instancesMap = new HashMap<String, Object>();
