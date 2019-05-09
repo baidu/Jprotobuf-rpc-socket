@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +46,8 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.RecoverHeartbeat;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.LoadBalanceStrategy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RoundRobinLoadBalanceStrategy;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
+
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 /**
  * a common utility proxy factory bean to support Spring beans load balance support.<br>
@@ -126,9 +127,6 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     /** The recover heartbeat. */
     private RecoverHeartbeat recoverHeartbeat;
 
-    /** The exe. */
-    private ExecutorService exe;
-
     /** The fail over event. */
     private FailOverEvent failOverEvent;
 
@@ -146,6 +144,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     
     /** The lastest exception. */
     private Throwable lastestException;
+    
+    /** The exe. */
+    private ExecutorService exe = Executors.newFixedThreadPool(1, new DefaultThreadFactory("loadbalance-heartbeat"));
 
     /**
      * Sets the fail over event.
@@ -558,13 +559,6 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
     private synchronized void executeHeartBeat() {
         if (!isHeartBeat()) { // if close heart beat manually
             return;
-        }
-        if (exe == null || exe.isShutdown()) {
-            exe = Executors.newFixedThreadPool(1, new ThreadFactory() {
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "loadbalance-" + beanName);
-                }
-            });
         }
         if (recoverHeartbeat == null) {
             recoverHeartbeat = new RecoverHeartbeat(this);

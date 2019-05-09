@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,15 @@ public class RpcServer extends ServerBootstrap {
     public void setExceptionCatcher(ExceptionCatcher exceptionCatcher) {
         this.exceptionCatcher = exceptionCatcher;
     }
+    
+    /**
+     * Gets the exception catcher.
+     *
+     * @return the exception catcher
+     */
+    protected ExceptionCatcher getExceptionCatcher() {
+        return exceptionCatcher;
+    }
 
     /**
      * Sets the interceptor.
@@ -136,6 +145,8 @@ public class RpcServer extends ServerBootstrap {
     /** rpcServiceRegistry. */
     private RpcServiceRegistry rpcServiceRegistry;
 
+    private Class<? extends ServerChannel> serverChannelClass;
+
     /**
      * Instantiates a new rpc server.
      *
@@ -152,41 +163,14 @@ public class RpcServer extends ServerBootstrap {
         if (serverOptions == null) {
             serverOptions = new RpcServerOptions();
         }
-
-        if (serverOptions.getIoEventGroupType() == RpcServerOptions.POLL_EVENT_GROUP) {
-            this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
-            this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
-        } else {
-            this.bossGroup = new EpollEventLoopGroup(serverOptions.getAcceptorThreads());
-            this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads());
-        }
-
-        if (serverOptions.getTaskTheads() > 0) {
-            es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L,
-                    TimeUnit.SECONDS, blockingqueue);
-        }
-
-        this.group(this.bossGroup, this.workerGroup);
-        this.channel(serverChannelClass);
-
-        this.option(ChannelOption.SO_BACKLOG, serverOptions.getBacklog());
-
-        this.childOption(ChannelOption.SO_KEEPALIVE, serverOptions.isKeepAlive());
-        this.childOption(ChannelOption.SO_REUSEADDR, true);
-        this.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-        this.childOption(ChannelOption.TCP_NODELAY, serverOptions.isTcpNoDelay());
-        this.childOption(ChannelOption.SO_LINGER, serverOptions.getSoLinger());
-        this.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, serverOptions.getConnectTimeout());
-        this.childOption(ChannelOption.SO_RCVBUF, serverOptions.getReceiveBufferSize());
-        this.childOption(ChannelOption.SO_SNDBUF, serverOptions.getSendBufferSize());
-
-        this.rpcServiceRegistry = rpcServiceRegistry;
-        // do register meta service
-        rpcServiceRegistry.doRegisterMetaService();
+        
         this.rpcServerOptions = serverOptions;
-        this.rpcServerPipelineInitializer =
-                new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es, exceptionCatcher);
-        this.childHandler(rpcServerPipelineInitializer);
+        this.rpcServiceRegistry = rpcServiceRegistry;
+        this.serverChannelClass = serverChannelClass;
+        this.exceptionCatcher = exceptionCatcher;
+        
+        init(rpcServerOptions);
+
     }
     
     public RpcServer(Class<? extends ServerChannel> serverChannelClass, RpcServerOptions serverOptions,
@@ -227,6 +211,47 @@ public class RpcServer extends ServerBootstrap {
         this(NioServerSocketChannel.class, new RpcServerOptions(), new RpcServiceRegistry(), exceptionCatcher);
     }
 
+    
+    /**
+     * Inits the.
+     *
+     * @param serverOptions the server options
+     */
+    protected void init(RpcServerOptions serverOptions) {
+        if (serverOptions.getIoEventGroupType() == RpcServerOptions.POLL_EVENT_GROUP) {
+            this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
+            this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
+        } else {
+            this.bossGroup = new EpollEventLoopGroup(serverOptions.getAcceptorThreads());
+            this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads());
+        }
+
+        if (serverOptions.getTaskTheads() > 0) {
+            es = new ThreadPoolExecutor(serverOptions.getTaskTheads(), serverOptions.getTaskTheads(), 60L,
+                    TimeUnit.SECONDS, blockingqueue);
+        }
+
+        this.group(this.bossGroup, this.workerGroup);
+        this.channel(serverChannelClass);
+
+        this.option(ChannelOption.SO_BACKLOG, serverOptions.getBacklog());
+
+        this.childOption(ChannelOption.SO_KEEPALIVE, serverOptions.isKeepAlive());
+        this.childOption(ChannelOption.SO_REUSEADDR, true);
+        this.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+        this.childOption(ChannelOption.TCP_NODELAY, serverOptions.isTcpNoDelay());
+        this.childOption(ChannelOption.SO_LINGER, serverOptions.getSoLinger());
+        this.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, serverOptions.getConnectTimeout());
+        this.childOption(ChannelOption.SO_RCVBUF, serverOptions.getReceiveBufferSize());
+        this.childOption(ChannelOption.SO_SNDBUF, serverOptions.getSendBufferSize());
+
+        
+        // do register meta service
+        rpcServiceRegistry.doRegisterMetaService();
+        this.rpcServerPipelineInitializer =
+                new RpcServerPipelineInitializer(rpcServiceRegistry, rpcServerOptions, es, exceptionCatcher);
+        this.childHandler(rpcServerPipelineInitializer);
+    }
 
     /**
      * Instantiates a new rpc server.

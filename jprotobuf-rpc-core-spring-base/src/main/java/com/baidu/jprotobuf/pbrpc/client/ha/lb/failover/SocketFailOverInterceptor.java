@@ -18,7 +18,6 @@ package com.baidu.jprotobuf.pbrpc.client.ha.lb.failover;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

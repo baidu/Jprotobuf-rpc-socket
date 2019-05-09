@@ -47,7 +47,7 @@ public class RpcClientOptions {
     private int maxIdleSize = 20;
     
     /** The min idle size. */
-    private int minIdleSize = 2;
+    private int minIdleSize = 1;
     
     /** The min evictable idle time. */
     private long minEvictableIdleTime = 1000L * 60L * 2;

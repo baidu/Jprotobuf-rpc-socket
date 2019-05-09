@@ -164,13 +164,16 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     private void oneThreadExecute(String requestString, String responseString) {
         setUp(1, requestString, responseString);
 
+        List<EchoInfo> list = new ArrayList<EchoInfo>(totalRequestSize);
         long time = System.currentTimeMillis();
         for (int i = 0; i < totalRequestSize; i++) {
-            echoService.echo(echoInfo);
+            EchoInfo echo = echoService.echo(echoInfo);
+            list.add(echo);
         }
         long timetook = System.currentTimeMillis() - time;
 
         printResult(in, out, totalRequestSize, timetook, 1);
+        System.out.println(list.size());
     }
 
     @Test

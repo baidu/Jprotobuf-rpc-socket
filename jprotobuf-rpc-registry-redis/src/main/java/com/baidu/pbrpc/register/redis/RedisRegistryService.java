@@ -31,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -47,6 +46,7 @@ import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.utils.Constants;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 
+import io.netty.util.concurrent.DefaultThreadFactory;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -55,8 +55,8 @@ import redis.clients.jedis.Jedis;
  * @author xiemalin
  * @since 1.0
  */
-public class RedisRegistryService extends AsyncRegistryService implements NamingService, DisposableBean,
-        InitializingBean {
+public class RedisRegistryService extends AsyncRegistryService
+        implements NamingService, DisposableBean, InitializingBean {
 
     private static final Logger logger = Logger.getLogger(RedisRegistryService.class.getName());
 
@@ -67,21 +67,17 @@ public class RedisRegistryService extends AsyncRegistryService implements Naming
     private final AtomicBoolean initilized = new AtomicBoolean(false);
 
     private final Set<RegisterInfo> registeredInfoSet = new CopyOnWriteArraySet<RegisterInfo>();
-    
+
     private static final String REGISTER = "REGISTER";
 
     private static final String UNREGISTER = "UNREGISTER";
-    
+
     private String group;
 
     private boolean administrator = false;
 
-    private final ScheduledExecutorService expireExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "RegistryExpireTimer");
-        }
-    });
+    private final ScheduledExecutorService expireExecutor =
+            Executors.newScheduledThreadPool(1, new DefaultThreadFactory("RegistryExpireTimer"));
 
     private ScheduledFuture<?> expireFuture;
 
@@ -148,8 +144,8 @@ public class RedisRegistryService extends AsyncRegistryService implements Naming
                 String serviceKey = Constants.SERVICE_KEY_PREIFX + group + registerInfo.getService();
                 String registerTime = System.currentTimeMillis() + "";
                 resource.hset(serviceKey, hostInfo, registerTime);
-                logger.log(Level.FINE, "Extend time for service provider [" + registerInfo.getService() + "] of value "
-                        + hostInfo);
+                logger.log(Level.FINE,
+                        "Extend time for service provider [" + registerInfo.getService() + "] of value " + hostInfo);
             }
         } finally {
             getJedisPool().returnResource(resource);
@@ -430,6 +426,7 @@ public class RedisRegistryService extends AsyncRegistryService implements Naming
 
     /**
      * get the group
+     * 
      * @return the group
      */
     public String getGroup() {
@@ -438,6 +435,7 @@ public class RedisRegistryService extends AsyncRegistryService implements Naming
 
     /**
      * set group value to group
+     * 
      * @param group the group to set
      */
     public void setGroup(String group) {
