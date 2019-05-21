@@ -39,6 +39,7 @@ import com.baidu.jprotobuf.pbrpc.transport.SimpleChannelPoolSharableFactory;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
 import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
+import com.baidu.jprotobuf.pbrpc.utils.TalkTimeoutController;
 
 /**
  * Protobuf RPC proxy utility class.
@@ -499,6 +500,20 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             }
 
             final BlockingRpcCallback callback = new BlockingRpcCallback(callbackDone);
+
+            // to check time out setting if need
+            long talkTimeout = TalkTimeoutController.getTalkTimeout();
+            if (talkTimeout > 0) {
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    LOGGER.log(Level.FINE,
+                            "talk time out is changed by TalkTimeoutController new value is '" + talkTimeout + "'");
+                }
+                onceTalkTimeout = talkTimeout;
+            }
+            
+            if (TalkTimeoutController.isEnableOnce()) {
+                TalkTimeoutController.clearTalkTimeout();
+            }
 
             try {
                 rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
