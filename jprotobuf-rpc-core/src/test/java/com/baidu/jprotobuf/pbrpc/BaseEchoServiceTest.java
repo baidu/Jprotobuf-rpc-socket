@@ -54,6 +54,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
         if (rpcServerOptions == null) {
             rpcServerOptions = new RpcServerOptions();
         }
+        rpcServerOptions.setTaskTheads(10);
         rpcServer = createRpcServer(rpcServerOptions, PORT);
         //RpcServer rpcServer = createRpcServer(rpcServerOptions, 8099);
         

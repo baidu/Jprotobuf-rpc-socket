@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +54,10 @@ public class RpcServiceRegistry {
      * registered service map. the key if unique represent service name
      */
     private Map<String, RpcHandler> serviceMap = new HashMap<String, RpcHandler>();
+    
+    
+    /** The async service map. */
+    private Set<String> asyncServiceMap = new HashSet<String>();
 
     /**
      * if override exist allowed. default is not allowed
@@ -211,9 +217,28 @@ public class RpcServiceRegistry {
             public Class<? extends ServerAuthenticationDataHandler> authenticationDataHandler() {
                 return authentiationDataCls;
             }
+            
+            @Override
+            public boolean async() {
+                return false;
+            }
+            
         };
 
         doRegiterService(method, service, protobufPRCService);
+    }
+    
+    
+    /**
+     * Checks if is async mode.
+     *
+     * @param serviceName the service name
+     * @param methodName the method name
+     * @return true, if is async mode
+     */
+    public boolean isAsyncMode(String serviceName, String methodName) {
+        String makeSignature = ServiceSignatureUtils.makeSignature(serviceName, methodName);
+        return asyncServiceMap.contains(makeSignature);
     }
 
     /**
@@ -226,7 +251,13 @@ public class RpcServiceRegistry {
     protected void doRegiterService(Method method, Object service, ProtobufRPCService protobufPRCService) {
         RpcHandler rpcHandler = doCreateRpcHandler(method, service, protobufPRCService);
         String methodSignature = rpcHandler.getMethodSignature();
-
+        
+        boolean async = protobufPRCService.async();
+        if (async) {
+            // if active async mode
+            asyncServiceMap.add(methodSignature);
+        }
+        
         if (serviceMap.containsKey(methodSignature)) {
             if (dummyOverride) {
                 serviceMap.put(methodSignature, rpcHandler);

@@ -63,7 +63,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
 
     /** The exception catcher. */
     private ExceptionCatcher exceptionCatcher;
-
+    
     /**
      * Instantiates a new rpc service handler.
      *
@@ -178,10 +178,23 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                     return;
                 }
             }
+            
 
             RpcMeta rpcMeta = dataPackage.getRpcMeta();
             String serviceName = rpcMeta.getRequest().getSerivceName();
             String methodName = rpcMeta.getRequest().getMethodName();
+            
+            // check if async mode
+            boolean asyncMode = rpcServiceRegistry.isAsyncMode(serviceName, methodName);
+            if (asyncMode) {
+                
+                RpcDataPackage copy = dataPackage.copy();
+                
+                copy.errorCode(ErrorCodes.ST_SUCCESS);
+                copy.data(null);
+                copy.attachment(null);
+                ctx.writeAndFlush(copy);
+            }
 
             Long logId = rpcMeta.getRequest().getLogId();
             // set log id to holder
@@ -237,7 +250,9 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                 // We know the encoder inserted at TelnetPipelineFactory will do
                 // the
                 // conversion.
-                ctx.writeAndFlush(dataPackage);
+                if (!asyncMode) {
+                    ctx.writeAndFlush(dataPackage);
+                }
             } catch (Exception t) {
                 ErrorDataException exception = new ErrorDataException(t.getMessage(), t);
                 exception.setErrorCode(ErrorCodes.ST_ERROR);
