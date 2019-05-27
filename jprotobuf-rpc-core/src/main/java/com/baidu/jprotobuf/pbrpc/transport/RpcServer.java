@@ -44,6 +44,7 @@ import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 /**
  * RPC server provider by Netty server.
@@ -218,12 +219,15 @@ public class RpcServer extends ServerBootstrap {
      * @param serverOptions the server options
      */
     protected void init(RpcServerOptions serverOptions) {
+        DefaultThreadFactory bossThreadFacotry = new DefaultThreadFactory("jprotobuf-rpc-acceptorThread");
+        DefaultThreadFactory workerThreadFacotry = new DefaultThreadFactory("jprotobuf-rpc-workerThread");
+        
         if (serverOptions.getIoEventGroupType() == RpcServerOptions.POLL_EVENT_GROUP) {
-            this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads());
-            this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads());
+            this.bossGroup = new NioEventLoopGroup(serverOptions.getAcceptorThreads(), bossThreadFacotry);
+            this.workerGroup = new NioEventLoopGroup(serverOptions.getWorkThreads(), workerThreadFacotry);
         } else {
-            this.bossGroup = new EpollEventLoopGroup(serverOptions.getAcceptorThreads());
-            this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads());
+            this.bossGroup = new EpollEventLoopGroup(serverOptions.getAcceptorThreads(), bossThreadFacotry);
+            this.workerGroup = new EpollEventLoopGroup(serverOptions.getWorkThreads(), workerThreadFacotry);
         }
 
         if (serverOptions.getTaskTheads() > 0) {
