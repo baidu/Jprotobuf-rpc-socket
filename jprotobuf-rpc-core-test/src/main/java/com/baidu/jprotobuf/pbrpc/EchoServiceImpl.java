@@ -19,15 +19,15 @@ package com.baidu.jprotobuf.pbrpc;
 import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
- * Echo service 
+ * Echo service
  * 
  * @author xiemalin
  * @since 1.0
  */
 public class EchoServiceImpl {
-    
+
     private Integer order;
-    
+
     /**
      * 
      */
@@ -42,61 +42,75 @@ public class EchoServiceImpl {
         this.order = order;
     }
 
-
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echo", description ="echo测试服务")
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo", description = "echo测试服务")
     public EchoInfo doEcho(EchoInfo info) {
         EchoInfo ret = new EchoInfo();
-        //SleepUtils.dummySleep(100000);
+        // SleepUtils.dummySleep(100000);
         ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
         return ret;
     }
-    
 
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echo2", description ="echo测试服务")
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo2", description = "echo测试服务")
     public EchoInfo doEchoAnnother(EchoInfo info) {
-        //SleepUtils.dummySleep(10000);
+        // SleepUtils.dummySleep(10000);
         return doEcho(info);
     }
 
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoWithAttachement", 
-            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件")
+    @ProtobufRPCService(serviceName = "echoService",
+            methodName = "echoWithAttachement",
+            attachmentHandler = EchoServerAttachmentHandler.class,
+            description = "echo测试服务带附件")
     public EchoInfo dealWithAttachement(EchoInfo info) {
         return doEcho(info);
     }
-    
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoGzip", 
-            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件和Gzip压缩")
+
+    @ProtobufRPCService(serviceName = "echoService",
+            methodName = "echoGzip",
+            attachmentHandler = EchoServerAttachmentHandler.class,
+            description = "echo测试服务带附件和Gzip压缩")
     public EchoInfo dealWithGzipEnable(EchoInfo info) {
         return doEcho(info);
     }
-    
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoSnappy", 
-            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件和Snappy压缩")
+
+    @ProtobufRPCService(serviceName = "echoService",
+            methodName = "echoSnappy",
+            attachmentHandler = EchoServerAttachmentHandler.class,
+            description = "echo测试服务带附件和Snappy压缩")
     public EchoInfo dealWithSnappyEnable(EchoInfo info) {
         return doEcho(info);
     }
-    
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoAuthenticateData", 
-            attachmentHandler = EchoServerAttachmentHandler.class, description ="echo测试服务带附件和Snappy压缩",
+
+    @ProtobufRPCService(serviceName = "echoService",
+            methodName = "echoAuthenticateData",
+            attachmentHandler = EchoServerAttachmentHandler.class,
+            description = "echo测试服务带附件和Snappy压缩",
             authenticationDataHandler = EchoServerAuthenticationDataHandler.class)
     public EchoInfo dealWithAuthenticationDataEnable(EchoInfo info) {
         return doEcho(info);
     }
-    
-    
+
     @ProtobufRPCService(serviceName = "echoService", methodName = "businessExceptionCall")
     public EchoInfo businessExceptionCall(EchoInfo info) {
         throw new RuntimeException("Throw business exception.");
     }
-    
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoTimeout", description ="echo测试服务")
+
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echoTimeout", description = "echo测试服务")
     public EchoInfo echoTimeout(EchoInfo info) {
         SleepUtils.dummySleep(2000);
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + info.getMessage());
         return ret;
     }
-    
+
+    @ProtobufRPCService(serviceName = "echoService", async= true, methodName = "echoWithoutReturn", description = "echo不带返回值")
+    public EchoInfo echoWithoutReturn(EchoInfo info) {
+        SleepUtils.dummySleep(2000);
+        System.out.println(info);
+        EchoInfo ret = new EchoInfo();
+        ret.setMessage("hello:" + info.getMessage());
+        return ret;
+    }
+
     public EchoInfo doEchoDynamic(EchoInfo info) {
         return info;
     }

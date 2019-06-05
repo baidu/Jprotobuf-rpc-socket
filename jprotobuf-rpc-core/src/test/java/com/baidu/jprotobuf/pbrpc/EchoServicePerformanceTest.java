@@ -54,7 +54,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 10000;
+    int totalRequestSize = 100000;
     
     /**
 	 * set totalRequestSize value to totalRequestSize
@@ -75,6 +75,8 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
 
     public void setUp(int threadSize, String requestData, String responseData) {
         RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setAcceptorThreads(2);
+        rpcServerOptions.setWorkThreads(20);
         rpcServerOptions.setHttpServerPort(8866);
         rpcServerOptions.setTaskTheads(threadSize);
         rpcServer = new RpcServer(rpcServerOptions);

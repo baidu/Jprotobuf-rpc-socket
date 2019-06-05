@@ -67,4 +67,7 @@ public interface EchoService {
     
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 1000)
     EchoInfo serverFailed(EchoInfo info);
+    
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 10000000)
+    EchoInfo echoWithoutReturn(EchoInfo info);
 }

@@ -48,6 +48,8 @@ public class EchoServiceTest extends BaseEchoServiceTest {
     protected RpcServerOptions getRpcServerOptions() {
 
         RpcServerOptions rpcServerOptions = new RpcServerOptions();
+        rpcServerOptions.setAcceptorThreads(2);
+        rpcServerOptions.setWorkThreads(10);
         rpcServerOptions.setHttpServerPort(8866);
         rpcServerOptions.setIoEventGroupType(RpcServerOptions.POLL_EVENT_GROUP);
 
