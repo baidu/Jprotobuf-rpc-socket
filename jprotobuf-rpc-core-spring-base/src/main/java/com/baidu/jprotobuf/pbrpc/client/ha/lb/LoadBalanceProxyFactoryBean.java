@@ -238,6 +238,7 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     // /---- InitializingBean implement
+    @SuppressWarnings("unchecked")
     public void afterPropertiesSet() throws Exception {
         if (getServiceInterface() == null) {
             throw new IllegalArgumentException("Property 'serviceInterfaces' is required");
