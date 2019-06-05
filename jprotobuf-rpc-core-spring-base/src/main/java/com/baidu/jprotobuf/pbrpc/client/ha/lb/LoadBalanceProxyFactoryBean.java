@@ -285,9 +285,11 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
             if (targets == null) {
                 targets = new HashSet<String>();
             }
+            
             for (String key : targets) {
                 if (!targetBeans.containsKey(key)) {
-                    throw new IllegalArgumentException("the target key '" + key + "' of loadBalanceStrategy is invalid");
+                    LOGGER.log(Level.SEVERE, "the target key '" + key + "' of loadBalanceStrategy is invalid");
+                    loadBalanceStrategy.removeTarget(key);
                 }
             }
         }
