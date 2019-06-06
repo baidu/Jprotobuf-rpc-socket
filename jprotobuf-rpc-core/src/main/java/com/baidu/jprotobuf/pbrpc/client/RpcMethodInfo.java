@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.baidu.jprotobuf.pbrpc.DummyLogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.LogIDGenerator;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.AbstractMessage;
 
 /**
  * RPC method description info.
@@ -98,14 +98,14 @@ public abstract class RpcMethodInfo {
 
         Class<?>[] types = method.getParameterTypes();
         if (types.length == 1) {
-            if (GeneratedMessage.class.isAssignableFrom(types[0])) {
+            if (AbstractMessage.class.isAssignableFrom(types[0])) {
                 paramMessagetType = true;
             }
         }
 
         Class<?> returnType = method.getReturnType();
         if (!ReflectionUtils.isVoid(returnType)) {
-            if (GeneratedMessage.class.isAssignableFrom(returnType)) {
+            if (AbstractMessage.class.isAssignableFrom(returnType)) {
                 if (paramMessagetType) {
                     return true;
                 } else {
@@ -116,6 +116,16 @@ public abstract class RpcMethodInfo {
         }
 
         return false;
+    }
+    
+    /**
+     * Checks if is message type.
+     *
+     * @param inputClass2 the input class 2
+     * @return true, if is message type
+     */
+    public static boolean isMessageType(Class inputClass2) {
+        return AbstractMessage.class.isAssignableFrom(inputClass2);
     }
 
     /**
@@ -290,6 +300,7 @@ public abstract class RpcMethodInfo {
     public AuthenticationDataHandler getAuthenticationDataHandler() {
         return authenticationDataHandler;
     }
+
 
     
 }

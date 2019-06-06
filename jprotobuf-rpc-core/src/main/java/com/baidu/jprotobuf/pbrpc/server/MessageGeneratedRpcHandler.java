@@ -22,8 +22,9 @@ import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
+import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.AbstractMessage;
 
 /**
  * RPC handler for Google protoc generated java code.
@@ -54,7 +55,7 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
         super(method, service, protobufPRCService);
 
         if (getInputClass() != null) {
-            if (GeneratedMessage.class.isAssignableFrom(getInputClass())) {
+            if (RpcMethodInfo.isMessageType(getInputClass())) {
                 try {
                     parseFromMethod = getInputClass().getMethod(PROTOBUF_PARSE_METHOD, InputStream.class);
                 } catch (Exception e) {
@@ -110,8 +111,8 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
                     PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
                             + "' time took:" + (System.currentTimeMillis() - time) + " ms");
 
-                    if (ret instanceof GeneratedMessage) {
-                        byte[] response = ((GeneratedMessage) ret).toByteArray();
+                    if (ret instanceof AbstractMessage) {
+                        byte[] response = ((AbstractMessage) ret).toByteArray();
                         retData.setData(response);
                     }
 
@@ -128,8 +129,8 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
                 return retData;
             }
 
-            if (ret != null && ret instanceof GeneratedMessage) {
-                byte[] response = ((GeneratedMessage) ret).toByteArray();
+            if (ret != null && ret instanceof AbstractMessage) {
+                byte[] response = ((AbstractMessage) ret).toByteArray();
                 retData.setData(response);
             }
 
