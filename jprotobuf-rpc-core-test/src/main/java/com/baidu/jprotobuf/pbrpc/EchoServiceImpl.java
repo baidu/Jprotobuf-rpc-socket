@@ -16,6 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.Arrays;
+
 import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 
 /**
@@ -113,5 +115,12 @@ public class EchoServiceImpl {
 
     public EchoInfo doEchoDynamic(EchoInfo info) {
         return info;
+    }
+    
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echoUseByteArrayInputParam", description = "echo不带返回值")
+    public EchoInfo echoUseByteArrayInputParam(byte[] bytes) {
+        EchoInfo ret = new EchoInfo();
+        ret.setMessage("hello:" + Arrays.toString(bytes));
+        return ret;
     }
 }

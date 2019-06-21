@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import com.baidu.jprotobuf.pbrpc.ProtobufRPCService;
 import com.baidu.jprotobuf.pbrpc.client.RpcMethodInfo;
-import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.google.protobuf.AbstractMessage;
 
 /**
@@ -65,81 +64,31 @@ public class MessageGeneratedRpcHandler extends AbstractAnnotationRpcHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doRealHandle(com.baidu.jprotobuf. pbrpc .server.RpcData)
+
+    /**
+     * Decode output param.
+     *
+     * @param ret the ret
+     * @return the byte[]
+     * @throws Exception the exception
      */
-    protected RpcData doRealHandle(RpcData data) throws Exception {
+    @Override
+    protected byte[] decodeOutputParam(Object ret) throws Exception {
+        if (ret != null && ret instanceof AbstractMessage) {
+            byte[] response = ((AbstractMessage) ret).toByteArray();
+            return response;
+        }
+        return null;
+    }
 
-        Object input = null;
-        Object[] param;
-        Object ret = null;
-        if (data.getData() != null && parseFromMethod != null) {
-            input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data.getData()));
-            param = new Object[] { input };
-        } else {
-            param = new Object[0];
+    @Override
+    protected Object encodeInputParam(byte[] data) throws Exception {
+        if (data != null && parseFromMethod != null) {
+            Object input = parseFromMethod.invoke(getInputClass(), new ByteArrayInputStream(data));
+            return input;
         }
 
-        RpcData retData = new RpcData();
-        
-        // process authentication data handler
-        if (getAuthenticationHandler() != null) {
-            getAuthenticationHandler().handle(data.getAuthenticationData(), getServiceName(),
-                    getMethodName(), param);
-        }
-        
-        // process attachment
-        if (getAttachmentHandler() != null) {
-            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
-                    getMethodName(), param);
-            retData.setAttachment(responseAttachment);
-        }
-
-        long time = System.currentTimeMillis();
-
-        try {
-            // check intercepter
-            if (getInterceptor() != null) {
-                MethodInvocationInfo methodInvocationInfo =
-                        new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
-                getInterceptor().beforeInvoke(methodInvocationInfo);
-
-                ret = getInterceptor().process(methodInvocationInfo);
-                if (ret != null) {
-                    PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
-                            + "' time took:" + (System.currentTimeMillis() - time) + " ms");
-
-                    if (ret instanceof AbstractMessage) {
-                        byte[] response = ((AbstractMessage) ret).toByteArray();
-                        retData.setData(response);
-                    }
-
-                    return retData;
-                }
-            }
-
-            ret = getMethod().invoke(getService(), param);
-            long took = (System.currentTimeMillis() - time);
-            PERFORMANCE_LOGGER
-                    .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
-
-            if (ret == null) {
-                return retData;
-            }
-
-            if (ret != null && ret instanceof AbstractMessage) {
-                byte[] response = ((AbstractMessage) ret).toByteArray();
-                retData.setData(response);
-            }
-
-            return retData;
-        } finally {
-            if (getInterceptor() != null) {
-                getInterceptor().afterProcess();
-            }
-        }
+        return null;
     }
 
 }

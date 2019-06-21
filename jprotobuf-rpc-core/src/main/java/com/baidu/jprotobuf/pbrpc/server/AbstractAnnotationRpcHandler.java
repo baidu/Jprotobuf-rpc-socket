@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.baidu.jprotobuf.pbrpc.server;
 
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.jprotobuf.pbrpc.DummyServerAttachmentHandler;
@@ -27,6 +28,8 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ServerAuthenticationDataHandler;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
+import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
+import com.baidu.jprotobuf.pbrpc.management.ServerStatus;
 import com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware;
 import com.baidu.jprotobuf.pbrpc.utils.ReflectionUtils;
 import com.baidu.jprotobuf.pbrpc.utils.ServiceSignatureUtils;
@@ -41,6 +44,9 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  */
 @SuppressWarnings({"rawtypes"})
 public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMetaAware {
+    
+    /** Logger for this class. */
+    private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     /** The service name. */
     private String serviceName;
@@ -76,6 +82,13 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
 	private InvokerInterceptor interceptor;
 
     private ServerAuthenticationDataHandler authenticationHandler;
+    
+
+    /** The service signature. */
+    private String serviceSignature;
+    
+    /** The is byte array input param. */
+    private boolean isByteArrayInputParam = false;
 
 	/**
 	 * Sets the interceptor.
@@ -127,14 +140,6 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         }
     }
     
-    /**
-     * Do real handle.
-     *
-     * @param data the data
-     * @return the rpc data
-     * @throws Exception the exception
-     */
-    protected abstract RpcData doRealHandle(RpcData data) throws Exception;
 
     /**
      * Instantiates a new abstract annotation rpc handler.
@@ -153,6 +158,8 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         if (StringUtils.isEmpty(methodName)) {
             methodName = method.getName();
         }
+        
+        serviceSignature = ServiceSignatureUtils.makeSignature(getServiceName(), getMethodName());
 
         Class<?>[] types = method.getParameterTypes();
         if (types.length > 1) {
@@ -160,6 +167,10 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
                     + method.getName());
         } else if (types.length == 1) {
             inputClass = types[0];
+            
+            if (byte[].class.equals(inputClass)) {
+                isByteArrayInputParam = true;
+            }
         }
 
         Class<?> returnType = method.getReturnType();
@@ -206,6 +217,104 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         }
     }
     
+    /**
+     * Do real handle.
+     *
+     * @param data the data
+     * @return the rpc data
+     * @throws Exception the exception
+     */
+    protected RpcData doRealHandle(RpcData data) throws Exception {
+        Object input = null;
+        Object[] param;
+        Object ret = null;
+        
+        if (isByteArrayInputParam) {
+            input = data.getData();
+        } else {
+            input = encodeInputParam(data.getData());
+        }
+        if (input != null) {
+            param = new Object[] { input };
+        } else {
+            param = new Object[0];
+        }
+        // process authentication data handler
+        if (getAuthenticationHandler() != null) {
+            getAuthenticationHandler().handle(data.getAuthenticationData(), getServiceName(), getMethodName(), param);
+        }
+
+        RpcData retData = new RpcData();
+        // process attachment
+        if (getAttachmentHandler() != null) {
+            byte[] responseAttachment = getAttachmentHandler().handleAttachement(data.getAttachment(), getServiceName(),
+                    getMethodName(), param);
+            retData.setAttachment(responseAttachment);
+        }
+
+        long time = System.currentTimeMillis();
+        try {
+            // check intercepter
+            if (getInterceptor() != null) {
+                MethodInvocationInfo methodInvocationInfo =
+                        new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+                getInterceptor().beforeInvoke(methodInvocationInfo);
+
+                ret = getInterceptor().process(methodInvocationInfo);
+                if (ret != null) {
+                    PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
+                            + "' time took:" + (System.currentTimeMillis() - time) + " ms");
+
+                    byte[] response = decodeOutputParam(ret);
+                    if (response != null) {
+                        retData.setData(response);
+                    }
+
+                    return retData;
+                }
+            }
+
+            ret = getMethod().invoke(getService(), param);
+            long took = (System.currentTimeMillis() - time);
+            PERFORMANCE_LOGGER
+                    .fine("RPC server invoke method(local) '" + getMethod().getName() + "' time took:" + took + " ms");
+
+            ServerStatus.incr(serviceSignature, took);
+
+            if (ret == null) {
+                return retData;
+            }
+
+            byte[] response = decodeOutputParam(ret);
+            
+            if (response != null) {
+                retData.setData(response);
+            }
+
+            return retData;
+        } finally {
+            if (getInterceptor() != null) {
+                getInterceptor().afterProcess();
+            }
+        }
+    }
+    
+    /**
+     * Decode output param.
+     *
+     * @param ret the ret
+     * @return the byte[]
+     */
+    protected abstract byte[] decodeOutputParam(Object ret) throws Exception;
+
+    /**
+     * Encode input param.
+     *
+     * @param data the data
+     * @return the object
+     */
+    protected abstract Object encodeInputParam(byte[] data) throws Exception;
+
     /* (non-Javadoc)
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodSignature()
      */
