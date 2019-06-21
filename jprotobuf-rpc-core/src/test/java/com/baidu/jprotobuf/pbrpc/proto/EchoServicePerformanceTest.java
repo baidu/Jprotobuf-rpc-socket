@@ -23,10 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import junit.framework.Assert;
-
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.jprotobuf.pbrpc.BasePerformaceTest;
@@ -36,6 +33,8 @@ import com.baidu.jprotobuf.pbrpc.proto.EchoInfoClass.EchoInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServer;
+
+import junit.framework.Assert;
 
 /**
  * Test class for {@link EchoService}

@@ -70,4 +70,7 @@ public interface EchoService {
     
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 10000000)
     EchoInfo echoWithoutReturn(EchoInfo info);
+    
+    @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 10000000)
+    EchoInfo echoUseByteArrayInputParam(EchoInfo info);
 }

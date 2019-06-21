@@ -118,14 +118,14 @@ public class EchoServiceTest extends BaseEchoServiceTest {
         EchoInfo response = echoService.echoGzip(echoInfo);
         Assert.assertEquals(ecohImpl.dealWithGzipEnable(echoInfo).getMessage(), response.getMessage());
     }
-    
+
     @Test
     public void echoWithoutReturn() {
         EchoInfo echoInfo = getEchoInfo();
         long time = System.currentTimeMillis();
         echoService.echoWithoutReturn(echoInfo);
         System.out.println(System.currentTimeMillis() - time);
-        
+
         SleepUtils.dummySleep(5000);
     }
 
@@ -169,12 +169,12 @@ public class EchoServiceTest extends BaseEchoServiceTest {
         }
 
     }
-    
+
     @Test
     public void testDynamiceTalkTimeout() {
         EchoInfo echoInfo = getEchoInfo();
-        
-        TalkTimeoutController.setTalkTimeout(10);
+
+        TalkTimeoutController.setTalkTimeout(1);
         try {
             echoService.echo(echoInfo);
             Assert.fail("Shold throw time out exception here");
@@ -182,7 +182,18 @@ public class EchoServiceTest extends BaseEchoServiceTest {
             Assert.assertNotNull(e);
             e.printStackTrace();
         }
-        
+
+    }
+
+    @Test
+    public void testByteArrayInputParam() {
+        EchoInfo echoInfo = getEchoInfo();
+
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+        EchoInfo response = echoService.echoUseByteArrayInputParam(echoInfo);
+        Assert.assertTrue(ecohImpl.dealWithAuthenticationDataEnable(echoInfo).getMessage().length() < response
+                .getMessage().length());
     }
 
 }
