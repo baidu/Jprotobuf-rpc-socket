@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.jprotobuf.pbrpc.client.ha;
 
@@ -60,19 +48,19 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
     /** The rpc client. */
     private final RpcClient rpcClient;
-    
+
     /** The interface class. */
     private final Class<T> interfaceClass;
-    
+
     /** The naming service. */
     private final NamingService namingService;
-    
+
     /** The load balance strategy factory. */
     private NamingServiceLoadBalanceStrategyFactory loadBalanceStrategyFactory;
-    
+
     /** The fail over interceptor. */
     private SocketFailOverInterceptor failOverInterceptor;
-    
+
     /** The proxy instance. */
     private T proxyInstance;
 
@@ -81,40 +69,40 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
     /** The instances map. */
     private Map<String, Object> instancesMap = new HashMap<String, Object>();
-    
+
     /** The lb map. */
     private Map<String, LoadBalanceProxyFactoryBean> lbMap = new HashMap<String, LoadBalanceProxyFactoryBean>();
-    
+
     /** The protobuf rpc proxy list map. */
     private Map<String, List<ProtobufRpcProxy<T>>> protobufRpcProxyListMap =
             new HashMap<String, List<ProtobufRpcProxy<T>>>();
 
     /** The proxied. */
     private AtomicBoolean proxied = new AtomicBoolean(false);
-    
-	/** The interceptor. */
-	protected InvokerInterceptor interceptor;
-	
-	/** The exception handler. */
-	protected ExceptionHandler exceptionHandler;
-	
-	/**
-	 * Sets the exception handler.
-	 *
-	 * @param exceptionHandler the new exception handler
-	 */
+
+    /** The interceptor. */
+    protected InvokerInterceptor interceptor;
+
+    /** The exception handler. */
+    protected ExceptionHandler exceptionHandler;
+
+    /**
+     * Sets the exception handler.
+     *
+     * @param exceptionHandler the new exception handler
+     */
     public void setExceptionHandler(ExceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
     }
 
-	/**
-	 * Sets the interceptor.
-	 *
-	 * @param interceptor the new interceptor
-	 */
-	public void setInterceptor(InvokerInterceptor interceptor) {
-		this.interceptor = interceptor;
-	}
+    /**
+     * Sets the interceptor.
+     *
+     * @param interceptor the new interceptor
+     */
+    public void setInterceptor(InvokerInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
     /**
      * Checks if is lookup stub on startup.
@@ -168,9 +156,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         if (namingService == null) {
             throw new NullPointerException("param 'namingService' is null.");
         }
-        
+
         ProxyFactory proxyFactory = new ProxyFactory(interfaceClass, this);
-        
+
         proxyInstance = (T) proxyFactory.getProxy();
 
     }
@@ -203,7 +191,6 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             Map<String, List<RegisterInfo>> servers = namingService.list(protobufRpcProxy.getServiceSignatures());
             // start update naming service task
             startUpdateNamingServiceTask(servers);
-
             createServiceProxy(servers);
         }
 
@@ -289,7 +276,9 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
                 + " time took:" + (System.currentTimeMillis() - current) + " ms");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.client.ha.NamingServiceChangeListener#close()
      */
     public void close() {
@@ -327,6 +316,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
                     LOGGER.fatal(e.getMessage(), e);
                 }
             }
+            protobufRpcProxyList.clear();
         }
     }
 

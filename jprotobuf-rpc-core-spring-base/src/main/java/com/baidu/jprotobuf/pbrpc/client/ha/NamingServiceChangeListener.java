@@ -54,8 +54,22 @@ public abstract class NamingServiceChangeListener {
 
     /**
      * time in milliseconds between successive NamingService result refresh update task executions.
+     * change default value to 1 hour
      */
-    private long period = 1000;
+    private long period = 1000 * 3600;
+    
+    /** The enable naming service callback. */
+    private boolean enableNamingServiceCallback = true;
+    
+    /**
+     * Sets the enable naming service callback.
+     *
+     * @param enableNamingServiceCallback the new enable naming service callback
+     */
+    public void setEnableNamingServiceCallback(boolean enableNamingServiceCallback) {
+        this.enableNamingServiceCallback = enableNamingServiceCallback;
+    }
+
 
     /**
      * Gets the naming service.
@@ -79,6 +93,9 @@ public abstract class NamingServiceChangeListener {
      * @param period the new time in milliseconds between successive NamingService result refresh update task executions
      */
     public void setPeriod(long period) {
+        if (period < 1000) {
+            period = 1000;
+        }
         this.period = period;
     }
 
@@ -97,10 +114,18 @@ public abstract class NamingServiceChangeListener {
      * @param serviceMap the service map
      */
     protected void startUpdateNamingServiceTask(Map<String, List<RegisterInfo>> serviceMap) {
+        if (!enableNamingServiceCallback) {
+            LOG.warning(
+                    "Naming service call back service is disabled, you can enable it by "
+                    + "setting 'enableNamingServiceCallback' to true");
+            return;
+        }
+        
         if (getNamingService() == null) {
             return;
         }
 
+        LOG.info("Start naming service call back function. interval time is :" + period + "(ms)");
         this.timer = new Timer(true);
         updateListTask = new UpdateNamingServiceTask(this, serviceMap);
         this.timer.scheduleAtFixedRate(updateListTask, delay, period);
