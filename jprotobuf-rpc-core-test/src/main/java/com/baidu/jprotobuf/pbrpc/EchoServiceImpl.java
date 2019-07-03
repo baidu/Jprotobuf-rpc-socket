@@ -117,7 +117,7 @@ public class EchoServiceImpl {
         return info;
     }
     
-    @ProtobufRPCService(serviceName = "echoService", methodName = "echoUseByteArrayInputParam", description = "echo不带返回值")
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echoUseByteArrayInputParam", description = "echo参数直接使用byte数组")
     public EchoInfo echoUseByteArrayInputParam(byte[] bytes) {
         EchoInfo ret = new EchoInfo();
         ret.setMessage("hello:" + Arrays.toString(bytes));
