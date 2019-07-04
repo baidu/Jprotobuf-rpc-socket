@@ -367,6 +367,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e.getCause());
             }
         }
+        rpcChannelMap.clear();
 
     }
 

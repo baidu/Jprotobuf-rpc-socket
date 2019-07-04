@@ -307,11 +307,13 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             } catch (Exception e) {
                 LOGGER.fatal(e.getMessage(), e);
             }
+            lbProxyBean = null;
         }
         if (protobufRpcProxyList != null) {
             for (ProtobufRpcProxy<T> proxy : protobufRpcProxyList) {
                 try {
                     proxy.close();
+                    proxy = null;
                 } catch (Exception e) {
                     LOGGER.fatal(e.getMessage(), e);
                 }

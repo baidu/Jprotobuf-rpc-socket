@@ -53,7 +53,8 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
 
         try {
             pbrpcProxy = new HaProtobufRpcProxy<EchoService>(rpcClient, EchoService.class, getNamingService());
-
+            pbrpcProxy.setPeriod(1000);
+            
             int serverSize = getNamingService().list(defaultServices).get(DEFAULT_KEY).size();
             Assert.assertEquals(5, serverSize);
 
@@ -175,7 +176,7 @@ public class HaEchoServiceTest extends HaEchoServiceTestBase {
         RegisterInfo registerInfo = new RegisterInfo();
         registerInfo.setHost(address.getHostName());
         registerInfo.setPort(address.getPort());
-        // delete one from naming service
+        // add one to naming service
         list.add(registerInfo);
         SleepUtils.dummySleep(6000);
         // to check naming service get size

@@ -641,6 +641,9 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
             exe.shutdown();
             exe = null;
         }
+        
+        targetBeans.clear();
+        failedFactoryBeans.clear();
     }
 
     /**
