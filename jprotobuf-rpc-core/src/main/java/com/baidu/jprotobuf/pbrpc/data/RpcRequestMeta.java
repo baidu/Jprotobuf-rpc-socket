@@ -54,22 +54,26 @@ public class RpcRequestMeta implements Readable, Writerable {
     /** 分布式追踪 Trace ID. */
     @Protobuf(order = 4)
     private Long traceId;
-    
+
     /** 分布式追踪 Span ID. */
     @Protobuf(order = 5)
     private Long spanId;
-    
+
     /** 分布式追踪 Parent Span ID. */
     @Protobuf(order = 6)
     private Long parentSpanId;
-    
+
     /** 扩展字段. */
     @Protobuf(order = 7)
     private List<RpcRequestMetaExtField> extFields;
-    
+
     /** 非PbRpc规范，用于传输额外的参数. */
     @Protobuf(fieldType = FieldType.BYTES, order = 110)
     private byte[] extraParam;
+
+    /** 非PbRpc规范，用于传输trace 字符串， 可以用于补充traceId. */
+    @Protobuf(order = 111)
+    private String traceKey;
 
     /**
      * Gets the service name.
@@ -161,6 +165,11 @@ public class RpcRequestMeta implements Readable, Writerable {
         setMethodName(meta.getMethodName());
         setServiceName(meta.getServiceName());
         setExtraParam(meta.getExtraParam());
+        setTraceId(meta.getTraceId());
+        setSpanId(meta.getSpanId());
+        setParentSpanId(meta.getParentSpanId());
+        setExtFields(meta.getExtFields());
+        setTraceKey(meta.getTraceKey());
     }
 
     /**
@@ -209,7 +218,7 @@ public class RpcRequestMeta implements Readable, Writerable {
         rpcRequestMeta.copy(this);
         return rpcRequestMeta;
     }
-    
+
     /**
      * Gets the ext fields.
      *
@@ -218,7 +227,7 @@ public class RpcRequestMeta implements Readable, Writerable {
     public List<RpcRequestMetaExtField> getExtFields() {
         return extFields;
     }
-    
+
     /**
      * Gets the ext fields as map.
      *
@@ -228,14 +237,14 @@ public class RpcRequestMeta implements Readable, Writerable {
         if (extFields == null) {
             return Collections.emptyMap();
         }
-        
+
         Map<String, String> ret = new HashMap<String, String>();
         for (RpcRequestMetaExtField rpcRequestMetaExtField : extFields) {
             ret.put(rpcRequestMetaExtField.getKey(), rpcRequestMetaExtField.getValue());
         }
         return ret;
     }
-    
+
     /**
      * Sets the ext fields.
      *
@@ -244,6 +253,77 @@ public class RpcRequestMeta implements Readable, Writerable {
     public void setExtFields(List<RpcRequestMetaExtField> extFields) {
         this.extFields = extFields;
     }
-    
+
+    /**
+     * 获取分布式追踪 Trace ID.
+     *
+     * @return Trace ID
+     */
+    public Long getTraceId() {
+        return traceId;
+    }
+
+    /**
+     * 设置分布式追踪 Trace ID.
+     *
+     * @param traceId Trace ID
+     */
+    public void setTraceId(Long traceId) {
+        this.traceId = traceId;
+    }
+
+    /**
+     * 获取分布式追踪 Trace ID.
+     *
+     * @return Trace ID
+     */
+    public Long getSpanId() {
+        return spanId;
+    }
+
+    /**
+     * 设置分布式追踪 Span ID.
+     *
+     * @param spanId Span ID
+     */
+    public void setSpanId(Long spanId) {
+        this.spanId = spanId;
+    }
+
+    /**
+     * 获取分布式追踪 Parent Span ID.
+     *
+     * @return Parent Span ID
+     */
+    public Long getParentSpanId() {
+        return parentSpanId;
+    }
+
+    /**
+     * 设置分布式追踪 Parent Span ID.
+     *
+     * @param parentSpanId Parent Span ID
+     */
+    public void setParentSpanId(Long parentSpanId) {
+        this.parentSpanId = parentSpanId;
+    }
+
+    /**
+     * Gets the trace key.
+     *
+     * @return the trace key
+     */
+    public String getTraceKey() {
+        return traceKey;
+    }
+
+    /**
+     * Sets the trace key.
+     *
+     * @param traceKey the new trace key
+     */
+    public void setTraceKey(String traceKey) {
+        this.traceKey = traceKey;
+    }
 
 }

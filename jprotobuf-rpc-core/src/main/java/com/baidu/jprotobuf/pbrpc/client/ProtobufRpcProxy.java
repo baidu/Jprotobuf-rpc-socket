@@ -11,7 +11,6 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -25,8 +24,9 @@ import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
-import com.baidu.jprotobuf.pbrpc.data.RpcRequestMetaExtField;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
+import com.baidu.jprotobuf.pbrpc.data.Trace;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
@@ -354,6 +354,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
+        
+        // set trace info
+        Trace trace = TraceContext.getTrace();
+        if (trace != null) {
+            rpcDataPackage.trace(trace);
+        }
+        
         return rpcDataPackage;
     }
 

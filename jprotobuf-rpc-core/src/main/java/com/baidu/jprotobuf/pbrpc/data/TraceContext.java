@@ -16,87 +16,44 @@
 package com.baidu.jprotobuf.pbrpc.data;
 
 /**
- * 分布式追踪上下文.
+ *  Hold the <code>Trace</code> object in the current thread.
  *
- * @see <a href="https://www.w3.org/TR/trace-context/">W3C - Trace Context</a>
- * @see <a href="https://github.com/opentracing/specification/blob/master/rfc/trace_identifiers.md">Open Tracing - Trace
- *      Identifiers</a>
+ * @author xiemalin
+ * @since 4.0.0
  */
 public class TraceContext {
 
-    /** The Trace ID. */
-    private Long traceId;
-
-    /** The Span ID. */
-    private Long spanId;
-
-    /** The Parent Span ID (optional). */
-    private Long parentSpanId;
-
+    /** The Constant TRACE. */
+    private static final ThreadLocal<Trace> TRACE = new ThreadLocal<Trace>();
+    
+    
     /**
-     * Instantiates a new trace context.
+     * Sets the trace.
      *
-     * @param traceId the trace id
-     * @param spanId the span id
-     * @param parentSpanId the parent span id
+     * @param trace the new trace
      */
-    public TraceContext(Long traceId, Long spanId, Long parentSpanId) {
-        this.traceId = traceId;
-        this.spanId = spanId;
-        this.parentSpanId = parentSpanId;
+    public static void setTrace(Trace trace) {
+        if (trace != null) {
+            TRACE.set(trace);;
+        }
     }
-
+    
     /**
-     * Gets the trace id.
+     * Gets the trace.
      *
-     * @return the trace id
+     * @return the trace
      */
-    public Long getTraceId() {
-        return traceId;
+    public static Trace getTrace() {
+        return TRACE.get();
     }
-
+    
+    
     /**
-     * Sets the trace id.
-     *
-     * @param traceId the new trace id
+     * Clear trace.
      */
-    public void setTraceId(Long traceId) {
-        this.traceId = traceId;
+    public static void clearTrace() {
+        TRACE.remove();
     }
-
-    /**
-     * Gets the span id.
-     *
-     * @return the span id
-     */
-    public Long getSpanId() {
-        return spanId;
-    }
-
-    /**
-     * Sets the span id.
-     *
-     * @param spanId the new span id
-     */
-    public void setSpanId(Long spanId) {
-        this.spanId = spanId;
-    }
-
-    /**
-     * Gets the parent span id.
-     *
-     * @return the parent span id
-     */
-    public Long getParentSpanId() {
-        return parentSpanId;
-    }
-
-    /**
-     * Sets the parent span id.
-     *
-     * @param parentSpanId the new parent span id
-     */
-    public void setParentSpanId(Long parentSpanId) {
-        this.parentSpanId = parentSpanId;
-    }
+    
+    
 }

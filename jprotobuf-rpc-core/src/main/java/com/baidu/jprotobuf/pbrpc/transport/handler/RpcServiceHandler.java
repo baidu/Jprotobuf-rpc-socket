@@ -26,6 +26,8 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
+import com.baidu.jprotobuf.pbrpc.data.Trace;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionCatcher;
@@ -219,6 +221,11 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                     request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
                     request.setExtFields(dataPackage.getRpcMeta().getRequest().getExtFieldsAsMap());
                     try {
+                        // set trace info
+                        Trace trace = dataPackage.trace();
+                        trace.stepInto();
+                        TraceContext.setTrace(trace);
+                        
                         RpcData response = handler.doHandle(request);
                         dataPackage.data(response.getData());
                         dataPackage.attachment(response.getAttachment());
