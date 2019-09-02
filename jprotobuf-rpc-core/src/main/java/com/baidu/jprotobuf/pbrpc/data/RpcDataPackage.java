@@ -245,7 +245,7 @@ public class RpcDataPackage implements Readable, Writerable {
      */
     public String serviceName() {
         RpcRequestMeta request = initRequest();
-        return request.getSerivceName();
+        return request.getServiceName();
     }
     
     /**

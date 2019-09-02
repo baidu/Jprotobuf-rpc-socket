@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +25,7 @@ import com.baidu.jprotobuf.pbrpc.ClientAttachmentHandler;
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.data.RpcRequestMetaExtField;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
@@ -467,7 +469,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             if (interceptor != null) {
 
                 byte[] extraParams = rpcDataPackage.getRpcMeta().getRequest().getExtraParam();
-                MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(proxy, args, method, extraParams);
+                Map<String, String> extFields = rpcDataPackage.getRpcMeta().getRequest().getExtFieldsAsMap();
+                MethodInvocationInfo methodInvocationInfo =
+                        new MethodInvocationInfo(proxy, args, method, extraParams, extFields);
                 interceptor.beforeInvoke(methodInvocationInfo);
 
                 Object ret = interceptor.process(methodInvocationInfo);
@@ -511,7 +515,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 }
                 onceTalkTimeout = talkTimeout;
             }
-            
+
             if (TalkTimeoutController.isEnableOnce()) {
                 TalkTimeoutController.clearTalkTimeout();
             }

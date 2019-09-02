@@ -42,72 +42,71 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
  * @see RpcServiceRegistry
  * @since 1.0
  */
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({ "rawtypes" })
 public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMetaAware {
-    
+
     /** Logger for this class. */
     private static final Logger PERFORMANCE_LOGGER = Logger.getLogger("performance-log");
 
     /** The service name. */
     private String serviceName;
-    
+
     /** The method name. */
     private String methodName;
-    
+
     /** The method. */
     private Method method;
-    
+
     /** The input class. */
     private Class inputClass;
-    
+
     /** The output class. */
     private Class outputClass;
-    
+
     /** The service. */
     private Object service;
-    
+
     /** The description. */
     private String description;
 
     /** The attachment handler. */
     private ServerAttachmentHandler attachmentHandler;
-    
+
     /** The input i dl. */
     protected String inputIDl;
-    
+
     /** The output idl. */
     protected String outputIDL;
-    
-	/** The interceptor. */
-	private InvokerInterceptor interceptor;
+
+    /** The interceptor. */
+    private InvokerInterceptor interceptor;
 
     private ServerAuthenticationDataHandler authenticationHandler;
-    
 
     /** The service signature. */
     private String serviceSignature;
-    
+
     /** The is byte array input param. */
     private boolean isByteArrayInputParam = false;
 
-	/**
-	 * Sets the interceptor.
-	 *
-	 * @param interceptor the new interceptor
-	 */
-	public void setInterceptor(InvokerInterceptor interceptor) {
-		this.interceptor = interceptor;
-	}
-	
-	/**
-	 * Gets the interceptor.
-	 *
-	 * @return the interceptor
-	 */
-	protected InvokerInterceptor getInterceptor() {
-		return interceptor;
-	}
-    
+    /**
+     * Sets the interceptor.
+     *
+     * @param interceptor the new interceptor
+     */
+    public void setInterceptor(InvokerInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
+
+    /**
+     * Gets the interceptor.
+     *
+     * @return the interceptor
+     */
+    protected InvokerInterceptor getInterceptor() {
+        return interceptor;
+    }
+
     /**
      * Gets the method.
      *
@@ -117,15 +116,18 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         return method;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getService()
      */
     public Object getService() {
         return service;
     }
 
-    
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#doHandle(com.baidu.jprotobuf.pbrpc.server.RpcData)
      */
     public RpcData doHandle(RpcData data) throws Exception {
@@ -139,7 +141,6 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             LogIDHolder.clearLogId();
         }
     }
-    
 
     /**
      * Instantiates a new abstract annotation rpc handler.
@@ -158,16 +159,16 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         if (StringUtils.isEmpty(methodName)) {
             methodName = method.getName();
         }
-        
+
         serviceSignature = ServiceSignatureUtils.makeSignature(getServiceName(), getMethodName());
 
         Class<?>[] types = method.getParameterTypes();
         if (types.length > 1) {
-            throw new IllegalArgumentException("RPC method can not has more than one parameter. illegal method:"
-                    + method.getName());
+            throw new IllegalArgumentException(
+                    "RPC method can not has more than one parameter. illegal method:" + method.getName());
         } else if (types.length == 1) {
             inputClass = types[0];
-            
+
             if (byte[].class.equals(inputClass)) {
                 isByteArrayInputParam = true;
             }
@@ -177,7 +178,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         if (!ReflectionUtils.isVoid(returnType)) {
             outputClass = returnType;
         }
-        
+
         // process attachment handler
         Class<? extends ServerAttachmentHandler> attachmentHandlerClass = protobufPRCService.attachmentHandler();
         if (attachmentHandlerClass != DummyServerAttachmentHandler.class) {
@@ -188,18 +189,18 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
                         + attachmentHandlerClass.getName() + "'");
             }
         }
-        
+
         // process authentication data handler
         Class<? extends ServerAuthenticationDataHandler> authClass = protobufPRCService.authenticationDataHandler();
         if (authClass != DummyServerAuthenticationDataHandler.class) {
             try {
                 authenticationHandler = authClass.newInstance();
             } catch (Exception e) {
-                throw new IllegalAccessError("Can not initialize 'ServerAuthenticationDataHandler' of class '"
-                        + authClass.getName() + "'");
+                throw new IllegalAccessError(
+                        "Can not initialize 'ServerAuthenticationDataHandler' of class '" + authClass.getName() + "'");
             }
         }
-        
+
         if (inputClass != null) {
             try {
                 inputIDl = ProtobufIDLGenerator.getIDL(inputClass);
@@ -207,7 +208,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
                 inputIDl = null;
             }
         }
-        
+
         if (outputClass != null) {
             try {
                 outputIDL = ProtobufIDLGenerator.getIDL(outputClass);
@@ -216,7 +217,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             }
         }
     }
-    
+
     /**
      * Do real handle.
      *
@@ -228,7 +229,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         Object input = null;
         Object[] param;
         Object ret = null;
-        
+
         if (isByteArrayInputParam) {
             input = data.getData();
         } else {
@@ -256,8 +257,8 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         try {
             // check intercepter
             if (getInterceptor() != null) {
-                MethodInvocationInfo methodInvocationInfo =
-                        new MethodInvocationInfo(getService(), param, getMethod(), data.getExtraParams());
+                MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(getService(), param, getMethod(),
+                        data.getExtraParams(), data.getExtFields());
                 getInterceptor().beforeInvoke(methodInvocationInfo);
 
                 ret = getInterceptor().process(methodInvocationInfo);
@@ -286,7 +287,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             }
 
             byte[] response = decodeOutputParam(ret);
-            
+
             if (response != null) {
                 retData.setData(response);
             }
@@ -298,7 +299,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
             }
         }
     }
-    
+
     /**
      * Decode output param.
      *
@@ -315,7 +316,9 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
      */
     protected abstract Object encodeInputParam(byte[] data) throws Exception;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodSignature()
      */
     public String getMethodSignature() {
@@ -323,21 +326,27 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         return methodSignature;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getInputClass()
      */
     public Class getInputClass() {
         return inputClass;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getOutputClass()
      */
     public Class getOutputClass() {
         return outputClass;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getServiceName()
      */
     public String getServiceName() {
@@ -353,7 +362,9 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
         this.serviceName = serviceName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getMethodName()
      */
     public String getMethodName() {
@@ -368,31 +379,37 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
     public ServerAttachmentHandler getAttachmentHandler() {
         return attachmentHandler;
     }
-    
 
     /**
      * get the authenticationHandler
+     * 
      * @return the authenticationHandler
      */
     public ServerAuthenticationDataHandler getAuthenticationHandler() {
         return authenticationHandler;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getInputMetaProto()
      */
     public String getInputMetaProto() {
         return inputIDl;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.meta.RpcMetaAware#getOutputMetaProto()
      */
     public String getOutputMetaProto() {
         return outputIDL;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.jprotobuf.pbrpc.RpcHandler#getDescription()
      */
     public String getDescription() {

@@ -16,6 +16,8 @@
 
 package com.baidu.jprotobuf.pbrpc.server;
 
+import java.util.Map;
+
 /**
  * RPC data object.
  *
@@ -38,6 +40,27 @@ public class RpcData {
 
     /** log id. */
     private Long logId;
+
+    /** extended fields. */
+    private Map<String, String> extFields;
+
+    /**
+     * Gets the extended fields
+     *
+     * @return the extended fields
+     */
+    public Map<String, String> getExtFields() {
+        return extFields;
+    }
+
+    /**
+     * Sets the extended fields
+     *
+     * @param extFields the extended fields
+     */
+    public void setExtFields(Map<String, String> extFields) {
+        this.extFields = extFields;
+    }
 
     /**
      * Gets the log id.

@@ -70,7 +70,7 @@ public class RpcRequestMetaTest {
         RpcRequestMeta rpcRequestMeta2 = new RpcRequestMeta();
         rpcRequestMeta2.read(bytes);
 
-        Assert.assertEquals(rpcRequestMeta.getSerivceName(), rpcRequestMeta2.getSerivceName());
+        Assert.assertEquals(rpcRequestMeta.getServiceName(), rpcRequestMeta2.getServiceName());
         Assert.assertEquals(rpcRequestMeta.getMethodName(), rpcRequestMeta2.getMethodName());
 
         if (includeLogId) {

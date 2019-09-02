@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>3.5.24</version>
+		<version>3.5.25-SNAPSHOT</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-core-test</artifactId>
 	<packaging>jar</packaging>

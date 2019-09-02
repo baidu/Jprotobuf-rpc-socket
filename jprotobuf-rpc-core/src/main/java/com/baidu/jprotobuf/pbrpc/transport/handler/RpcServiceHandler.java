@@ -181,7 +181,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
             
 
             RpcMeta rpcMeta = dataPackage.getRpcMeta();
-            String serviceName = rpcMeta.getRequest().getSerivceName();
+            String serviceName = rpcMeta.getRequest().getServiceName();
             String methodName = rpcMeta.getRequest().getMethodName();
             
             // check if async mode
@@ -217,6 +217,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                         request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
                     }
                     request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
+                    request.setExtFields(dataPackage.getRpcMeta().getRequest().getExtFieldsAsMap());
                     try {
                         RpcData response = handler.doHandle(request);
                         dataPackage.data(response.getData());

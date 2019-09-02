@@ -113,7 +113,7 @@ public class RpcDataPackageTest {
         
         for (RpcDataPackage data : chunkList) {
             Assert.assertEquals("HULU", data.getHead().getMagicCodeAsString());
-            Assert.assertEquals(serviceName, data.getRpcMeta().getRequest().getSerivceName());
+            Assert.assertEquals(serviceName, data.getRpcMeta().getRequest().getServiceName());
             Assert.assertEquals(methodName, data.getRpcMeta().getRequest().getMethodName());
             if (pos == 0) {
                 Assert.assertArrayEquals(attachment, data.getAttachment());

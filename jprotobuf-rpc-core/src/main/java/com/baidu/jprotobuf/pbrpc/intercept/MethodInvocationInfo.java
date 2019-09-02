@@ -16,6 +16,7 @@
 package com.baidu.jprotobuf.pbrpc.intercept;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * A method invocation includes all needed information for method invoke process.
@@ -25,109 +26,126 @@ import java.lang.reflect.Method;
  */
 public class MethodInvocationInfo {
 
-	/** The target. */
-	private Object target;
-	
-	/** The args. */
-	private Object[] args;
-	
-	/** The method. */
-	private Method method;
-	
-	/** The extra params. */
-	private byte[] extraParams;
-	
+    /** The target. */
+    private Object target;
 
-	/**
-	 * Instantiates a new method invocation info.
-	 *
-	 * @param target the target
-	 * @param args the args
-	 * @param method the method
-	 * @param extraParams the extra params
-	 */
-	public MethodInvocationInfo(Object target, Object[] args, Method method, byte[] extraParams) {
-		super();
-		this.target = target;
-		this.args = args;
-		this.method = method;
-		this.extraParams = extraParams;
-	}
+    /** The args. */
+    private Object[] args;
 
-	/**
-	 * Gets the args.
-	 *
-	 * @return the args
-	 */
-	public Object[] getArgs() {
-		return args;
-	}
+    /** The method. */
+    private Method method;
 
-	/**
-	 * Sets the args.
-	 *
-	 * @param args the new args
-	 */
-	public void setArgs(Object[] args) {
-		this.args = args;
-	}
+    /** The extra params. */
+    private byte[] extraParams;
 
-	/**
-	 * Gets the target.
-	 *
-	 * @return the target
-	 */
-	public Object getTarget() {
-		return target;
-	}
+    /** The extended fields. */
+    private Map<String, String> extFields;
 
-	/**
-	 * Sets the target.
-	 *
-	 * @param target the new target
-	 */
-	public void setTarget(Object target) {
-		this.target = target;
-	}
+    /**
+     * Instantiates a new method invocation info.
+     *
+     * @param target the target
+     * @param args the args
+     * @param method the method
+     * @param extraParams the extra params
+     */
+    public MethodInvocationInfo(Object target, Object[] args, Method method, byte[] extraParams,
+            Map<String, String> extFields) {
+        super();
+        this.target = target;
+        this.args = args;
+        this.method = method;
+        this.extraParams = extraParams;
+        this.extFields = extFields;
+    }
 
-	/**
-	 * Gets the method.
-	 *
-	 * @return the method
-	 */
-	public Method getMethod() {
-		return method;
-	}
+    /**
+     * Gets the args.
+     *
+     * @return the args
+     */
+    public Object[] getArgs() {
+        return args;
+    }
 
-	/**
-	 * Sets the method.
-	 *
-	 * @param method the new method
-	 */
-	public void setMethod(Method method) {
-		this.method = method;
-	}
+    /**
+     * Sets the args.
+     *
+     * @param args the new args
+     */
+    public void setArgs(Object[] args) {
+        this.args = args;
+    }
 
-	/**
-	 * Gets the extra params.
-	 *
-	 * @return the extra params
-	 */
-	public byte[] getExtraParams() {
-		return extraParams;
-	}
+    /**
+     * Gets the target.
+     *
+     * @return the target
+     */
+    public Object getTarget() {
+        return target;
+    }
 
-	/**
-	 * Sets the extra params.
-	 *
-	 * @param extraParams the new extra params
-	 */
-	public void setExtraParams(byte[] extraParams) {
-		this.extraParams = extraParams;
-	}
-	
-	
-	
-	
-	
+    /**
+     * Sets the target.
+     *
+     * @param target the new target
+     */
+    public void setTarget(Object target) {
+        this.target = target;
+    }
+
+    /**
+     * Gets the method.
+     *
+     * @return the method
+     */
+    public Method getMethod() {
+        return method;
+    }
+
+    /**
+     * Sets the method.
+     *
+     * @param method the new method
+     */
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    /**
+     * Gets the extra params.
+     *
+     * @return the extra params
+     */
+    public byte[] getExtraParams() {
+        return extraParams;
+    }
+
+    /**
+     * Sets the extra params.
+     *
+     * @param extraParams the new extra params
+     */
+    public void setExtraParams(byte[] extraParams) {
+        this.extraParams = extraParams;
+    }
+
+    /**
+     * Gets the extended fields
+     *
+     * @return the extended fields
+     */
+    public Map<String, String> getExtFields() {
+        return extFields;
+    }
+
+    /**
+     * Sets the extended fields
+     *
+     * @param extFields the extended fields
+     */
+    public void setExtFields(Map<String, String> extFields) {
+        this.extFields = extFields;
+    }
 }
