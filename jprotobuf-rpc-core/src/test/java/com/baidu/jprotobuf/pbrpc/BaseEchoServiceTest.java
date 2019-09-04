@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
@@ -73,6 +74,7 @@ public abstract class BaseEchoServiceTest extends BaseTest {
             @Override
             public Object process(MethodInvocationInfo methodInvocation) {
                 System.out.println("server intercepr method:" + methodInvocation.getMethod());
+                System.out.println("trace info:" + TraceContext.getTrace());
                 return null;
             }
             

@@ -28,14 +28,31 @@ public class RpcRequestMetaExtField implements Readable, Writerable {
      * default encode and decode handler.
      */
     private static final Codec<RpcRequestMetaExtField> CODEC = ProtobufProxy.create(RpcRequestMetaExtField.class);
-    
+
     /** 字段 Key. */
     @Protobuf(required = true, order = 1)
     private String key;
-    
+
     /** 字段 Value. */
     @Protobuf(required = true, order = 2)
     private String value;
+
+    /**
+     * 
+     */
+    public RpcRequestMetaExtField() {
+        super();
+    }
+
+    /**
+     * @param key
+     * @param value
+     */
+    public RpcRequestMetaExtField(String key, String value) {
+        super();
+        this.key = key;
+        this.value = value;
+    }
 
     /**
      * 获取字段 Key.
@@ -116,5 +133,43 @@ public class RpcRequestMetaExtField implements Readable, Writerable {
         }
         this.key = extField.key;
         this.value = extField.value;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((key == null) ? 0 : key.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        RpcRequestMetaExtField other = (RpcRequestMetaExtField) obj;
+        if (key == null) {
+            if (other.key != null) {
+                return false;
+            }
+        } else if (!key.equals(other.key)) {
+            return false;
+        }
+        if (value == null) {
+            if (other.value != null) {
+                return false;
+            }
+        } else if (!value.equals(other.value)) {
+            return false;
+        }
+        return true;
     }
 }

@@ -16,11 +16,12 @@
 
 package com.baidu.jprotobuf.pbrpc.data;
 
-import junit.framework.Assert;
+import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
+import junit.framework.Assert;
 
 /**
  * Test class for RpcRequestMeta
@@ -65,6 +66,15 @@ public class RpcRequestMetaTest {
             rpcRequestMeta.setLogId(101L);
         }
 
+        rpcRequestMeta.setTraceId(123L);
+        rpcRequestMeta.setSpanId(456L);
+        rpcRequestMeta.setParentSpanId(789L);
+        rpcRequestMeta.setTraceKey("hello this is a trace key.");
+
+        RpcRequestMetaExtField rpcRequestMetaExtField = new RpcRequestMetaExtField("k", "v");
+        List<RpcRequestMetaExtField> list = Arrays.asList(rpcRequestMetaExtField);
+        rpcRequestMeta.setExtFields(list);
+
         byte[] bytes = rpcRequestMeta.write();
 
         RpcRequestMeta rpcRequestMeta2 = new RpcRequestMeta();
@@ -72,6 +82,12 @@ public class RpcRequestMetaTest {
 
         Assert.assertEquals(rpcRequestMeta.getServiceName(), rpcRequestMeta2.getServiceName());
         Assert.assertEquals(rpcRequestMeta.getMethodName(), rpcRequestMeta2.getMethodName());
+        Assert.assertEquals(rpcRequestMeta.getTraceId(), rpcRequestMeta2.getTraceId());
+        Assert.assertEquals(rpcRequestMeta.getSpanId(), rpcRequestMeta2.getSpanId());
+        Assert.assertEquals(rpcRequestMeta.getParentSpanId(), rpcRequestMeta2.getParentSpanId());
+        Assert.assertEquals(rpcRequestMeta.getTraceKey(), rpcRequestMeta2.getTraceKey());
+        
+        Assert.assertEquals(rpcRequestMeta.getExtFieldsAsMap(), rpcRequestMeta2.getExtFieldsAsMap());
 
         if (includeLogId) {
             Assert.assertEquals(rpcRequestMeta.getLogId(), rpcRequestMeta2.getLogId());
