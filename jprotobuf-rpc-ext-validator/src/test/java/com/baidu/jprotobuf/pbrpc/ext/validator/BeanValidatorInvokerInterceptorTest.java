@@ -24,7 +24,7 @@ public class BeanValidatorInvokerInterceptorTest {
 	public void testValidateSuccess() {
 		PojoBean bean = PojoBean.makeValidate();
 		
-		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null);
+		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null, null);
 		
 		try {
 			beanValidatorInvokerInterceptor.beforeInvoke(methodInvocationInfo);
@@ -37,7 +37,7 @@ public class BeanValidatorInvokerInterceptorTest {
 	@Test
 	public void testValidateFailed() {
 		PojoBean bean = PojoBean.makeInValidate();
-		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null);
+		MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(null, new Object[] {bean}, null, null, null);
 		
 		try {
 			beanValidatorInvokerInterceptor.beforeInvoke(methodInvocationInfo);
