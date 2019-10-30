@@ -32,7 +32,7 @@
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.27.Final</netty-all.version>
 		<snappy-java.version>1.1.1.6</snappy-java.version>
-		<spring-web.version>3.2.11.RELEASE</spring-web.version>
+		<spring-web.version>4.3.18.RELEASE</spring-web.version>
 		<servlet-api.version>2.4</servlet-api.version>
 		<jedis.version>2.0.0</jedis.version>
 
@@ -73,6 +73,7 @@
 		<module>jprotobuf-rpc-registry-redis</module>
 		<module>jprotobuf-rpc-registry-bns</module>
 		<module>jprotobuf-rpc-ext-validator</module>
+		<module>jprotobuf-rpc-spring-starter</module>
 	</modules>
 
 

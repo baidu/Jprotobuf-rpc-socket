@@ -326,6 +326,8 @@ HaRpcProxyFactoryBean是对负载均衡功能的Spring集成支持。 配置也�
 	</bean>
 ```
 
+使用spring boot方式，可以省去上面的配置
+
 下面的配置是推荐给大家，以更好的使用注解发布方式
 
 ```xml

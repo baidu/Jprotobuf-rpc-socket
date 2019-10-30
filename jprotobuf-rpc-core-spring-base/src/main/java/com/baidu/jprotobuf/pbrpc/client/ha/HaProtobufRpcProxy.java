@@ -12,12 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.util.CollectionUtils;
 
@@ -44,7 +43,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implements MethodInterceptor {
 
     /** The Constant LOG. */
-    private static final Logger LOG = Logger.getLogger(HaProtobufRpcProxy.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(HaProtobufRpcProxy.class.getName());
 
     /** The rpc client. */
     private final RpcClient rpcClient;
@@ -121,9 +120,6 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     public void setLookupStubOnStartup(boolean lookupStubOnStartup) {
         this.lookupStubOnStartup = lookupStubOnStartup;
     }
-
-    /** log this class. */
-    protected static final Log LOGGER = LogFactory.getLog(HaProtobufRpcProxy.class);
 
     /**
      * Instantiates a new ha protobuf rpc proxy.
@@ -225,7 +221,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         if (CollectionUtils.isEmpty(servers)) {
             servers = new ArrayList<RegisterInfo>();
         }
-        LOG.info("Begin: proxy service [" + service + "] for target servicesList of size:" + servers.size());
+        LOGGER.info("Begin: proxy service [" + service + "] for target servicesList of size:" + servers.size());
 
         LoadBalanceProxyFactoryBean lbProxyBean = new LoadBalanceProxyFactoryBean();
         lbProxyBean.setServiceInterface(interfaceClass);
@@ -272,7 +268,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         lbMap.put(service, lbProxyBean);
         instancesMap.put(service, (T) lbProxyBean.getObject());
 
-        LOG.info("Finished:proxy service [" + service + "] for target servicesList of size:" + servers.size()
+        LOGGER.info("Finished:proxy service [" + service + "] for target servicesList of size:" + servers.size()
                 + " time took:" + (System.currentTimeMillis() - current) + " ms");
     }
 
@@ -305,7 +301,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             try {
                 lbProxyBean.destroy();
             } catch (Exception e) {
-                LOGGER.fatal(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
             lbProxyBean = null;
         }
@@ -315,7 +311,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
                     proxy.close();
                     proxy = null;
                 } catch (Exception e) {
-                    LOGGER.fatal(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
             protobufRpcProxyList.clear();
@@ -351,7 +347,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
             // try to close old
             doClose(oldLbProxyBean, oldProtobufRpcProxyList);
         } catch (Exception e) {
-            LOGGER.fatal(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

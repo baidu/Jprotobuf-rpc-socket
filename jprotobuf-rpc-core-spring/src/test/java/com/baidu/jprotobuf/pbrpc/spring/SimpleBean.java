@@ -21,6 +21,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Service;
 
 /**
@@ -125,6 +126,16 @@ public class SimpleBean implements InitializingBean, ApplicationListener, BeanFa
     public <T> T getBean(Class<T> requiredType) throws BeansException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType, Object...args) throws BeansException {
+        return null;
+    }
+
+    @Override
+    public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+        return false;
     }
 
 }

@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -44,7 +44,7 @@ public class BNSNamingServiceOld implements NamingService, InitializingBean {
     /**
      * log this class
      */
-    protected static final Log LOGGER = LogFactory.getLog(BNSNamingServiceOld.class.getName());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BNSNamingServiceOld.class.getName());
 
     /**
      *  port split string

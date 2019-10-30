@@ -29,8 +29,8 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -75,7 +75,7 @@ public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPos
         InitializingBean, ApplicationListener<ApplicationEvent> {
 
     /** log this class. */
-    protected static final Log LOGGER = LogFactory.getLog(AutowiredAnnotationBeanPostProcessor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AutowiredAnnotationBeanPostProcessor.class);
 
     /** call back class for {@link AnnotationParserCallback}. */
     private AnnotationParserCallback callback;

@@ -3,7 +3,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.ext.validator;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 

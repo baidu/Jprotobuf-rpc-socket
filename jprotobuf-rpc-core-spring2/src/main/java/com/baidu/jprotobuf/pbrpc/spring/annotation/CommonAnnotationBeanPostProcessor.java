@@ -28,8 +28,8 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -72,7 +72,7 @@ import com.baidu.jprotobuf.pbrpc.spring.PropertyPlaceholderConfigurerTool;
 public class CommonAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
         implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware, DisposableBean,
         InitializingBean, ApplicationListener {
-    private static final Log LOGGER = LogFactory.getLog(AutowiredAnnotationBeanPostProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutowiredAnnotationBeanPostProcessor.class);
 
     private AnnotationParserCallback callback;
 

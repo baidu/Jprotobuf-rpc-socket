@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -39,7 +39,7 @@ import com.baidu.jprotobuf.pbrpc.utils.StringUtils;
 public class RpcMetaExporter implements ApplicationListener, InitializingBean {
 
     /** log this class. */
-    protected static final Log LOGGER = LogFactory.getLog(RpcMetaExporter.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(RpcMetaExporter.class);
     
     /** The service port. */
     private int servicePort;

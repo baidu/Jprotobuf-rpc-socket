@@ -15,8 +15,8 @@
  */
 package com.baidu.jprotobuf.pbrpc.client.ha.lb.failover;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
@@ -30,7 +30,7 @@ import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 public class TimeoutIgnoredSocketFailOverInterceptor extends SocketFailOverInterceptor {
     
     /** log this class. */
-    protected static final Log LOGGER = LogFactory.getLog(TimeoutIgnoredSocketFailOverInterceptor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(TimeoutIgnoredSocketFailOverInterceptor.class);
 
     /*
      * (non-Javadoc)
