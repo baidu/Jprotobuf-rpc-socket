@@ -149,6 +149,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
 		for (RpcDataPackageDecoder rpcDataPackageDecoder : list) {
 			rpcDataPackageDecoder.close();
 		}
+		rpcDataPackageDecoderList.clear();
 	}
 
 }

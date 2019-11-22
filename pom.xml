@@ -13,7 +13,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>3.5.25-SNAPSHOT</version>
+	<version>4.1.0</version>
 	<packaging>pom</packaging>
 
 	<name>jprotobuf-rpc-socket</name>
@@ -27,12 +27,12 @@
 		<junit.version>4.10</junit.version>
 
 		<!-- Common libs -->
-		<jprotobuf.version>1.11.11</jprotobuf.version>
+		<jprotobuf.version>2.3.1</jprotobuf.version>
 		<jprotobuf-rpc-common.version>1.9</jprotobuf-rpc-common.version>
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.27.Final</netty-all.version>
 		<snappy-java.version>1.1.1.6</snappy-java.version>
-		<spring-web.version>3.2.11.RELEASE</spring-web.version>
+		<spring-web.version>4.3.18.RELEASE</spring-web.version>
 		<servlet-api.version>2.4</servlet-api.version>
 		<jedis.version>2.0.0</jedis.version>
 
@@ -73,6 +73,7 @@
 		<module>jprotobuf-rpc-registry-redis</module>
 		<module>jprotobuf-rpc-registry-bns</module>
 		<module>jprotobuf-rpc-ext-validator</module>
+		<module>jprotobuf-rpc-spring-starter</module>
 	</modules>
 
 

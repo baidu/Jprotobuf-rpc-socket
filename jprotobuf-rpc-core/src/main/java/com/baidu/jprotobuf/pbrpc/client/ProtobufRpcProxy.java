@@ -25,6 +25,8 @@ import com.baidu.jprotobuf.pbrpc.ErrorDataException;
 import com.baidu.jprotobuf.pbrpc.ProtobufRPC;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
+import com.baidu.jprotobuf.pbrpc.data.Trace;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.MethodInvocationInfo;
 import com.baidu.jprotobuf.pbrpc.transport.BlockingRpcCallback;
@@ -352,6 +354,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
      */
     protected RpcDataPackage buildRequestDataPackage(RpcMethodInfo rpcMethodInfo, Object[] args) throws IOException {
         RpcDataPackage rpcDataPackage = RpcDataPackage.buildRpcDataPackage(rpcMethodInfo, args);
+        
+        // set trace info
+        Trace trace = TraceContext.getTrace();
+        if (trace != null) {
+            rpcDataPackage.trace(trace);
+        }
+        
         return rpcDataPackage;
     }
 
@@ -467,7 +476,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             if (interceptor != null) {
 
                 byte[] extraParams = rpcDataPackage.getRpcMeta().getRequest().getExtraParam();
-                MethodInvocationInfo methodInvocationInfo = new MethodInvocationInfo(proxy, args, method, extraParams);
+                Map<String, String> extFields = rpcDataPackage.getRpcMeta().getRequest().getExtFieldsAsMap();
+                MethodInvocationInfo methodInvocationInfo =
+                        new MethodInvocationInfo(proxy, args, method, extraParams, extFields);
                 interceptor.beforeInvoke(methodInvocationInfo);
 
                 Object ret = interceptor.process(methodInvocationInfo);
@@ -511,7 +522,7 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 }
                 onceTalkTimeout = talkTimeout;
             }
-            
+
             if (TalkTimeoutController.isEnableOnce()) {
                 TalkTimeoutController.clearTalkTimeout();
             }

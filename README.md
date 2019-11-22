@@ -44,6 +44,13 @@ golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.c
 	<version>4.1.0</version>
 </dependency>
 
+<!-- 提供spring boot扩展 -->
+<dependency>
+	<groupId>com.baidu</groupId>
+	<artifactId>jprotobuf-rpc-spring-starter</artifactId>
+	<version>4.1.0</version>
+</dependency>
+
 <!-- 基于redis实现服务注册，发现功能 -->
 <dependency>
 	<groupId>com.baidu</groupId>

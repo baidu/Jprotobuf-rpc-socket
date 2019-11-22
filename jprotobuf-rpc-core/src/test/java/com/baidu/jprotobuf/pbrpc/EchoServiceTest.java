@@ -21,6 +21,8 @@ import java.util.concurrent.Future;
 
 import org.junit.Test;
 
+import com.baidu.jprotobuf.pbrpc.data.Trace;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.transport.RpcServerOptions;
 import com.baidu.jprotobuf.pbrpc.utils.SleepUtils;
 import com.baidu.jprotobuf.pbrpc.utils.TalkTimeoutController;
@@ -100,7 +102,7 @@ public class EchoServiceTest extends BaseEchoServiceTest {
 
     @Test
     public void testAttachment() {
-
+        TraceContext.setTrace(Trace.newParentTrace());
         EchoInfo echoInfo = getEchoInfo();
 
         EchoServiceImpl ecohImpl = new EchoServiceImpl();

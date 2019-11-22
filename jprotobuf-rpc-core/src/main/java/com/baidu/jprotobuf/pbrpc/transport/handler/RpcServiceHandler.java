@@ -26,6 +26,8 @@ import com.baidu.jprotobuf.pbrpc.RpcHandler;
 import com.baidu.jprotobuf.pbrpc.data.ProtocolConstant;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
+import com.baidu.jprotobuf.pbrpc.data.Trace;
+import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionCatcher;
@@ -181,7 +183,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
             
 
             RpcMeta rpcMeta = dataPackage.getRpcMeta();
-            String serviceName = rpcMeta.getRequest().getSerivceName();
+            String serviceName = rpcMeta.getRequest().getServiceName();
             String methodName = rpcMeta.getRequest().getMethodName();
             
             // check if async mode
@@ -217,7 +219,13 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                         request.setAuthenticationData(dataPackage.getRpcMeta().getAuthenticationData());
                     }
                     request.setExtraParams(dataPackage.getRpcMeta().getRequest().getExtraParam());
+                    request.setExtFields(dataPackage.getRpcMeta().getRequest().getExtFieldsAsMap());
                     try {
+                        // set trace info
+                        Trace trace = dataPackage.trace();
+                        trace.stepInto();
+                        TraceContext.setTrace(trace);
+                        
                         RpcData response = handler.doHandle(request);
                         dataPackage.data(response.getData());
                         dataPackage.attachment(response.getAttachment());

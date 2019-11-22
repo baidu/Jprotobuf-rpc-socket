@@ -82,7 +82,7 @@ public class RpcMetaTest {
         Assert.assertEquals(meta.getChunkInfo().getChunkId(), meta2.getChunkInfo().getChunkId());
         Assert.assertEquals(meta.getChunkInfo().getStreamId(), meta2.getChunkInfo().getStreamId());
         Assert.assertEquals(meta.getRequest().getMethodName(), meta2.getRequest().getMethodName());
-        Assert.assertEquals(meta.getRequest().getSerivceName(), meta2.getRequest().getSerivceName());
+        Assert.assertEquals(meta.getRequest().getServiceName(), meta2.getRequest().getServiceName());
         Assert.assertEquals(meta.getRequest().getLogId(), meta2.getRequest().getLogId());
         
         Assert.assertEquals(meta.getResponse().getErrorText(), meta2.getResponse().getErrorText());

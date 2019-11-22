@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+/*
+ * Copyright 2002-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.baidu.jprotobuf.pbrpc.data;
@@ -24,8 +36,8 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
 /**
  * RPC 包数据完整定义实现.
  * 
- *  Data package for baidu RPC.
- *  all request and response data package should apply this.
+ * Data package for baidu RPC. all request and response data package should apply this.
+ * 
  * <pre>
  * -----------------------------------
  * | Head | Meta | Data | Attachment |
@@ -69,6 +81,7 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * 
  * 4. <Attachment> attachment body data message
  * </pre>
+ * 
  * @author xiemalin
  * @since 1.0
  */
@@ -237,7 +250,7 @@ public class RpcDataPackage implements Readable, Writerable {
         request.setServiceName(serviceName);
         return this;
     }
-    
+
     /**
      * Service name.
      *
@@ -245,9 +258,9 @@ public class RpcDataPackage implements Readable, Writerable {
      */
     public String serviceName() {
         RpcRequestMeta request = initRequest();
-        return request.getSerivceName();
+        return request.getServiceName();
     }
-    
+
     /**
      * Method name.
      *
@@ -390,6 +403,33 @@ public class RpcDataPackage implements Readable, Writerable {
         RpcMeta rpcMeta = initRpcMeta();
         rpcMeta.setChunkInfo(chunkInfo);
         return this;
+    }
+
+    /**
+     * set Trace value.
+     *
+     * @param trace the trace
+     * @return the rpc data package
+     */
+    public RpcDataPackage trace(Trace trace) {
+        RpcRequestMeta request = initRequest();
+        request.setTraceId(trace.getTraceId());
+        request.setTraceKey(trace.getTraceKey());
+        request.setSpanId(trace.getSpanId());
+        request.setParentSpanId(trace.getParentSpanId());
+        return this;
+    }
+
+    /**
+     * Trace.
+     *
+     * @return the trace
+     */
+    public Trace trace() {
+        RpcRequestMeta request = initRequest();
+        Trace trace = new Trace(request.getTraceId(), request.getTraceKey(), 
+                request.getSpanId(), request.getParentSpanId());
+        return trace;
     }
 
     /**
@@ -684,7 +724,7 @@ public class RpcDataPackage implements Readable, Writerable {
             attachment = new byte[attachmentSize];
             bais.read(attachment, 0, attachmentSize);
         }
-        
+
         try {
             bais.close(); // ByteArrayInputStream close method is empty
         } catch (IOException e) {
