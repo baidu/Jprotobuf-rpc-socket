@@ -39,7 +39,7 @@ public class RpcRequestMeta implements Readable, Writerable {
     /** default encode and decode handler. */
     private static final Codec<RpcRequestMeta> CODEC = ProtobufProxy.create(RpcRequestMeta.class, false);
 
-    /** 服务�? */
+    /** 服务名称 */
     @Protobuf(required = true, order = 1)
     private String serviceName;
 

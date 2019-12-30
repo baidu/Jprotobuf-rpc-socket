@@ -34,7 +34,7 @@ public class ChunkInfo implements Readable, Writerable {
     /** The Constant CODEC. */
     private static final Codec<ChunkInfo> CODEC = ProtobufProxy.create(ChunkInfo.class, false);
 
-    /** 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检�? */
+    /** 用于唯一标识一个数据流，由发送方保证其唯一性，协议不对此进行任何检 */
     @Protobuf(required = true)
     private Long streamId;
 
