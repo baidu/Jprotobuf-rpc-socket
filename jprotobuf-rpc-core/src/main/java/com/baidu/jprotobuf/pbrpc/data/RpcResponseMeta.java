@@ -32,7 +32,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class RpcResponseMeta implements Readable, Writerable {
     
     /** Decode and encode hanlder. */
-    private static final Codec<RpcResponseMeta> CODEC = ProtobufProxy.create(RpcResponseMeta.class);
+    private static final Codec<RpcResponseMeta> CODEC = ProtobufProxy.create(RpcResponseMeta.class, false);
 
     /**
      * default constrctor.

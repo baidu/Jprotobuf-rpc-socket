@@ -35,6 +35,11 @@ public class RpcServerChannelIdleHandler extends ChannelDuplexHandler {
 	/** The log. */
 	private static Logger LOG = Logger
 			.getLogger(RpcServerChannelIdleHandler.class.getName());
+    private int idleTimeout;
+	
+	public RpcServerChannelIdleHandler(int idleTimeout) {
+        this.idleTimeout = idleTimeout;
+	}
 	
 	/* (non-Javadoc)
 	 * @see io.netty.channel.ChannelInboundHandlerAdapter#userEventTriggered(io.netty.channel.ChannelHandlerContext, java.lang.Object)
@@ -47,7 +52,7 @@ public class RpcServerChannelIdleHandler extends ChannelDuplexHandler {
 			if (e.state() == IdleState.ALL_IDLE) {
 				// if no read and write for period time, close current channel
 				LOG.log(Level.WARNING, "channel:" + ctx.channel()
-				+ " ip=" + ctx.channel().remoteAddress() + " is idle for period time. close now.");
+				+ " ip=" + ctx.channel().remoteAddress() + " is idle for period time [" + idleTimeout + "]. close now.");
 				ctx.close();
 			} else {
 				LOG.log(Level.WARNING, "idle on channel[" + e.state() + "]:" + ctx.channel());

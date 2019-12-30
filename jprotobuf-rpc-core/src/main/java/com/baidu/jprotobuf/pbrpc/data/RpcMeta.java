@@ -43,7 +43,7 @@ public class RpcMeta implements Readable, Writerable, Cloneable {
     public static final int COMPERESS_GZIP = 2;
 
     /** Decode and encode handler. */
-    private static final Codec<RpcMeta> CODEC = ProtobufProxy.create(RpcMeta.class);
+    private static final Codec<RpcMeta> CODEC = ProtobufProxy.create(RpcMeta.class, false);
 
     /** 请求包元数据. */
     @Protobuf(fieldType = FieldType.OBJECT, order = 1)

@@ -27,7 +27,7 @@ public class RpcRequestMetaExtField implements Readable, Writerable {
     /**
      * default encode and decode handler.
      */
-    private static final Codec<RpcRequestMetaExtField> CODEC = ProtobufProxy.create(RpcRequestMetaExtField.class);
+    private static final Codec<RpcRequestMetaExtField> CODEC = ProtobufProxy.create(RpcRequestMetaExtField.class, false);
 
     /** 字段 Key. */
     @Protobuf(required = true, order = 1)

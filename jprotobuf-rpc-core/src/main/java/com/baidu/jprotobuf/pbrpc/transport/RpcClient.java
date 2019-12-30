@@ -99,7 +99,7 @@ public class RpcClient extends Bootstrap {
      * @param clientChannelClass the client channel class
      */
     public RpcClient(Class<? extends Channel> clientChannelClass) {
-        this(NioSocketChannel.class, new RpcClientOptions());
+        this(clientChannelClass, new RpcClientOptions());
     }
 
     /**

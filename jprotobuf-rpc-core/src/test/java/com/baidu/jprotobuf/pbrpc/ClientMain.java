@@ -22,19 +22,37 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
 /**
+ * The Class ClientMain.
  *
  * @author xiemalin
- *
  */
 public class ClientMain {
+    
+    
+    private EchoService echoService;
+    private RpcClient rpcClient;
+    private ProtobufRpcProxy<EchoService> pbrpcProxy;
 
-    public static void main(String[] args) {
-
+    /**
+     * Test client request.
+     */
+    @Test
+    public void testClientRequest() {
+        doClientRquest(1);
+        
+    }
+    
+    @Before
+    public void warmUp() {
         RpcClientOptions options = new RpcClientOptions();
         options.setThreadPoolSize(10);
         options.setMaxIdleSize(10);
@@ -42,16 +60,32 @@ public class ClientMain {
         options.setMaxWait(5000);
         options.setShortConnection(false);
 
-        RpcClient rpcClient = new RpcClient(options);
-        ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
+        rpcClient = new RpcClient(options);
+        pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
         pbrpcProxy.setPort(8000);
         pbrpcProxy.setHost("localhost");
-        EchoService echoService = pbrpcProxy.proxy();
+        echoService = pbrpcProxy.proxy();
+        EchoInfo echoInfo = new EchoInfo();
+        echoInfo.setMessage("warm message");
+        echoService.echo(echoInfo);
+    }
+    
+    @After
+    public void tearDown() {
+        pbrpcProxy.close();
+        rpcClient.shutdown();
+    }
 
+    /**
+     * Do client rquest.
+     *
+     * @param times the times
+     */
+    private void doClientRquest(int times) {
         EchoInfo echoInfo = new EchoInfo();
         long time = System.currentTimeMillis();
         List<Future<EchoInfo>> list = new ArrayList<Future<EchoInfo>>();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < times; i++) {
             try {
                 echoInfo.setMessage("hi" + i);
 
@@ -76,10 +110,14 @@ public class ClientMain {
             }
         }
         
-        
-        
         System.out.println(System.currentTimeMillis() - time);
-        pbrpcProxy.close();
-        rpcClient.shutdown();
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
+    
 }

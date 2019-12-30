@@ -67,7 +67,6 @@ public class RpcTimerTask implements TimerTask {
      * @see io.netty.util.TimerTask#run(io.netty.util.Timeout)
      */
     public void run(Timeout timeout) throws Exception {
-
         RpcClientCallState state = rpcClient.removePendingRequest(correlationId);
         if (null != state) {
             String msg =  "correlationId:" + correlationId + " timeout with bound channel =>" + state.getChannel();

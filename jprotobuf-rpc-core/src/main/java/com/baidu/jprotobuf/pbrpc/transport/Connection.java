@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import io.netty.channel.ChannelFuture;
-
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import io.netty.channel.ChannelFuture;
 
 /**
  * RPC client connection .
@@ -30,9 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Connection {
     
-    /** max request default count. */
-    private static final int MAX_REQUEST_SIZE = 102400;
-    
     /** The future. */
     private ChannelFuture future;
     
@@ -41,6 +38,9 @@ public class Connection {
     
     /** The request queue. */
     private BlockingQueue<RpcClientCallState> requestQueue;
+    
+    /** The Constant DEFAULT_SIZE. */
+    private static final int DEFAULT_SIZE = 1024;
     
     /** The client. */
     private RpcClient client;
@@ -53,7 +53,7 @@ public class Connection {
     public Connection(RpcClient client) {
         this.isConnected.set(false);
         this.future = null;
-        this.requestQueue = new ArrayBlockingQueue<RpcClientCallState>(MAX_REQUEST_SIZE);
+        this.requestQueue = new LinkedBlockingQueue<RpcClientCallState>(DEFAULT_SIZE);
         this.client = client;
     }
 

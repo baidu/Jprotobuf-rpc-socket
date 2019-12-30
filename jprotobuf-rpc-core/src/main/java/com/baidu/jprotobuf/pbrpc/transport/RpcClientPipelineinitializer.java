@@ -88,7 +88,8 @@ public class RpcClientPipelineinitializer extends ChannelInitializer<Channel> {
 		int idleTimeout = this.rpcClient.getRpcClientOptions().getIdleTimeout();
 		channelPipe.addFirst(RPC_CHANNEL_STATE_AWARE_HANDLER,
 				new IdleStateHandler(idleTimeout, idleTimeout, idleTimeout));
-		channelPipe.addFirst(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler());
+		
+		channelPipe.addFirst(RPC_CHANNEL_IDLE_HANDLER, new RpcServerChannelIdleHandler(idleTimeout));
 
 		// check if need to compress for data and attachment
 		channelPipe.addFirst(COMPRESS, new RpcDataPackageCompressHandler());

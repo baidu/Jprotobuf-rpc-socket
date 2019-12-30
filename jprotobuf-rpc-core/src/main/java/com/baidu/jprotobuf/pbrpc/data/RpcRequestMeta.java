@@ -37,9 +37,9 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class RpcRequestMeta implements Readable, Writerable {
 
     /** default encode and decode handler. */
-    private static final Codec<RpcRequestMeta> CODEC = ProtobufProxy.create(RpcRequestMeta.class);
+    private static final Codec<RpcRequestMeta> CODEC = ProtobufProxy.create(RpcRequestMeta.class, false);
 
-    /** 服务名. */
+    /** 服务�? */
     @Protobuf(required = true, order = 1)
     private String serviceName;
 
