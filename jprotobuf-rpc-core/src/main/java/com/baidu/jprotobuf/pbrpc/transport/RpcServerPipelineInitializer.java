@@ -3,14 +3,6 @@
  */
 package com.baidu.jprotobuf.pbrpc.transport;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.timeout.IdleStateHandler;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +14,12 @@ import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageEncoder;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcDataPackageUnCompressHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServerChannelIdleHandler;
 import com.baidu.jprotobuf.pbrpc.transport.handler.RpcServiceHandler;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * RPC server channel handler factory.
@@ -61,9 +59,6 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
     /** The rpc server options. */
     private final RpcServerOptions rpcServerOptions;
 
-    /** The rpc data package decoder list. */
-    private List<RpcDataPackageDecoder> rpcDataPackageDecoderList = new ArrayList<RpcDataPackageDecoder>();
-
     /** The es. */
     private ExecutorService es;
 
@@ -93,6 +88,7 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
         this.rpcServerOptions = rpcServerOptions;
         this.es = es;
         this.exceptionCatcher = exceptionCatcher;
+
     }
 
     /*
@@ -120,10 +116,10 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
         channelPipe.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(rpcServerOptions.getMaxSize(),
                 messageLengthFieldStart, messageLengthFieldWidth, adjustSize, 0));
 
+        // receive byte array to encode to RpcDataPackage
+
         RpcDataPackageDecoder rpcDataPackageDecoder =
                 new RpcDataPackageDecoder(this.rpcServerOptions.getChunkPackageTimeout());
-        rpcDataPackageDecoderList.add(rpcDataPackageDecoder);
-        // receive byte array to encode to RpcDataPackage
         channelPipe.addLast(DECODER, rpcDataPackageDecoder);
         // do uncompress handle
         channelPipe.addLast(UNCOMPRESS, new RpcDataPackageUnCompressHandler());
@@ -145,14 +141,10 @@ public class RpcServerPipelineInitializer extends ChannelInitializer<Channel> {
      * Close.
      */
     public void close() {
-        if (rpcDataPackageDecoderList.isEmpty()) {
-            return;
-        }
-        List<RpcDataPackageDecoder> list = new ArrayList<RpcDataPackageDecoder>(rpcDataPackageDecoderList);
-        for (RpcDataPackageDecoder rpcDataPackageDecoder : list) {
-            rpcDataPackageDecoder.close();
-        }
-        rpcDataPackageDecoderList.clear();
+        RpcDataPackageDecoder rpcDataPackageDecoder =
+                new RpcDataPackageDecoder(this.rpcServerOptions.getChunkPackageTimeout());
+        // to close the static thread pool
+        rpcDataPackageDecoder.close();
     }
 
 }

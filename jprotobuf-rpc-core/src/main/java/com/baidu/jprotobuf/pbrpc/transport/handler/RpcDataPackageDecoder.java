@@ -59,10 +59,10 @@ public class RpcDataPackageDecoder extends ByteToMessageDecoder {
     private static final AtomicBoolean startChunkPackageCleanUp = new AtomicBoolean(false);
     
     /** The es. */
-    private ExecutorService es;;
+    private static ExecutorService es;
     
     /** The stop chunk package timeout clean. */
-    private boolean stopChunkPackageTimeoutClean = false;
+    private static boolean stopChunkPackageTimeoutClean = false;
     
     
     /**
