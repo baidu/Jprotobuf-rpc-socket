@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
 import com.baidu.jprotobuf.pbrpc.client.ha.NamingService;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
@@ -66,6 +67,18 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
 	
 	/** The exception handler. */
 	private ExceptionHandler exceptionHandler;
+	
+    /** The strategy interceptor. */
+    private StrategyInterceptor strategyInterceptor;
+    
+    /**
+     * Sets the strategy interceptor.
+     *
+     * @param strategyInterceptor the new strategy interceptor
+     */
+    public void setStrategyInterceptor(StrategyInterceptor strategyInterceptor) {
+        this.strategyInterceptor = strategyInterceptor;
+    }
 	
 	/**
 	 * Sets the exception handler.
@@ -178,6 +191,7 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
         pbrpcProxy.setLookupStubOnStartup(lookupStubOnStartup);
         pbrpcProxy.setInterceptor(interceptor);
         pbrpcProxy.setExceptionHandler(exceptionHandler);
+        pbrpcProxy.setStrategyInterceptor(strategyInterceptor);
         pbrpcProxy.proxy();
 
         ProxyFactory proxyFactory = new ProxyFactory(getServiceInterface(), this);

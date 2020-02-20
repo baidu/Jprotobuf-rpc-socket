@@ -26,6 +26,7 @@ import com.baidu.jprotobuf.pbrpc.client.ha.lb.LoadBalanceProxyFactoryBean;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.failover.SocketFailOverInterceptor;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.NamingServiceLoadBalanceStrategyFactory;
 import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.RRNamingServiceLoadBalanceStrategyFactory;
+import com.baidu.jprotobuf.pbrpc.client.ha.lb.strategy.StrategyInterceptor;
 import com.baidu.jprotobuf.pbrpc.intercept.InvokerInterceptor;
 import com.baidu.jprotobuf.pbrpc.registry.RegisterInfo;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionHandler;
@@ -84,6 +85,18 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
 
     /** The exception handler. */
     protected ExceptionHandler exceptionHandler;
+    
+    /** The strategy interceptor. */
+    private StrategyInterceptor strategyInterceptor;
+    
+    /**
+     * Sets the strategy interceptor.
+     *
+     * @param strategyInterceptor the new strategy interceptor
+     */
+    public void setStrategyInterceptor(StrategyInterceptor strategyInterceptor) {
+        this.strategyInterceptor = strategyInterceptor;
+    }
 
     /**
      * Sets the exception handler.
@@ -224,6 +237,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         LOGGER.info("Begin: proxy service [" + service + "] for target servicesList of size:" + servers.size());
 
         LoadBalanceProxyFactoryBean lbProxyBean = new LoadBalanceProxyFactoryBean();
+        lbProxyBean.setStrategyInterceptor(strategyInterceptor);
         lbProxyBean.setServiceInterface(interfaceClass);
         List<ProtobufRpcProxy<T>> protobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>();
         Map<String, String> serverUrls = new HashMap<String, String>(servers.size());
