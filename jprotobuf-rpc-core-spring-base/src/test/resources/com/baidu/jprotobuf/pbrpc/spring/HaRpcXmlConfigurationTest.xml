@@ -42,7 +42,7 @@
 
 	<bean id="namingService" class="com.baidu.jprotobuf.pbrpc.spring.UrlBasedNamingService">
 		<constructor-arg>
-			<value>localhost:1031;localhost:1032;localhost:1033</value>
+			<value>localhost:1031;localhost:1032;localhost:1033</value> 
 		</constructor-arg>
 	</bean>
 

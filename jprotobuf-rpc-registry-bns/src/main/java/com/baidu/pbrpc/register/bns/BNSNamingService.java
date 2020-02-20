@@ -46,7 +46,7 @@ public class BNSNamingService implements NamingService, InitializingBean {
     private String portName = "rpc";
     
     /** To set instance status value to filter. multiple use ',' to split */
-    private String filterInstanceStatus;
+    private String filterInstanceStatus = "0";
     
     private Set<Integer> instanceStatusFilterSet;
     
