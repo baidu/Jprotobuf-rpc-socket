@@ -29,8 +29,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.baidu</groupId>
-			<artifactId>bns-client</artifactId>
-			<version>1.2.3</version>
+			<artifactId>bns-client-spring</artifactId>
+			<version>1.4.9-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>

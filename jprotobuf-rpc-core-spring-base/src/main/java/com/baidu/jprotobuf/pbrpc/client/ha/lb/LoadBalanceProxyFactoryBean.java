@@ -634,10 +634,15 @@ public class LoadBalanceProxyFactoryBean extends ServiceMultiInterfaceAccessor i
      */
     // /---- DisposableBean
     public void destroy() throws Exception {
+        cleanResource(true);
+    }
+    
+    public void cleanResource(boolean needFreeThreadPool) {
         if (recoverHeartbeat != null) {
             recoverHeartbeat.close();
         }
-        if (exe != null) {
+        
+        if (needFreeThreadPool && exe != null) {
             exe.shutdown();
             exe = null;
         }
