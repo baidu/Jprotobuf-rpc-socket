@@ -34,28 +34,28 @@ golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.c
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core</artifactId>
-	<version>4.1.0</version>
+	<version>4.1.1</version>
 </dependency>
 
 <!-- 提供spring扩展 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core-spring</artifactId>
-	<version>4.1.0</version>
+	<version>4.1.1</version>
 </dependency>
 
 <!-- 提供spring boot扩展 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-spring-starter</artifactId>
-	<version>4.1.0</version>
+	<version>4.1.1</version>
 </dependency>
 
 <!-- 基于redis实现服务注册，发现功能 -->
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
-	<version>4.1.0</version>
+	<version>4.1.1</version>
 </dependency>
 
 ```
