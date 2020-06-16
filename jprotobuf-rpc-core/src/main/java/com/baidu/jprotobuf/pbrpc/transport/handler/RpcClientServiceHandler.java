@@ -8,6 +8,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +27,8 @@ public class RpcClientServiceHandler extends SimpleChannelInboundHandler<RpcData
 
     /** log this class. */
     private static final Logger LOG = Logger.getLogger(RpcClientServiceHandler.class.getName());
+    
+    private boolean includeRemoteServerInfoOnError = false;
 
     /** RPC client. */
     private RpcClient rpcClient;
@@ -37,6 +40,10 @@ public class RpcClientServiceHandler extends SimpleChannelInboundHandler<RpcData
      */
     public RpcClientServiceHandler(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
+        if (rpcClient.getRpcClientOptions() != null) {
+            includeRemoteServerInfoOnError = rpcClient.getRpcClientOptions().isIncludeRemoteServerInfoOnError();
+        }
+        
     }
 
     /*
@@ -58,7 +65,12 @@ public class RpcClientServiceHandler extends SimpleChannelInboundHandler<RpcData
 
         if (!ErrorCodes.isSuccess(errorCode)) {
             if (state != null) {
-                state.handleFailure(errorCode, response.getErrorText());
+                String error = response.getErrorText();
+                if (includeRemoteServerInfoOnError) {
+                    SocketAddress remoteAddress = ctx.channel().remoteAddress();
+                    error = "[error with remote info:" + remoteAddress + "]";
+                }
+                state.handleFailure(errorCode, error);
             } else {
                 ctx.fireChannelReadComplete();
                 throw new Exception(response.getErrorText());

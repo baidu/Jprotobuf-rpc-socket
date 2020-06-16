@@ -59,6 +59,7 @@ public class ClientMain {
         options.setMinIdleSize(10);
         options.setMaxWait(5000);
         options.setShortConnection(false);
+        options.setIncludeRemoteServerInfoOnError(true);
 
         rpcClient = new RpcClient(options);
         pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);

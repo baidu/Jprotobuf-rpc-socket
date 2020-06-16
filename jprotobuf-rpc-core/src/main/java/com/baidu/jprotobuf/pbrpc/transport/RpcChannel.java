@@ -17,8 +17,9 @@
 package com.baidu.jprotobuf.pbrpc.transport;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 
@@ -34,7 +35,7 @@ import io.netty.util.Timeout;
 public class RpcChannel {
 
     /** The log. */
-    private static Logger LOG = Logger.getLogger(RpcChannel.class.getName());
+    private static Logger LOG = LoggerFactory.getLogger(RpcChannel.class.getName());
 
     /** RPC client. */
     private RpcClient rpcClient;
@@ -114,20 +115,20 @@ public class RpcChannel {
                 RpcClientCallState callState = rpcClient.removePendingRequest(correlationId);
                 if (callState != null) {
                     callState.handleFailure(e.getMessage());
-                    LOG.log(Level.FINE, "id:" + correlationId + " is put in the queue");
+                    LOG.debug("id:" + correlationId + " is put in the queue");
                 }
             }
         } else {
             Channel channel = connection.getFuture().channel();
             state.setChannel(channel);
 
-            LOG.log(Level.FINE, "Do send request with service name '" + rpcDataPackage.serviceName() + "' method name '"
+            LOG.debug("Do send request with service name '" + rpcDataPackage.serviceName() + "' method name '"
                     + rpcDataPackage.methodName() + "' bound channel =>" + channel);
             channel.writeAndFlush(state.getDataPackage());
         }
 
         long callMethodEnd = System.currentTimeMillis();
-        LOG.log(Level.FINE, "profiling callMethod cost " + (callMethodEnd - callMethodStart) + "ms");
+        LOG.debug("profiling callMethod cost " + (callMethodEnd - callMethodStart) + "ms");
 
     }
 
