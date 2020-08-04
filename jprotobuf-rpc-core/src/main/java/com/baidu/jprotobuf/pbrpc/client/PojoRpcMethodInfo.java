@@ -90,6 +90,10 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
      */
     @Override
     public byte[] inputEncode(Object input) throws IOException {
+        if (input == null) {
+            return null;
+        }
+        
         if (inputCodec != null) {
             return inputCodec.encode(input);
         }
@@ -101,6 +105,9 @@ public class PojoRpcMethodInfo extends RpcMethodInfo {
      */
     @Override
     public Object outputDecode(byte[] output) throws IOException {
+        if (output == null) {
+            return null;
+        }
         if (outputCodec != null) {
             return outputCodec.decode(output);
         }
