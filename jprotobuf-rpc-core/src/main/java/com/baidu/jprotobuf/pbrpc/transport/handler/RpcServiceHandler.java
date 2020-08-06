@@ -29,6 +29,7 @@ import com.baidu.jprotobuf.pbrpc.data.RpcMeta;
 import com.baidu.jprotobuf.pbrpc.data.Trace;
 import com.baidu.jprotobuf.pbrpc.data.TraceContext;
 import com.baidu.jprotobuf.pbrpc.server.RpcData;
+import com.baidu.jprotobuf.pbrpc.server.RpcServiceHandleContext;
 import com.baidu.jprotobuf.pbrpc.server.RpcServiceRegistry;
 import com.baidu.jprotobuf.pbrpc.transport.ExceptionCatcher;
 import com.baidu.jprotobuf.pbrpc.transport.RpcErrorMessage;
@@ -196,11 +197,14 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                 copy.data(null);
                 copy.attachment(null);
                 ctx.writeAndFlush(copy);
+                
+                return;
             }
 
             Long logId = rpcMeta.getRequest().getLogId();
             // set log id to holder
             LogIdThreadLocalHolder.setLogId(logId);
+            RpcServiceHandleContext.setChannelHandlerContext(ctx);
             try {
                 RpcHandler handler = rpcServiceRegistry.lookupService(serviceName, methodName);
                 if (handler == null) {
@@ -271,6 +275,7 @@ public class RpcServiceHandler extends SimpleChannelInboundHandler<RpcDataPackag
                         + (System.currentTimeMillis() - time) + " ms");
 
                 LogIdThreadLocalHolder.clearLogId();
+                RpcServiceHandleContext.clearChannelHandlerContext();
             }
         }
 
