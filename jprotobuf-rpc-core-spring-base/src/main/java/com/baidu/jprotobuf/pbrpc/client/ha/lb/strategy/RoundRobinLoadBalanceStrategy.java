@@ -140,6 +140,9 @@ public class RoundRobinLoadBalanceStrategy implements NamingServiceLoadBalanceSt
      */
     private void reInitTargets(Map<String, Integer> lbFactors) {
         targets = initTargets(lbFactors);
+        if (targets != null) {
+            Collections.shuffle(targets); // shuffle the list to random order.
+        }
         currentPos = 0;
     }
 

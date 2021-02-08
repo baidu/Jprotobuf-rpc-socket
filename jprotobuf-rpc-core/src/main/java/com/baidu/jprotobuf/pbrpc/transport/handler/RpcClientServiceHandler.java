@@ -4,18 +4,19 @@
 
 package com.baidu.jprotobuf.pbrpc.transport.handler;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.jprotobuf.pbrpc.RpcChannelErrorException;
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
 import com.baidu.jprotobuf.pbrpc.data.RpcResponseMeta;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientCallState;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * RPC client service handler upon receive response data from server.
@@ -115,6 +116,6 @@ public class RpcClientServiceHandler extends SimpleChannelInboundHandler<RpcData
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        handleChannelError(ctx, new RuntimeException("Channel inactive error!"));
+        handleChannelError(ctx, new RpcChannelErrorException("Channel inactive error!"));
     }
 }

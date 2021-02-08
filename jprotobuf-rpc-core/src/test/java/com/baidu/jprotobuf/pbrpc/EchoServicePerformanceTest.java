@@ -54,7 +54,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
     RpcDataPackage in;
     RpcDataPackage out;
 
-    int totalRequestSize = 1000;
+    int totalRequestSize = 1000000;
     
     /**
 	 * set totalRequestSize value to totalRequestSize
@@ -229,7 +229,7 @@ public class EchoServicePerformanceTest extends BasePerformaceTest {
             responseString += "hello world";
         }
 
-        int thread = 40;
+        int thread = 500;
         long timetook = multiExecute(totalRequestSize, thread, requestString, responseString);
 
         printResult(in, out, totalRequestSize, timetook, thread);

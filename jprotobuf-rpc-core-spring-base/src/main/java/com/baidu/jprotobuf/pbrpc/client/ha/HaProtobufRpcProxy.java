@@ -89,6 +89,19 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
     /** The strategy interceptor. */
     private StrategyInterceptor strategyInterceptor;
     
+    /** The heart beat interval. */
+    private long heartBeatInterval = 1000L;
+    
+    /**
+     * Sets the heart beat interval.
+     *
+     * @param heartBeatInterval the new heart beat interval
+     */
+    public void setHeartBeatInterval(long heartBeatInterval) {
+        this.heartBeatInterval = heartBeatInterval;
+    }
+    
+    
     /**
      * Sets the strategy interceptor.
      *
@@ -239,6 +252,7 @@ public class HaProtobufRpcProxy<T> extends NamingServiceChangeListener implement
         LoadBalanceProxyFactoryBean lbProxyBean = new LoadBalanceProxyFactoryBean();
         lbProxyBean.setStrategyInterceptor(strategyInterceptor);
         lbProxyBean.setServiceInterface(interfaceClass);
+        lbProxyBean.setRecoverInterval(heartBeatInterval);
         List<ProtobufRpcProxy<T>> protobufRpcProxyList = new ArrayList<ProtobufRpcProxy<T>>();
         Map<String, String> serverUrls = new HashMap<String, String>(servers.size());
         Map<String, Object> targetBeans = new HashMap<String, Object>();

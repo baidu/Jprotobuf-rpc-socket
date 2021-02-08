@@ -71,6 +71,18 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
     /** The strategy interceptor. */
     private StrategyInterceptor strategyInterceptor;
     
+    /** The heart beat interval. */
+    private long heartBeatInterval = 1000L;
+    
+    /**
+     * Sets the heart beat interval.
+     *
+     * @param heartBeatInterval the new heart beat interval
+     */
+    public void setHeartBeatInterval(long heartBeatInterval) {
+        this.heartBeatInterval = heartBeatInterval;
+    }
+    
     /**
      * Sets the strategy interceptor.
      *
@@ -192,6 +204,7 @@ public class HaRpcProxyFactoryBean extends RpcClientOptions
         pbrpcProxy.setInterceptor(interceptor);
         pbrpcProxy.setExceptionHandler(exceptionHandler);
         pbrpcProxy.setStrategyInterceptor(strategyInterceptor);
+        pbrpcProxy.setHeartBeatInterval(heartBeatInterval);
         pbrpcProxy.proxy();
 
         ProxyFactory proxyFactory = new ProxyFactory(getServiceInterface(), this);
