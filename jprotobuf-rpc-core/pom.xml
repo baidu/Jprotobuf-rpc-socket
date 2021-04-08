@@ -29,7 +29,7 @@
 			<artifactId>servlet-api</artifactId>
 			<version>${servlet-api.version}</version>
 			<type>jar</type>
-			<scope>provider</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
