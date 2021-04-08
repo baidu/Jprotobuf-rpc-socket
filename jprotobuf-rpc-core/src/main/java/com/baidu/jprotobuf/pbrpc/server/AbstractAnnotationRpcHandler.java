@@ -262,7 +262,7 @@ public abstract class AbstractAnnotationRpcHandler implements RpcHandler, RpcMet
                 getInterceptor().beforeInvoke(methodInvocationInfo);
 
                 ret = getInterceptor().process(methodInvocationInfo);
-                if (ret != null) {
+                if (ret != null || ret == InvokerInterceptor.NULL) {
                     PERFORMANCE_LOGGER.fine("RPC client invoke method(by intercepter) '" + getMethod().getName()
                             + "' time took:" + (System.currentTimeMillis() - time) + " ms");
 

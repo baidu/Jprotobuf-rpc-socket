@@ -22,6 +22,8 @@ package com.baidu.jprotobuf.pbrpc.intercept;
  * @since 3.4.0
  */
 public interface InvokerInterceptor {
+    
+    Object NULL = new Object();
 	
 	/**
 	 * This method will call before RPC method invoke.
@@ -36,6 +38,7 @@ public interface InvokerInterceptor {
 	 * @param methodInvocation the method invocation
 	 * @return if not null, this intercepter will active and this result will replace to real RPC return.<br>
 	 *         if return null will continue to another intercepter.
+	 *         if method with void return type. please return <code>NULL</code> to stop next chain invocation.
 	 */
 	Object process(MethodInvocationInfo methodInvocation);
 	
