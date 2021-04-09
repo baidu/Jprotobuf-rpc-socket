@@ -27,7 +27,7 @@
 		<junit.version>4.10</junit.version>
 
 		<!-- Common libs -->
-		<jprotobuf.version>2.3.1</jprotobuf.version>
+		<jprotobuf.version>2.4.8</jprotobuf.version>
 		<jprotobuf-rpc-common.version>1.9</jprotobuf-rpc-common.version>
 		<commons-pool2.version>2.3</commons-pool2.version>
 		<netty-all.version>4.0.56.Final</netty-all.version>
