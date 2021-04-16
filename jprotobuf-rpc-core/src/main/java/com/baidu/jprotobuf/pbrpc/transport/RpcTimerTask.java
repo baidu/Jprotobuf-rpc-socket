@@ -58,7 +58,7 @@ public class RpcTimerTask implements TimerTask {
         this.correlationId = correlationId;
         this.rpcClient = client;
         this.time = timeOut;
-        this.timeUnit = timeUnit;
+        this.timeUnit = timeUnit; 
     }
 
     /*
