@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>4.1.5</version>
+		<version>4.1.6</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-core-spring</artifactId>
 	<packaging>jar</packaging>
@@ -14,8 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<spring-web.version>4.3.18.RELEASE</spring-web.version>
-		<!-- 2.5.6.SEC03 3.2.11.RELEASE-->
+		<spring-web.version>4.3.30.RELEASE</spring-web.version>
 
 		<!-- publish version -->
 

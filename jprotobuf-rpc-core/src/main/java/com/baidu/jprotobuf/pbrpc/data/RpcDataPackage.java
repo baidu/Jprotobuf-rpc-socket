@@ -52,29 +52,40 @@ import com.baidu.jprotobuf.pbrpc.utils.LogIdThreadLocalHolder;
  * 
  * 2. <Meta> body proto description as follow
  * message RpcMeta {
- *     optional RpcRequestMeta request = 1;
- *     optional RpcResponseMeta response = 2;
- *     optional int32 compress_type = 3; // 0:nocompress 1:Snappy 2:gzip
- *     optional int64 correlation_id = 4;
- *     optional int32 attachment_size = 5;
- *     optional ChunkInfo chuck_info = 6;
- *     optional bytes authentication_data = 7;
+ *     RpcRequestMeta request = 1;
+ *     RpcResponseMeta response = 2;
+ *     int32 compress_type = 3; // 0:nocompress 1:Snappy 2:gzip
+ *     int64 correlation_id = 4;
+ *     int32 attachment_size = 5;
+ *     ChunkInfo chuck_info = 6;
+ *     bytes authentication_data = 7;
  * };
  * 
  * message Request {
  *     required string service_name = 1;
  *     required string method_name = 2;
- *     optional int64 log_id = 3;
+ *     int64 log_id = 3;
+ *     int64 traceId = 4;
+ *     int64 spanId = 5;
+ *     int64 parentSpanId = 6;
+ *     repeated RpcRequestMetaExtField rpcRequestMetaExt = 7;
+ *     
+ *     bytes extraParam = 110;
  * };
  * 
  * message Response {
- *     optional int32 error_code = 1;
- *     optional string error_text = 2;
+ *     int32 error_code = 1;
+ *     string error_text = 2;
  * };
  * 
- * messsage ChunkInfo {
- *         required int64 stream_id = 1;
- *         required int64 chunk_id = 2;
+ * message ChunkInfo {
+ *     required int64 stream_id = 1;
+ *     required int64 chunk_id = 2;
+ * };
+ * 
+ * message RpcRequestMetaExtField {
+ *     string key = 1;
+ *     string value = 2;
  * };
  * 
  * 3. <Data> customize transport data message.
