@@ -13,7 +13,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-socket</artifactId>
-	<version>4.1.6</version>
+	<version>4.1.7</version>
 	<packaging>pom</packaging>
 
 	<name>jprotobuf-rpc-socket</name>
