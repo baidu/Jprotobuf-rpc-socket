@@ -26,91 +26,93 @@ public class RpcClientOptions {
 
     /** The connect timeout. */
     private int connectTimeout; // connection time out in milliseconds
-    
+
     /** The send buffer size. */
     private int sendBufferSize;
-    
+
     /** The receive buffer size. */
     private int receiveBufferSize;
-    
+
     /** The tcp no delay. */
     private boolean tcpNoDelay;
-    
+
     /** The keep alive. */
     private boolean keepAlive;
-    
+
     /** The reuse address. */
     private boolean reuseAddress;
-    
+
     /** The idle timeout. */
     private int idleTimeout;
 
     /** The short connection. */
     // connection pool settings
     private boolean shortConnection = false;
-    
-    /** The thread pool size. */
-    private int threadPoolSize = 20;
-    
-    /** The work group thread size. */
+
+    /** The work group thread size. Netty work thread size, default is NettyRuntime.availableProcessors() * 2 */
     private int workGroupThreadSize = 0;
-    
+
+    /**
+     * this is set to connection pool of maxTotal
+     */
+    private int threadPoolSize = 8;
+
     /** The max idle size. */
-    private int maxIdleSize = 20;
-    
+    private int maxIdleSize = 8;
+
     /** The min idle size. */
     private int minIdleSize = 1;
-    
+
     /** The min evictable idle time. */
     private long minEvictableIdleTime = 1000L * 60L * 2;
-    
+
     /** The max wait. */
     private long maxWait = 2000L; // max wait time in milliseconds for pool available
-    
+
     /** The lifo. */
     private boolean lifo = false;
-    
+
     /** The share thread pool under each proxy. */
     private boolean shareThreadPoolUnderEachProxy = false; // share a thread pool under each rpc proxy
 
     /** The test on borrow. */
     private boolean testOnBorrow = true;
-    
+
     /** The test on return. */
     private boolean testOnReturn = false;
 
     /** The once talk timeout. */
     // in MILLISECONDS unit
     private int onceTalkTimeout = 1000;
-    
+
     /** The max byte size to send and receive from buffer. */
     private int maxSize = Integer.MAX_VALUE;
-    
+
     /** The Constant POLL_EVENT_GROUP. */
     public static final int POLL_EVENT_GROUP = 0;
-    
+
     /** The Constant EPOLL_EVENT_GROUP. */
     public static final int EPOLL_EVENT_GROUP = 1;
-    
+
     /** The io event group type. */
     private int ioEventGroupType = POLL_EVENT_GROUP; // 0=poll, 1=epoll
 
     /** The chunk size. */
     // if use chunkSize will split chunkSize
     private long chunkSize = -1;
-    
+
     /** The jmx enabled. */
     private boolean jmxEnabled = false;
-    
+
     /** this set true will use Netty pool solution. */
     private boolean innerResuePool = true;
-    
+
     /** 启动相同Host和port的使用一个共用连接池. */
     private boolean shareChannelPool = false;
-    
+
     /** The error include remote server info. */
     private boolean includeRemoteServerInfoOnError = false;
-    
+
     /**
      * Sets the include remote server info on error.
      *
@@ -119,7 +121,7 @@ public class RpcClientOptions {
     public void setIncludeRemoteServerInfoOnError(boolean includeRemoteServerInfoOnError) {
         this.includeRemoteServerInfoOnError = includeRemoteServerInfoOnError;
     }
-    
+
     /**
      * Checks if is include remote server info on error.
      *
@@ -128,8 +130,7 @@ public class RpcClientOptions {
     public boolean isIncludeRemoteServerInfoOnError() {
         return includeRemoteServerInfoOnError;
     }
-    
-    
+
     /**
      * Sets the share channel pool.
      *
@@ -138,7 +139,7 @@ public class RpcClientOptions {
     public void setShareChannelPool(boolean shareChannelPool) {
         this.shareChannelPool = shareChannelPool;
     }
-    
+
     /**
      * Checks if is share channel pool.
      *
@@ -147,7 +148,6 @@ public class RpcClientOptions {
     public boolean isShareChannelPool() {
         return shareChannelPool;
     }
-    
 
     /**
      * Copy from.
@@ -182,7 +182,7 @@ public class RpcClientOptions {
         this.ioEventGroupType = options.ioEventGroupType;
         this.workGroupThreadSize = options.workGroupThreadSize;
     }
-    
+
     /**
      * Sets the work group thread size.
      *
@@ -191,7 +191,7 @@ public class RpcClientOptions {
     public void setWorkGroupThreadSize(int workGroupThreadSize) {
         this.workGroupThreadSize = workGroupThreadSize;
     }
-    
+
     /**
      * Gets the work group thread size.
      *
@@ -200,14 +200,12 @@ public class RpcClientOptions {
     public int getWorkGroupThreadSize() {
         return workGroupThreadSize;
     }
-    
-    
 
     /**
      * time out set for chunk package wait in ms.
      */
     private int chunkPackageTimeout = 300 * 1000;
-    
+
     /**
      * Sets the inner resue pool.
      *
@@ -216,7 +214,7 @@ public class RpcClientOptions {
     public void setInnerResuePool(boolean innerResuePool) {
         this.innerResuePool = innerResuePool;
     }
-    
+
     /**
      * Checks if is inner resue pool.
      *
@@ -225,8 +223,7 @@ public class RpcClientOptions {
     public boolean isInnerResuePool() {
         return innerResuePool;
     }
-    
-    
+
     /**
      * Gets the time out set for chunk package wait in ms.
      *
@@ -424,8 +421,18 @@ public class RpcClientOptions {
      * Gets the thread pool size.
      *
      * @return the thread pool size
+     * @deprecated please use {@link #getMaxTotal()} instead
      */
     public int getThreadPoolSize() {
+        return threadPoolSize;
+    }
+
+    /**
+     * Gets the max total.
+     *
+     * @return the max total
+     */
+    public int getMaxTotal() {
         return threadPoolSize;
     }
 
@@ -433,9 +440,19 @@ public class RpcClientOptions {
      * Sets the thread pool size.
      *
      * @param threadPoolSize the new thread pool size
+     * @deprecated please use {@link #setMaxTotoal(int)} instead
      */
     public void setThreadPoolSize(int threadPoolSize) {
         this.threadPoolSize = threadPoolSize;
+    }
+
+    /**
+     * Sets the max totoal.
+     *
+     * @param maxTotal the new max totoal
+     */
+    public void setMaxTotoal(int maxTotal) {
+        this.threadPoolSize = maxTotal;
     }
 
     /**
@@ -590,7 +607,7 @@ public class RpcClientOptions {
     public boolean isJmxEnabled() {
         return jmxEnabled;
     }
-    
+
     /**
      * Sets the jmx enabled.
      *
@@ -599,7 +616,7 @@ public class RpcClientOptions {
     public void setJmxEnabled(boolean jmxEnabled) {
         this.jmxEnabled = jmxEnabled;
     }
-    
+
     /**
      * Sets the lifo.
      *
@@ -608,7 +625,7 @@ public class RpcClientOptions {
     public void setLifo(boolean lifo) {
         this.lifo = lifo;
     }
-    
+
     /**
      * Checks if is lifo.
      *
@@ -618,23 +635,23 @@ public class RpcClientOptions {
         return lifo;
     }
 
-	/**
-	 * Gets the max size.
-	 *
-	 * @return the max size
-	 */
-	public int getMaxSize() {
-		return maxSize;
-	}
+    /**
+     * Gets the max size.
+     *
+     * @return the max size
+     */
+    public int getMaxSize() {
+        return maxSize;
+    }
 
-	/**
-	 * Sets the max buffer size receive.
-	 *
-	 * @param maxSize the new max size
-	 */
-	public void setMaxSize(int maxSize) {
-		this.maxSize = maxSize;
-	}
+    /**
+     * Sets the max buffer size receive.
+     *
+     * @param maxSize the new max size
+     */
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
+    }
 
     /**
      * Gets the io event group type.
@@ -653,7 +670,5 @@ public class RpcClientOptions {
     public void setIoEventGroupType(int ioEventGroupType) {
         this.ioEventGroupType = ioEventGroupType;
     }
-    
-    
-    
+
 }
