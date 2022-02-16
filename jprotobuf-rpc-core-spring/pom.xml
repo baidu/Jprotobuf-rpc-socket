@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-rpc-socket</artifactId>
-		<version>4.1.9</version>
+		<version>4.2.0</version>
 	</parent>
 	<artifactId>jprotobuf-rpc-core-spring</artifactId>
 	<packaging>jar</packaging>
@@ -14,7 +15,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<spring-web.version>4.3.30.RELEASE</spring-web.version>
+		<spring-web.version>5.1.19.RELEASE</spring-web.version>
 
 		<!-- publish version -->
 
@@ -30,28 +31,26 @@
 			<groupId>com.baidu</groupId>
 			<artifactId>jprotobuf-rpc-core-spring-base</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
+			<artifactId>spring-context</artifactId>
 			<version>${spring-web.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 			<version>${spring-web.version}</version>
-		</dependency>		
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis.version}</version>
-			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
-			<version>3.2.0</version>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>5.0.4</version>
 		</dependency>
 	</dependencies>
 </project>
