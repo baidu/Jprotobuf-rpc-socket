@@ -65,6 +65,7 @@ public class ChannelPool {
         pool.setTestOnBorrow(clientConfig.isTestOnBorrow());
         pool.setTestOnReturn(clientConfig.isTestOnReturn());
         pool.setLifo(clientConfig.isLifo());
+        
     }
     
     /**

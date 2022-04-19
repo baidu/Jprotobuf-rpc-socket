@@ -116,7 +116,6 @@ public class RpcClient extends Bootstrap {
             this.workerGroup = new EpollEventLoopGroup(rpcClientOptions.getWorkGroupThreadSize(),
                     new DefaultThreadFactory(CLIENT_T_NAME));
         }
-
         this.group(workerGroup);
         this.channel(clientChannelClass);
         this.handler(new RpcClientPipelineinitializer(this));
