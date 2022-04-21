@@ -28,7 +28,7 @@ golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.c
 
 环境要求：JDK 6+
 ```xml
-<dependency>
+<dependency> 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-core</artifactId>
 	<version>4.2.1</version>
