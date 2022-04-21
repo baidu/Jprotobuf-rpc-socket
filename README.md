@@ -52,7 +52,7 @@ golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.c
 <dependency>
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf-rpc-registry-redis</artifactId>
-	<version>4.2.1</version>
+	<version>4.2.1</version> 
 </dependency>
 
 ```
