@@ -496,7 +496,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 throw new RuntimeException("No rpcChannel bind with serviceSignature '" + channelKey + "'");
             }
 
-            final Connection connection = rpcChannel.getConnection();
+            final Connection connection;
+            if (!rpcClient.getRpcClientOptions().isInnerResuePool()) {
+                connection = rpcChannel.getReusedConnection();
+            } else {
+                connection = rpcChannel.getConnection();
+            }
+            
 
             BlockingRpcCallback.CallbackDone callbackDone = null;
             if (!rpcClient.getRpcClientOptions().isInnerResuePool()) {

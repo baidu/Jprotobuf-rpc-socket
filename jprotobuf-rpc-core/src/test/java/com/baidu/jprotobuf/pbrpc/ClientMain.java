@@ -15,110 +15,39 @@
  */
 package com.baidu.jprotobuf.pbrpc;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.baidu.jprotobuf.pbrpc.client.ProtobufRpcProxy;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClient;
 import com.baidu.jprotobuf.pbrpc.transport.RpcClientOptions;
 
 /**
- * The Class ClientMain.
- *
  * @author xiemalin
+ *
  */
 public class ClientMain {
-    
-    
-    private EchoService echoService;
-    private RpcClient rpcClient;
-    private ProtobufRpcProxy<EchoService> pbrpcProxy;
 
-    /**
-     * Test client request.
-     */
-    @Test
-    public void testClientRequest() {
-        doClientRquest(1);
+    public static void main(String[] args) {
         
-    }
-    
-    @Before
-    public void warmUp() {
         RpcClientOptions options = new RpcClientOptions();
-        options.setThreadPoolSize(10);
+        options.setThreadPoolSize(5);
         options.setMaxIdleSize(10);
-        options.setMinIdleSize(10);
-        options.setMaxWait(5000);
-        options.setShortConnection(false);
-        options.setIncludeRemoteServerInfoOnError(true);
-
-        rpcClient = new RpcClient(options);
-        pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
-        pbrpcProxy.setPort(8000);
+        options.setMaxWait(1000);
+        // options.setInnerResuePool(true);
+        
+        RpcClient rpcClient = new RpcClient(options);
+        ProtobufRpcProxy<EchoService> pbrpcProxy = new ProtobufRpcProxy<EchoService>(rpcClient, EchoService.class);
+        pbrpcProxy.setPort(8122);
         pbrpcProxy.setHost("localhost");
-        echoService = pbrpcProxy.proxy();
+        EchoService echoService = pbrpcProxy.proxy();
+
         EchoInfo echoInfo = new EchoInfo();
-        echoInfo.setMessage("warm message");
-        echoService.echo(echoInfo);
-    }
-    
-    @After
-    public void tearDown() {
+        echoInfo.setMessage("hello");
+        
+        for (int i = 0; i < 1000; i++) {
+            EchoInfo ret = echoService.echo(echoInfo);
+            System.out.println(ret);
+        }
+        
         pbrpcProxy.close();
         rpcClient.shutdown();
     }
-
-    /**
-     * Do client rquest.
-     *
-     * @param times the times
-     */
-    private void doClientRquest(int times) {
-        EchoInfo echoInfo = new EchoInfo();
-        long time = System.currentTimeMillis();
-        List<Future<EchoInfo>> list = new ArrayList<Future<EchoInfo>>();
-        for (int i = 0; i < times; i++) {
-            try {
-                echoInfo.setMessage("hi" + i);
-
-                Future<EchoInfo> echoInfo2 = echoService.echoAsync(echoInfo);
-                list.add(echoInfo2);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("begin wait");
-        for (Future<EchoInfo> future : list) {
-            EchoInfo echoInfo3;
-            try {
-                echoInfo3 = future.get(500000, TimeUnit.MILLISECONDS);
-                System.out.println(echoInfo3);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (TimeoutException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        System.out.println(System.currentTimeMillis() - time);
-
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-    
 }

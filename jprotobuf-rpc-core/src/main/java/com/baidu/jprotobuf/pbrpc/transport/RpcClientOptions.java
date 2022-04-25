@@ -104,7 +104,7 @@ public class RpcClientOptions {
     /** The jmx enabled. */
     private boolean jmxEnabled = false;
 
-    /** this set true will use Netty pool solution. */
+    /** this set true will use connection pool solution. */
     private boolean innerResuePool = true;
 
     /** 启动相同Host和port的使用一个共用连接池. */

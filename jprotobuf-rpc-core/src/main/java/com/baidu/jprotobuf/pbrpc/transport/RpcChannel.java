@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ public class RpcChannel {
 
     /** The channel pool. */
     private ChannelPool channelPool;
+    
+    private Connection connection;
 
     /**
      * try to do connect.
@@ -72,6 +74,18 @@ public class RpcChannel {
     public Connection getConnection() {
         Connection channel = channelPool.getChannel();
         return channel;
+    }
+    
+    /**
+     * Gets the reused connection.
+     *
+     * @return the reused connection
+     */
+    public synchronized Connection getReusedConnection() {
+        if (connection == null) {
+            connection = getConnection();
+        }
+        return connection;
     }
 
     /**
