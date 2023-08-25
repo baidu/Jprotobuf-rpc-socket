@@ -58,6 +58,14 @@ public class EchoServiceImpl {
         return doEcho(info);
     }
 
+    @ProtobufRPCService(serviceName = "echoService", methodName = "echo3", description = "echo测试服务")
+    public EchoInfo doEcho3(EchoInfo info) {
+        EchoInfo ret = new EchoInfo();
+        // SleepUtils.dummySleep(100000);
+        ret.setMessage("hello:" + info.getMessage() + (order == null ? "" : order));
+        return ret;
+    }
+
     @ProtobufRPCService(serviceName = "echoService",
             methodName = "echoWithAttachement",
             attachmentHandler = EchoServerAttachmentHandler.class,

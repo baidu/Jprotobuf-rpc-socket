@@ -70,7 +70,7 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
         this.message = message;
         if (callbackDone != null) {
             try {
-                callbackDone.done();
+                callbackDone.done(message);
             } catch (Exception e) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, e.getMessage(), e);
@@ -110,6 +110,6 @@ public class BlockingRpcCallback implements RpcCallback<RpcDataPackage> {
 	    /**
 	     * Done.
 	     */
-	    void done();
+	    void done(RpcDataPackage message);
     }
 }

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -170,7 +171,6 @@ public class DynamicProtobufRpcProxy {
     /**
      * Invoke.
      *
-     * @param serviceSignature the service signature
      * @param proxy the proxy
      * @param method the method
      * @param args the args
@@ -308,21 +308,42 @@ public class DynamicProtobufRpcProxy {
             throw new RuntimeException("No rpcChannel bind with serviceSignature '" + serviceSignature + "'");
         }
 
+        final String serviceName = rpcMethodInfo.getServiceName();
+        final String m = rpcMethodInfo.getMethodName();
         final Connection connection = rpcChannel.getConnection();
-
-        final BlockingRpcCallback callback = new BlockingRpcCallback(new BlockingRpcCallback.CallbackDone() {
-
-            @Override
-            public void done() {
-                if (rpcChannel != null) {
+        BlockingRpcCallback.CallbackDone done = null;
+        CompletableFuture<Object> completableFuture = null;
+        if (method.getReturnType().isAssignableFrom(CompletableFuture.class)) {
+            CompletableFuture<Object> f = new CompletableFuture<>();
+            done = new BlockingRpcCallback.CallbackDone() {
+                @Override
+                public void done(RpcDataPackage message) {
+                    rpcChannel.releaseConnection(connection);
+                    try {
+                        Object o = decodeRpcResult(message, args, serviceName, m, rpcMethodInfo);
+                        f.complete(o);
+                    } catch (Throwable e) {
+                        f.completeExceptionally(e);
+                    }
+                }
+            };
+            completableFuture = f;
+        } else {
+            done = new BlockingRpcCallback.CallbackDone() {
+                @Override
+                public void done(RpcDataPackage message) {
                     rpcChannel.releaseConnection(connection);
                 }
-            }
-        });
+            };
+        }
+        final BlockingRpcCallback callback = new BlockingRpcCallback(done);
 
         rpcChannel.doTransport(connection, rpcDataPackage, callback, onceTalkTimeout);
 
-        final String m = rpcMethodInfo.getMethodName();
+        if (method.getReturnType().isAssignableFrom(CompletableFuture.class)) {
+            return completableFuture;
+        }
+
         if (method.getReturnType().isAssignableFrom(Future.class)) {
             // if use non-blocking call
             Future<Object> f = new Future<Object>() {
@@ -420,45 +441,7 @@ public class DynamicProtobufRpcProxy {
             }
         }
 
-        RpcDataPackage message = callback.getMessage();
-
-        RpcResponseMeta response = message.getRpcMeta().getResponse();
-        if (response != null) {
-            Integer errorCode = response.getErrorCode();
-            if (!ErrorCodes.isSuccess(errorCode)) {
-                
-                if (exceptionHandler != null) {
-                    
-                    RpcErrorMessage rpcErrorMessage = new RpcErrorMessage(errorCode, response.getErrorText());
-                    Exception exception = exceptionHandler.handleException(rpcErrorMessage);
-                    if (exception != null) {
-                        throw exception;
-                    }
-                    
-                } else {
-                    String error = message.getRpcMeta().getResponse().getErrorText();
-                    throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
-                            errorCode);
-                }
-            }
-        }
-
-        byte[] attachment = message.getAttachment();
-        if (attachment != null) {
-            ClientAttachmentHandler attachmentHandler = rpcMethodInfo.getClientAttachmentHandler();
-            if (attachmentHandler != null) {
-                attachmentHandler.handleResponse(attachment, serviceName, methodName, args);
-            }
-        }
-
-        // handle response data
-        byte[] data = message.getData();
-        if (data == null) {
-            return null;
-        }
-
-        Object o = rpcMethodInfo.outputDecode(data);
-        return o;
+        return decodeRpcResult(callback.getMessage(), args, serviceName, methodName, rpcMethodInfo);
     }
 
     /**
@@ -521,4 +504,43 @@ public class DynamicProtobufRpcProxy {
 
     }
 
+    private Object decodeRpcResult(RpcDataPackage message, Object[] args, String serviceName, String methodName,
+                                   RpcMethodInfo rpcMethodInfo) throws Exception {
+        RpcResponseMeta response = message.getRpcMeta().getResponse();
+        if (response != null) {
+            Integer errorCode = response.getErrorCode();
+            if (!ErrorCodes.isSuccess(errorCode)) {
+
+                if (exceptionHandler != null) {
+
+                    RpcErrorMessage rpcErrorMessage = new RpcErrorMessage(errorCode, response.getErrorText());
+                    Exception exception = exceptionHandler.handleException(rpcErrorMessage);
+                    if (exception != null) {
+                        throw exception;
+                    }
+
+                } else {
+                    String error = message.getRpcMeta().getResponse().getErrorText();
+                    throw new ErrorDataException("A error occurred: errorCode=" + errorCode + " errorMessage:" + error,
+                            errorCode);
+                }
+            }
+        }
+
+        byte[] attachment = message.getAttachment();
+        if (attachment != null) {
+            ClientAttachmentHandler attachmentHandler = rpcMethodInfo.getClientAttachmentHandler();
+            if (attachmentHandler != null) {
+                attachmentHandler.handleResponse(attachment, serviceName, methodName, args);
+            }
+        }
+
+        // handle response data
+        byte[] data = message.getData();
+        if (data == null) {
+            return null;
+        }
+
+        return rpcMethodInfo.outputDecode(data);
+    }
 }
