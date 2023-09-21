@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -40,6 +41,9 @@ public interface EchoService {
     
     @ProtobufRPC(serviceName = "echoService", methodName = "echo", onceTalkTimeout = 1000)
     Future<EchoInfo> echoAsync(EchoInfo info);
+
+    @ProtobufRPC(serviceName = "echoService", methodName = "echo3", onceTalkTimeout = 1000)
+    CompletableFuture<EchoInfo> echo3Async(EchoInfo info);
     
     @ProtobufRPC(serviceName = "echoService", onceTalkTimeout = 10000000, 
             attachmentHandler = EchoClientAttachmentHandler.class, logIDGenerator = EchoLogIDGenerator.class)

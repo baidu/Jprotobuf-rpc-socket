@@ -16,6 +16,7 @@
 
 package com.baidu.jprotobuf.pbrpc;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -173,13 +174,34 @@ public class EchoServiceTest extends BaseEchoServiceTest {
     }
 
     @Test
+    public void testAyncCall2() {
+        EchoInfo echoInfo = getEchoInfo();
+
+        EchoServiceImpl ecohImpl = new EchoServiceImpl();
+
+        CompletableFuture<EchoInfo> echoAsync = echoService.echo3Async(echoInfo);
+
+        try {
+            EchoInfo response = echoAsync.get();
+            Assert.assertEquals(ecohImpl.doEcho(echoInfo).getMessage(), response.getMessage());
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            Assert.fail(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void testDynamiceTalkTimeout() {
         EchoInfo echoInfo = getEchoInfo();
 
         TalkTimeoutController.setTalkTimeout(1);
         try {
             echoService.echo(echoInfo);
-            Assert.fail("Shold throw time out exception here");
+            Assert.fail("Should throw time out exception here");
         } catch (Exception e) {
             Assert.assertNotNull(e);
             e.printStackTrace();
@@ -197,5 +219,4 @@ public class EchoServiceTest extends BaseEchoServiceTest {
         Assert.assertTrue(ecohImpl.dealWithAuthenticationDataEnable(echoInfo).getMessage().length() < response
                 .getMessage().length());
     }
-
 }

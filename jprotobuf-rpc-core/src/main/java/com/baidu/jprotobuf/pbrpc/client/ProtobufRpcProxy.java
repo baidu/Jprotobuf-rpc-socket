@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -503,17 +504,33 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 connection = rpcChannel.getConnection();
             }
             
-
+            boolean innerReusePool = rpcClient.getRpcClientOptions().isInnerResuePool();
             BlockingRpcCallback.CallbackDone callbackDone = null;
-            if (!rpcClient.getRpcClientOptions().isInnerResuePool()) {
+            CompletableFuture<Object> completableFuture = null;
+            if (method.getReturnType().isAssignableFrom(CompletableFuture.class)) {
+                CompletableFuture<Object> f = new CompletableFuture<>();
+                String m = methodName;
                 callbackDone = new BlockingRpcCallback.CallbackDone() {
                     @Override
-                    public void done() {
-                        if (rpcChannel != null) {
+                    public void done(RpcDataPackage message) {
+                        if (!innerReusePool) {
                             rpcChannel.releaseConnection(connection);
                         }
+                        try {
+                            Object o = decodeRpcResult(message, args, serviceName, m, rpcMethodInfo);
+                            f.complete(o);
+                        } catch (Throwable e) {
+                            f.completeExceptionally(e);
+                        }
                     }
-
+                };
+                completableFuture = f;
+            }  else if (!innerReusePool) {
+                callbackDone = new BlockingRpcCallback.CallbackDone() {
+                    @Override
+                    public void done(RpcDataPackage message) {
+                        rpcChannel.releaseConnection(connection);
+                    }
                 };
             }
 
@@ -541,8 +558,10 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 }
             }
 
-            final String m = methodName;
-            if (method.getReturnType().isAssignableFrom(Future.class)) {
+            if (method.getReturnType().isAssignableFrom(CompletableFuture.class)) {
+                return completableFuture;
+            } else if (method.getReturnType().isAssignableFrom(Future.class)) {
+                final String m = methodName;
                 // if use non-blocking call
                 Future<Object> f = new Future<Object>() {
 
@@ -588,13 +607,13 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
                 };
 
                 return f;
+            } else {
+                Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback, -1, null);
+
+                PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
+                        + (System.currentTimeMillis() - time) + " ms");
+                return o;
             }
-
-            Object o = doWaitCallback(method, args, serviceName, methodName, rpcMethodInfo, callback, -1, null);
-
-            PERFORMANCE_LOGGER.fine("RPC client invoke method '" + method.getName() + "' time took:"
-                    + (System.currentTimeMillis() - time) + " ms");
-            return o;
         } finally {
             if (interceptor != null) {
                 interceptor.afterProcess();
@@ -638,8 +657,21 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             }
         }
 
-        RpcDataPackage message = c.getMessage();
+        return decodeRpcResult(c.getMessage(), args, serviceName, methodName, rpcMethodInfo);
+    }
 
+    /**
+     * do wait {@link BlockingRpcCallback} return.
+     *
+     * @param args method arguments
+     * @param serviceName service name
+     * @param methodName method name
+     * @param rpcMethodInfo RPC method info
+     * @return RPC result
+     * @throws Exception the exception
+     */
+    private Object decodeRpcResult(RpcDataPackage message, Object[] args, String serviceName, String methodName,
+                                   RpcMethodInfo rpcMethodInfo) throws Exception {
         RpcResponseMeta response = message.getRpcMeta().getResponse();
         if (response != null) {
             Integer errorCode = response.getErrorCode();
@@ -662,11 +694,9 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
         }
 
         byte[] attachment = message.getAttachment();
-        if (attachment != null) {
-            ClientAttachmentHandler attachmentHandler = rpcMethodInfo.getClientAttachmentHandler();
-            if (attachmentHandler != null) {
-                attachmentHandler.handleResponse(attachment, serviceName, methodName, args);
-            }
+        ClientAttachmentHandler attachmentHandler = rpcMethodInfo.getClientAttachmentHandler();
+        if (attachment != null && attachmentHandler != null) {
+            attachmentHandler.handleResponse(attachment, serviceName, methodName, args);
         }
 
         // handle response data
@@ -675,8 +705,6 @@ public class ProtobufRpcProxy<T> implements InvocationHandler {
             return null;
         }
 
-        Object o = rpcMethodInfo.outputDecode(data);
-        return o;
+        return rpcMethodInfo.outputDecode(data);
     }
-
 }
