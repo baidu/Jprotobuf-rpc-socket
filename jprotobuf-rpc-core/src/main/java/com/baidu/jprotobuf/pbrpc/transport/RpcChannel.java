@@ -22,8 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.jprotobuf.pbrpc.data.RpcDataPackage;
+import com.baidu.jprotobuf.pbrpc.transport.handler.ErrorCodes;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.util.Timeout;
 
 /**
@@ -138,7 +140,11 @@ public class RpcChannel {
 
             LOG.debug("Do send request with service name '" + rpcDataPackage.serviceName() + "' method name '"
                     + rpcDataPackage.methodName() + "' bound channel =>" + channel);
-            channel.writeAndFlush(state.getDataPackage());
+            channel.writeAndFlush(state.getDataPackage()).addListener((ChannelFutureListener) channelFuture -> {
+                if (!channelFuture.isSuccess() && channelFuture.cause() != null) {
+                    state.handleFailure(ErrorCodes.ST_WRITE_FAILED, channelFuture.cause().getMessage());
+                }
+            });
         }
 
         long callMethodEnd = System.currentTimeMillis();
