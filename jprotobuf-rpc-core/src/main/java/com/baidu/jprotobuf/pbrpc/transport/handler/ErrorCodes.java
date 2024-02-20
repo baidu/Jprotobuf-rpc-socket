@@ -36,6 +36,9 @@ public class ErrorCodes {
     /** read time out. */
     public static final int ST_READ_TIMEOUT = 62;
 
+    /** 消息发送异常. */
+    public static final int ST_WRITE_FAILED = 4001;
+
     /** onceTalkTimeout timeout message. */
     public static final String MSG_READ_TIMEOUT =
             "method request time out, please check 'onceTalkTimeout' property. current value is:";
